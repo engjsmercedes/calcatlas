@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { InputField } from "@/components/ui/input-field";
 import { ResultCard } from "@/components/ui/result-card";
@@ -8,7 +8,7 @@ import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculato
 import { calculateDebtPayoff } from "@/lib/calculators/expansion";
 import { formatCurrency, parseNumberInput } from "@/lib/utils";
 
-import { CalculatorActions, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
+import { CalculatorActions, ComparisonControls, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
 const initialState = {
   balance: "18000",
@@ -26,6 +26,8 @@ function formatMonths(months: number) {
 }
 
 export function DebtPayoffCalculator() {
+  const [comparisonEnabled, setComparisonEnabled] = useState(false);
+  const [comparisonState, setComparisonState] = useState(initialState);
   const { state, setState, hasActiveValues, copyShareLink, reset } = useShareableCalculatorState({
     initialState,
     keys: ["balance", "annualRate", "monthlyPayment", "extraPaymentMonthly"]
@@ -37,11 +39,23 @@ export function DebtPayoffCalculator() {
   const extraPaymentMonthly = parseNumberInput(state.extraPaymentMonthly) ?? 0;
 
   const result = useMemo(() => {
-    if (balance === undefined || annualRate === undefined || monthlyPayment === undefined) {
-      return undefined;
-    }
+    if (balance === undefined || annualRate === undefined || monthlyPayment === undefined) return undefined;
     return calculateDebtPayoff({ balance, annualRate, monthlyPayment, extraPaymentMonthly });
   }, [annualRate, balance, extraPaymentMonthly, monthlyPayment]);
+
+  const comparisonResult = useMemo(() => {
+    if (!comparisonEnabled) return undefined;
+    const compareBalance = parseNumberInput(comparisonState.balance);
+    const compareRate = parseNumberInput(comparisonState.annualRate);
+    const comparePayment = parseNumberInput(comparisonState.monthlyPayment);
+    if (compareBalance === undefined || compareRate === undefined || comparePayment === undefined) return undefined;
+    return calculateDebtPayoff({
+      balance: compareBalance,
+      annualRate: compareRate,
+      monthlyPayment: comparePayment,
+      extraPaymentMonthly: parseNumberInput(comparisonState.extraPaymentMonthly) ?? 0
+    });
+  }, [comparisonEnabled, comparisonState]);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
@@ -65,6 +79,27 @@ export function DebtPayoffCalculator() {
             { label: "Lower payment pressure", description: "$18,000 balance at 10% with a $350 payment and no extra.", onApply: () => setState({ balance: "18000", annualRate: "10", monthlyPayment: "350", extraPaymentMonthly: "0" }) }
           ]}
         />
+        <ComparisonControls
+          enabled={comparisonEnabled}
+          onEnable={() => {
+            setComparisonEnabled(true);
+            setComparisonState(state);
+          }}
+          onDisable={() => setComparisonEnabled(false)}
+          onCopyCurrent={() => setComparisonState(state)}
+          title="Compare two debt payoff plans"
+          body="Compare payment levels and extra principal to see how much faster one payoff strategy wins."
+        />
+        {comparisonEnabled ? (
+          <div className="surface p-6 md:p-8">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <InputField label="Compare balance" prefix="$" value={comparisonState.balance} onChange={(event) => setComparisonState((current) => ({ ...current, balance: event.target.value }))} />
+              <InputField label="Compare rate" hint="Annual %" value={comparisonState.annualRate} onChange={(event) => setComparisonState((current) => ({ ...current, annualRate: event.target.value }))} />
+              <InputField label="Compare monthly payment" prefix="$" value={comparisonState.monthlyPayment} onChange={(event) => setComparisonState((current) => ({ ...current, monthlyPayment: event.target.value }))} />
+              <InputField label="Compare extra payment" prefix="$" hint="Monthly" value={comparisonState.extraPaymentMonthly} onChange={(event) => setComparisonState((current) => ({ ...current, extraPaymentMonthly: event.target.value }))} />
+            </div>
+          </div>
+        ) : null}
       </div>
       <div className="space-y-4">
         {!result ? (
@@ -77,9 +112,7 @@ export function DebtPayoffCalculator() {
               <div>
                 <p className="section-label">Debt payoff plan</p>
                 <h3 className="mt-4 text-3xl font-semibold">{formatMonths(result.payoffMonths)}</h3>
-                <p className="mt-2 text-sm leading-7">
-                  Paying {formatCurrency(monthlyPayment ?? 0)} per month would retire the balance in about {formatMonths(result.payoffMonths)} and cost about {formatCurrency(result.interestPaid)} in interest.
-                </p>
+                <p className="mt-2 text-sm leading-7">Paying {formatCurrency(monthlyPayment ?? 0)} per month would retire the balance in about {formatMonths(result.payoffMonths)} and cost about {formatCurrency(result.interestPaid)} in interest.</p>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <ResultCard label="Payoff time" value={formatMonths(result.payoffMonths)} tone="success" />
@@ -92,9 +125,7 @@ export function DebtPayoffCalculator() {
               <div>
                 <p className="section-label">With extra payment</p>
                 <h3 className="mt-4 text-2xl font-semibold">{formatMonths(result.acceleratedMonths)}</h3>
-                <p className="mt-2 text-sm leading-7">
-                  Adding {formatCurrency(extraPaymentMonthly)} per month could save about {formatCurrency(result.interestSaved)} and shorten payoff by {formatMonths(result.monthsSaved)}.
-                </p>
+                <p className="mt-2 text-sm leading-7">Adding {formatCurrency(extraPaymentMonthly)} per month could save about {formatCurrency(result.interestSaved)} and shorten payoff by {formatMonths(result.monthsSaved)}.</p>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <ResultCard label="Accelerated payoff" value={formatMonths(result.acceleratedMonths)} tone="success" />
@@ -104,6 +135,21 @@ export function DebtPayoffCalculator() {
               </div>
             </div>
             <InsightPanel title="Debt strategy note" body="A debt payoff calculator becomes more useful when it shows the payoff-time and interest tradeoff at the same time. That helps users decide whether an extra monthly payment is worth the cash-flow sacrifice." />
+            {comparisonEnabled && comparisonResult && comparisonResult.payoffPossible ? (
+              <div className="surface space-y-4 p-6 md:p-8">
+                <div>
+                  <p className="section-label">Comparison summary</p>
+                  <h3 className="mt-4 text-2xl font-semibold">How the second payoff plan compares</h3>
+                  <p className="mt-2 text-sm leading-7">The comparison plan changes payoff time by {formatMonths(Math.abs(comparisonResult.acceleratedMonths - result.acceleratedMonths))}, interest paid by {formatCurrency(comparisonResult.acceleratedInterest - result.acceleratedInterest)}, and total paid by {formatCurrency(comparisonResult.acceleratedTotalPaid - result.acceleratedTotalPaid)}.</p>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <ResultCard label="Scenario B payoff" value={formatMonths(comparisonResult.acceleratedMonths)} />
+                  <ResultCard label="Payoff delta" value={formatMonths(Math.abs(comparisonResult.acceleratedMonths - result.acceleratedMonths))} tone={comparisonResult.acceleratedMonths <= result.acceleratedMonths ? "success" : "default"} />
+                  <ResultCard label="Scenario B interest" value={formatCurrency(comparisonResult.acceleratedInterest)} />
+                  <ResultCard label="Interest delta" value={formatCurrency(comparisonResult.acceleratedInterest - result.acceleratedInterest)} tone={comparisonResult.acceleratedInterest <= result.acceleratedInterest ? "success" : "default"} />
+                </div>
+              </div>
+            ) : null}
           </>
         )}
       </div>
