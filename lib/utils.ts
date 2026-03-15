@@ -16,6 +16,15 @@ export function parseNumberInput(value: string) {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
+export function parsePositiveNumberInput(value: string) {
+  const parsed = parseNumberInput(value);
+  if (parsed === undefined || parsed <= 0) {
+    return undefined;
+  }
+
+  return parsed;
+}
+
 export function formatNumber(value: number, maximumFractionDigits = 2) {
   return new Intl.NumberFormat("en-US", {
     maximumFractionDigits,
@@ -44,4 +53,3 @@ export function round(value: number, decimals = 2) {
   const factor = 10 ** decimals;
   return Math.round(value * factor) / factor;
 }
-

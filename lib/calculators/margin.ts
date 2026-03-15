@@ -13,6 +13,7 @@ export interface MarginResult {
   margin: number;
   markup: number;
   solvedBy: string;
+  solvedField?: "cost" | "price" | "profit" | "margin" | "markup";
   error?: string;
 }
 
@@ -22,7 +23,12 @@ function nearlyEqual(a: number | undefined, b: number, allowedDifference = toler
   return a === undefined || Math.abs(a - b) <= allowedDifference;
 }
 
-function complete(cost: number, price: number, solvedBy: string): MarginResult | undefined {
+function complete(
+  cost: number,
+  price: number,
+  solvedBy: string,
+  solvedField?: MarginResult["solvedField"]
+): MarginResult | undefined {
   if (!Number.isFinite(cost) || !Number.isFinite(price) || cost < 0 || price <= 0) {
     return undefined;
   }
@@ -37,7 +43,8 @@ function complete(cost: number, price: number, solvedBy: string): MarginResult |
     profit,
     margin,
     markup,
-    solvedBy
+    solvedBy,
+    solvedField
   };
 }
 
@@ -56,22 +63,22 @@ export function solveMargin(inputs: MarginInputs) {
 
   const candidates: Array<MarginResult | undefined> = [
     cost !== undefined && price !== undefined ? complete(cost, price, "cost and selling price") : undefined,
-    cost !== undefined && profit !== undefined ? complete(cost, cost + profit, "cost and profit") : undefined,
-    price !== undefined && profit !== undefined ? complete(price - profit, price, "selling price and profit") : undefined,
-    cost !== undefined && margin !== undefined && margin < 100 ? complete(cost, cost / (1 - margin / 100), "cost and margin") : undefined,
-    cost !== undefined && markup !== undefined ? complete(cost, cost * (1 + markup / 100), "cost and markup") : undefined,
-    price !== undefined && margin !== undefined && margin >= 0 && margin < 100 ? complete(price * (1 - margin / 100), price, "selling price and margin") : undefined,
-    price !== undefined && markup !== undefined && markup > -100 ? complete(price / (1 + markup / 100), price, "selling price and markup") : undefined,
+    cost !== undefined && profit !== undefined ? complete(cost, cost + profit, "cost and profit", "price") : undefined,
+    price !== undefined && profit !== undefined ? complete(price - profit, price, "selling price and profit", "cost") : undefined,
+    cost !== undefined && margin !== undefined && margin < 100 ? complete(cost, cost / (1 - margin / 100), "cost and margin", "price") : undefined,
+    cost !== undefined && markup !== undefined ? complete(cost, cost * (1 + markup / 100), "cost and markup", "price") : undefined,
+    price !== undefined && margin !== undefined && margin >= 0 && margin < 100 ? complete(price * (1 - margin / 100), price, "selling price and margin", "cost") : undefined,
+    price !== undefined && markup !== undefined && markup > -100 ? complete(price / (1 + markup / 100), price, "selling price and markup", "cost") : undefined,
     profit !== undefined && margin !== undefined && margin > 0 && margin < 100
       ? (() => {
           const derivedPrice = profit / (margin / 100);
-          return complete(derivedPrice - profit, derivedPrice, "profit and margin");
+          return complete(derivedPrice - profit, derivedPrice, "profit and margin", "cost");
         })()
       : undefined,
     profit !== undefined && markup !== undefined && markup !== 0
       ? (() => {
           const derivedCost = profit / (markup / 100);
-          return complete(derivedCost, derivedCost + profit, "profit and markup");
+          return complete(derivedCost, derivedCost + profit, "profit and markup", "cost");
         })()
       : undefined
   ].filter(Boolean);

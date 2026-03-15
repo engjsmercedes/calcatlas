@@ -7,7 +7,7 @@ import { LineChart } from "@/components/ui/line-chart";
 import { ResultCard } from "@/components/ui/result-card";
 import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculator-state";
 import { amortizedMonthlyPayment, calculateLoan, solveAnnualRateFromPayment } from "@/lib/calculators/borrowing";
-import { formatCurrency, formatNumber, parseNumberInput } from "@/lib/utils";
+import { formatCurrency, formatNumber, parseNumberInput, parsePositiveNumberInput } from "@/lib/utils";
 
 import { CalculatorActions, ComparisonControls, DecisionSummaryPanel, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
@@ -16,7 +16,7 @@ const initialState = {
   annualRate: "7.2",
   targetMonthlyPayment: "",
   years: "5",
-  extraPaymentMonthly: "100"
+  extraPaymentMonthly: ""
 };
 
 function solveLoanAmount(monthlyPayment: number, annualRate: number, years: number) {
@@ -104,10 +104,10 @@ export function LoanCalculator() {
     keys: ["amount", "annualRate", "targetMonthlyPayment", "years", "extraPaymentMonthly"]
   });
 
-  const amount = parseNumberInput(state.amount);
-  const annualRate = parseNumberInput(state.annualRate);
-  const targetMonthlyPayment = parseNumberInput(state.targetMonthlyPayment);
-  const years = parseNumberInput(state.years);
+  const amount = parsePositiveNumberInput(state.amount);
+  const annualRate = parsePositiveNumberInput(state.annualRate);
+  const targetMonthlyPayment = parsePositiveNumberInput(state.targetMonthlyPayment);
+  const years = parsePositiveNumberInput(state.years);
   const extraPaymentMonthly = parseNumberInput(state.extraPaymentMonthly) ?? 0;
 
   const resolved = useMemo(() => resolveLoanCore({ amount, annualRate, years, monthlyPayment: targetMonthlyPayment }), [amount, annualRate, targetMonthlyPayment, years]);
@@ -119,10 +119,10 @@ export function LoanCalculator() {
   const comparisonResolved = useMemo(() => {
     if (!comparisonEnabled) return undefined;
     return resolveLoanCore({
-      amount: parseNumberInput(comparisonState.amount),
-      annualRate: parseNumberInput(comparisonState.annualRate),
-      years: parseNumberInput(comparisonState.years),
-      monthlyPayment: parseNumberInput(comparisonState.targetMonthlyPayment)
+      amount: parsePositiveNumberInput(comparisonState.amount),
+      annualRate: parsePositiveNumberInput(comparisonState.annualRate),
+      years: parsePositiveNumberInput(comparisonState.years),
+      monthlyPayment: parsePositiveNumberInput(comparisonState.targetMonthlyPayment)
     });
   }, [comparisonEnabled, comparisonState]);
 
@@ -136,16 +136,18 @@ export function LoanCalculator() {
     });
   }, [comparisonEnabled, comparisonResolved, comparisonState.extraPaymentMonthly]);
 
+  const solvedField = resolved && !("error" in resolved) ? resolved.solvedField : undefined;
+
   return (
     <div className="space-y-8">
       <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="space-y-4">
           <div className="surface p-6 md:p-8">
             <div className="grid gap-4 sm:grid-cols-2">
-              <InputField label="Loan amount" prefix="$" value={state.amount} onChange={(event) => setState((current) => ({ ...current, amount: event.target.value }))} />
-              <InputField label="Interest rate" hint="Annual %" value={state.annualRate} onChange={(event) => setState((current) => ({ ...current, annualRate: event.target.value }))} />
-              <InputField label="Loan term" hint="Years" value={state.years} onChange={(event) => setState((current) => ({ ...current, years: event.target.value }))} />
-              <InputField label="Monthly payment" prefix="$" hint="Base payment before extras" value={state.targetMonthlyPayment} onChange={(event) => setState((current) => ({ ...current, targetMonthlyPayment: event.target.value }))} />
+              <InputField label="Loan amount" hint="Required core field" tooltip="Original balance before any extra payments." prefix="$" highlighted={solvedField === "amount"} value={state.amount} onChange={(event) => setState((current) => ({ ...current, amount: event.target.value }))} />
+              <InputField label="Interest rate" hint="Annual %" tooltip="Nominal yearly loan rate. Leave blank to solve for the implied rate." highlighted={solvedField === "annualRate"} value={state.annualRate} onChange={(event) => setState((current) => ({ ...current, annualRate: event.target.value }))} />
+              <InputField label="Loan term" hint="Years" tooltip="Repayment term in years. Leave blank to solve for the needed payoff time." highlighted={solvedField === "years"} value={state.years} onChange={(event) => setState((current) => ({ ...current, years: event.target.value }))} />
+              <InputField label="Monthly payment" prefix="$" hint="Base payment before extras" tooltip="Scheduled monthly payment before any optional extra principal." highlighted={solvedField === "monthlyPayment"} value={state.targetMonthlyPayment} onChange={(event) => setState((current) => ({ ...current, targetMonthlyPayment: event.target.value }))} />
               <InputField label="Extra payment" prefix="$" hint="Monthly" value={state.extraPaymentMonthly} onChange={(event) => setState((current) => ({ ...current, extraPaymentMonthly: event.target.value }))} />
             </div>
             <p className="mt-4 text-sm leading-7 text-muted">Enter any three core loan fields and leave the fourth blank. The calculator solves the missing amount, rate, term, or scheduled payment, then compares the standard payoff against any extra monthly payment you add.</p>
@@ -157,9 +159,9 @@ export function LoanCalculator() {
             title="Try an example"
             body="Use a preset to solve for a missing payment, rate, or term before comparing the effect of extra principal."
             items={[
-              { label: "Solve monthly payment", description: "A standard $25,000 personal loan at 7.2% over 5 years.", onApply: () => setState({ amount: "25000", annualRate: "7.2", targetMonthlyPayment: "", years: "5", extraPaymentMonthly: "0" }) },
-              { label: "Solve rate from payment", description: "Back into the implied rate from a $497.97 payment on a $25,000, 5-year loan.", onApply: () => setState({ amount: "25000", annualRate: "", targetMonthlyPayment: "497.97", years: "5", extraPaymentMonthly: "0" }) },
-              { label: "Solve term from payment", description: "Estimate how long a $550 payment would take to pay off a $25,000 loan at 7.2%.", onApply: () => setState({ amount: "25000", annualRate: "7.2", targetMonthlyPayment: "550", years: "", extraPaymentMonthly: "0" }) }
+              { label: "Solve monthly payment", description: "A standard $25,000 personal loan at 7.2% over 5 years.", onApply: () => setState({ amount: "25000", annualRate: "7.2", targetMonthlyPayment: "", years: "5", extraPaymentMonthly: "" }) },
+              { label: "Solve rate from payment", description: "Back into the implied rate from a $497.97 payment on a $25,000, 5-year loan.", onApply: () => setState({ amount: "25000", annualRate: "", targetMonthlyPayment: "497.97", years: "5", extraPaymentMonthly: "" }) },
+              { label: "Solve term from payment", description: "Estimate how long a $550 payment would take to pay off a $25,000 loan at 7.2%.", onApply: () => setState({ amount: "25000", annualRate: "7.2", targetMonthlyPayment: "550", years: "", extraPaymentMonthly: "" }) }
             ]}
           />
           <ComparisonControls
@@ -251,6 +253,7 @@ export function LoanCalculator() {
     </div>
   );
 }
+
 
 
 

@@ -34,38 +34,17 @@ export function RoiCalculator() {
     [state]
   );
 
+  const solvedField = result && !result.error ? result.solvedField : undefined;
+
   return (
     <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
       <div className="surface p-6 md:p-8">
         <div className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
-            <InputField
-              label="Initial investment"
-              hint="Starting amount"
-              prefix="$"
-              value={state.initial}
-              onChange={(event) => setState((current) => ({ ...current, initial: event.target.value }))}
-            />
-            <InputField
-              label="Final value"
-              hint="Ending amount"
-              prefix="$"
-              value={state.finalValue}
-              onChange={(event) => setState((current) => ({ ...current, finalValue: event.target.value }))}
-            />
-            <InputField
-              label="Gain or loss"
-              hint="Use a negative number for a loss"
-              prefix="$"
-              value={state.gainLoss}
-              onChange={(event) => setState((current) => ({ ...current, gainLoss: event.target.value }))}
-            />
-            <InputField
-              label="Years held"
-              hint="Optional for annualized ROI"
-              value={state.years}
-              onChange={(event) => setState((current) => ({ ...current, years: event.target.value }))}
-            />
+            <InputField label="Initial investment" hint="Starting amount" tooltip="Your starting cash outlay or investment basis." prefix="$" highlighted={solvedField === "initial"} value={state.initial} onChange={(event) => setState((current) => ({ ...current, initial: event.target.value }))} />
+            <InputField label="Final value" hint="Ending amount" tooltip="Ending value after growth or loss." prefix="$" highlighted={solvedField === "finalValue"} value={state.finalValue} onChange={(event) => setState((current) => ({ ...current, finalValue: event.target.value }))} />
+            <InputField label="Gain or loss" hint="Use a negative number for a loss" tooltip="Absolute change between the initial investment and final value." prefix="$" highlighted={solvedField === "gain"} value={state.gainLoss} onChange={(event) => setState((current) => ({ ...current, gainLoss: event.target.value }))} />
+            <InputField label="Years held" hint="Optional for annualized ROI" tooltip="Holding period used to annualize the return." value={state.years} onChange={(event) => setState((current) => ({ ...current, years: event.target.value }))} />
           </div>
           <p className="text-sm leading-7">
             Enter any two compatible ROI fields. The calculator will solve the missing value and check whether additional fields agree with each other.
@@ -96,9 +75,7 @@ export function RoiCalculator() {
                 <ResultCard label="Final value" value={formatCurrency(result.finalValue)} tone="success" />
                 <ResultCard label="Gain or loss" value={formatCurrency(result.gain)} tone={result.gain >= 0 ? "success" : "warning"} />
                 <ResultCard label="ROI" value={formatPercent(result.roi)} />
-                {result.annualized !== undefined ? (
-                  <ResultCard label="Annualized ROI" value={formatPercent(result.annualized)} />
-                ) : null}
+                {result.annualized !== undefined ? <ResultCard label="Annualized ROI" value={formatPercent(result.annualized)} /> : null}
               </div>
             </div>
             <InsightPanel

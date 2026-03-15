@@ -30,7 +30,7 @@ export function CalculatorActions({
         Print result
       </Button>
       <Button variant="ghost" type="button" onClick={onReset}>
-        Reset
+        Clear all
       </Button>
     </div>
   );
@@ -198,4 +198,5 @@ export function ComparisonControls({
     </div>
   );
 }
+
 

@@ -11,6 +11,11 @@ export function useShareableCalculatorState<T extends Record<string, string>>(op
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const initialized = useRef(false);
+  const emptyState = useMemo(
+    () =>
+      Object.fromEntries(Object.keys(initialState).map((key) => [key, ""])) as T,
+    [initialState]
+  );
   const [state, setState] = useState<T>(initialState);
 
   useEffect(() => {
@@ -61,6 +66,6 @@ export function useShareableCalculatorState<T extends Record<string, string>>(op
     setState,
     hasActiveValues,
     copyShareLink,
-    reset: () => setState(initialState)
+    reset: () => setState(emptyState)
   };
 }

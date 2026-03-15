@@ -12,6 +12,7 @@ export interface RoiResult {
   roi: number;
   annualized?: number;
   solvedBy: string;
+  solvedField?: "initial" | "finalValue" | "gain";
   error?: string;
 }
 
@@ -21,7 +22,13 @@ function nearlyEqual(a: number | undefined, b: number, allowedDifference = toler
   return a === undefined || Math.abs(a - b) <= allowedDifference;
 }
 
-function complete(initial: number, finalValue: number, solvedBy: string, years?: number): RoiResult | undefined {
+function complete(
+  initial: number,
+  finalValue: number,
+  solvedBy: string,
+  years?: number,
+  solvedField?: RoiResult["solvedField"]
+): RoiResult | undefined {
   if (initial <= 0 || finalValue < 0) {
     return undefined;
   }
@@ -36,15 +43,16 @@ function complete(initial: number, finalValue: number, solvedBy: string, years?:
     gain,
     roi,
     annualized,
-    solvedBy
+    solvedBy,
+    solvedField
   };
 }
 
 export function calculateRoi({ initial, finalValue, gain, years }: RoiInputs): RoiResult | undefined {
   const candidates = [
     initial !== undefined && finalValue !== undefined ? complete(initial, finalValue, "initial and final value", years) : undefined,
-    initial !== undefined && gain !== undefined ? complete(initial, initial + gain, "initial and gain/loss", years) : undefined,
-    finalValue !== undefined && gain !== undefined ? complete(finalValue - gain, finalValue, "final value and gain/loss", years) : undefined
+    initial !== undefined && gain !== undefined ? complete(initial, initial + gain, "initial and gain/loss", years, "finalValue") : undefined,
+    finalValue !== undefined && gain !== undefined ? complete(finalValue - gain, finalValue, "final value and gain/loss", years, "initial") : undefined
   ].filter(Boolean) as RoiResult[];
 
   if (candidates.length === 0) {

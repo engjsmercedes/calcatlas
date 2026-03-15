@@ -36,43 +36,17 @@ export function MarginCalculator() {
     [state]
   );
 
+  const solvedField = result && !result.error ? result.solvedField : undefined;
+
   return (
     <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
       <div className="surface p-6 md:p-8">
         <div className="grid gap-4 sm:grid-cols-2">
-          <InputField
-            label="Cost"
-            hint="Unit cost"
-            prefix="$"
-            value={state.cost}
-            onChange={(event) => setState((current) => ({ ...current, cost: event.target.value }))}
-          />
-          <InputField
-            label="Selling price"
-            hint="Customer price"
-            prefix="$"
-            value={state.price}
-            onChange={(event) => setState((current) => ({ ...current, price: event.target.value }))}
-          />
-          <InputField
-            label="Profit"
-            hint="Absolute profit"
-            prefix="$"
-            value={state.profit}
-            onChange={(event) => setState((current) => ({ ...current, profit: event.target.value }))}
-          />
-          <InputField
-            label="Margin"
-            hint="Gross margin %"
-            value={state.margin}
-            onChange={(event) => setState((current) => ({ ...current, margin: event.target.value }))}
-          />
-          <InputField
-            label="Markup"
-            hint="Markup %"
-            value={state.markup}
-            onChange={(event) => setState((current) => ({ ...current, markup: event.target.value }))}
-          />
+          <InputField label="Cost" hint="Unit cost" tooltip="Your unit cost before markup or margin is added." prefix="$" highlighted={solvedField === "cost"} value={state.cost} onChange={(event) => setState((current) => ({ ...current, cost: event.target.value }))} />
+          <InputField label="Selling price" hint="Customer price" tooltip="Final customer price before taxes and fees." prefix="$" highlighted={solvedField === "price"} value={state.price} onChange={(event) => setState((current) => ({ ...current, price: event.target.value }))} />
+          <InputField label="Profit" hint="Absolute profit" tooltip="Absolute profit in dollars, equal to price minus cost." prefix="$" highlighted={solvedField === "profit"} value={state.profit} onChange={(event) => setState((current) => ({ ...current, profit: event.target.value }))} />
+          <InputField label="Margin" hint="Gross margin %" tooltip="Gross margin percentage based on selling price." highlighted={solvedField === "margin"} value={state.margin} onChange={(event) => setState((current) => ({ ...current, margin: event.target.value }))} />
+          <InputField label="Markup" hint="Markup %" tooltip="Markup percentage based on cost." highlighted={solvedField === "markup"} value={state.markup} onChange={(event) => setState((current) => ({ ...current, markup: event.target.value }))} />
         </div>
         <p className="mt-4 text-sm leading-7">
           Enter any two compatible fields, or leave just one field blank if the others agree. The calculator will solve the missing values and flag contradictory combinations.
@@ -107,10 +81,7 @@ export function MarginCalculator() {
                 <ResultCard label="Markup" value={formatPercent(result.markup)} />
               </div>
             </div>
-            <InsightPanel
-              title="Pricing insight"
-              body={`If your cost is ${formatCurrency(result.cost)}, every sale at ${formatCurrency(result.price)} contributes ${formatCurrency(result.profit)} before overhead. Margin helps compare against revenue, while markup helps plan from cost.`}
-            />
+            <InsightPanel title="Pricing insight" body={`If your cost is ${formatCurrency(result.cost)}, every sale at ${formatCurrency(result.price)} contributes ${formatCurrency(result.profit)} before overhead. Margin helps compare against revenue, while markup helps plan from cost.`} />
           </>
         )}
       </div>

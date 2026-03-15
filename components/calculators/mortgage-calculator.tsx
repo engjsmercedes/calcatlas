@@ -9,7 +9,7 @@ import { ResultCard } from "@/components/ui/result-card";
 import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculator-state";
 import { amortizedMonthlyPayment } from "@/lib/calculators/borrowing";
 import { calculateMortgage, solveMortgageAnnualRate } from "@/lib/calculators/mortgage";
-import { formatCurrency, formatNumber, parseNumberInput } from "@/lib/utils";
+import { formatCurrency, formatNumber, parseNumberInput, parsePositiveNumberInput } from "@/lib/utils";
 
 import { CalculatorActions, ComparisonControls, DecisionSummaryPanel, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
@@ -20,9 +20,9 @@ const initialState = {
   years: "30",
   propertyTaxAnnual: "4800",
   insuranceAnnual: "1800",
-  hoaMonthly: "0",
-  pmiMonthly: "0",
-  extraMonthlyPayment: "0"
+  hoaMonthly: "",
+  pmiMonthly: "",
+  extraMonthlyPayment: ""
 };
 
 function solveMortgageAmount(monthlyPayment: number, annualRate: number, years: number) {
@@ -187,10 +187,10 @@ export function MortgageCalculator() {
     keys: ["loanAmount", "annualRate", "targetPrincipalInterest", "years", "propertyTaxAnnual", "insuranceAnnual", "hoaMonthly", "pmiMonthly", "extraMonthlyPayment"]
   });
 
-  const loanAmount = parseNumberInput(state.loanAmount);
-  const annualRate = parseNumberInput(state.annualRate);
-  const principalInterest = parseNumberInput(state.targetPrincipalInterest);
-  const years = parseNumberInput(state.years);
+  const loanAmount = parsePositiveNumberInput(state.loanAmount);
+  const annualRate = parsePositiveNumberInput(state.annualRate);
+  const principalInterest = parsePositiveNumberInput(state.targetPrincipalInterest);
+  const years = parsePositiveNumberInput(state.years);
   const propertyTaxAnnual = parseNumberInput(state.propertyTaxAnnual) ?? 0;
   const insuranceAnnual = parseNumberInput(state.insuranceAnnual) ?? 0;
   const hoaMonthly = parseNumberInput(state.hoaMonthly) ?? 0;
@@ -225,10 +225,10 @@ export function MortgageCalculator() {
     });
   }, [extraMonthlyPayment, hoaMonthly, insuranceAnnual, pmiMonthly, propertyTaxAnnual, resolved]);
 
-  const comparisonLoanAmount = parseNumberInput(comparisonState.loanAmount);
-  const comparisonAnnualRate = parseNumberInput(comparisonState.annualRate);
-  const comparisonPrincipalInterest = parseNumberInput(comparisonState.targetPrincipalInterest);
-  const comparisonYears = parseNumberInput(comparisonState.years);
+  const comparisonLoanAmount = parsePositiveNumberInput(comparisonState.loanAmount);
+  const comparisonAnnualRate = parsePositiveNumberInput(comparisonState.annualRate);
+  const comparisonPrincipalInterest = parsePositiveNumberInput(comparisonState.targetPrincipalInterest);
+  const comparisonYears = parsePositiveNumberInput(comparisonState.years);
   const comparisonPropertyTaxAnnual = parseNumberInput(comparisonState.propertyTaxAnnual) ?? 0;
   const comparisonInsuranceAnnual = parseNumberInput(comparisonState.insuranceAnnual) ?? 0;
   const comparisonHoaMonthly = parseNumberInput(comparisonState.hoaMonthly) ?? 0;
@@ -273,19 +273,23 @@ export function MortgageCalculator() {
     comparisonResolved
   ]);
 
+  const solvedField = resolved && !("error" in resolved) ? resolved.solvedField : undefined;
+
   return (
     <div className="space-y-8">
       <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="space-y-4">
           <div className="surface p-6 md:p-8">
             <div className="grid gap-4 sm:grid-cols-2">
-              <InputField label="Loan amount" prefix="$" value={state.loanAmount} onChange={(event) => setState((current) => ({ ...current, loanAmount: event.target.value }))} />
-              <InputField label="Interest rate" hint="Annual %" value={state.annualRate} onChange={(event) => setState((current) => ({ ...current, annualRate: event.target.value }))} />
-              <InputField label="Loan term" hint="Years" value={state.years} onChange={(event) => setState((current) => ({ ...current, years: event.target.value }))} />
+              <InputField label="Loan amount" hint="Required core field" tooltip="Total amount borrowed before taxes, insurance, HOA, PMI, and extra payments." prefix="$" highlighted={solvedField === "loanAmount"} value={state.loanAmount} onChange={(event) => setState((current) => ({ ...current, loanAmount: event.target.value }))} />
+              <InputField label="Interest rate" hint="Annual %" tooltip="Nominal yearly mortgage rate. Leave blank to solve for the implied rate from the other core fields." highlighted={solvedField === "annualRate"} value={state.annualRate} onChange={(event) => setState((current) => ({ ...current, annualRate: event.target.value }))} />
+              <InputField label="Loan term" hint="Years" tooltip="Repayment length in years. Leave blank to solve for the term supported by the other core values." highlighted={solvedField === "years"} value={state.years} onChange={(event) => setState((current) => ({ ...current, years: event.target.value }))} />
               <InputField
                 label="Principal + interest"
                 hint="Monthly core payment"
+                tooltip="Monthly payment for principal and interest only. Taxes, insurance, HOA, PMI, and extra payments are added afterward."
                 prefix="$"
+                highlighted={solvedField === "principalInterest"}
                 value={state.targetPrincipalInterest}
                 onChange={(event) => setState((current) => ({ ...current, targetPrincipalInterest: event.target.value }))}
               />
@@ -317,9 +321,9 @@ export function MortgageCalculator() {
                     years: "30",
                     propertyTaxAnnual: "4800",
                     insuranceAnnual: "1800",
-                    hoaMonthly: "0",
-                    pmiMonthly: "0",
-                    extraMonthlyPayment: "0"
+                    hoaMonthly: "",
+                    pmiMonthly: "",
+                    extraMonthlyPayment: ""
                   })
               },
               {
@@ -333,9 +337,9 @@ export function MortgageCalculator() {
                     years: "30",
                     propertyTaxAnnual: "4800",
                     insuranceAnnual: "1800",
-                    hoaMonthly: "0",
-                    pmiMonthly: "0",
-                    extraMonthlyPayment: "0"
+                    hoaMonthly: "",
+                    pmiMonthly: "",
+                    extraMonthlyPayment: ""
                   })
               },
               {
@@ -349,9 +353,9 @@ export function MortgageCalculator() {
                     years: "",
                     propertyTaxAnnual: "4800",
                     insuranceAnnual: "1800",
-                    hoaMonthly: "0",
-                    pmiMonthly: "0",
-                    extraMonthlyPayment: "0"
+                    hoaMonthly: "",
+                    pmiMonthly: "",
+                    extraMonthlyPayment: ""
                   })
               }
             ]}
@@ -537,6 +541,8 @@ export function MortgageCalculator() {
     </div>
   );
 }
+
+
 
 
 
