@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import { StaticPageShell } from "@/components/static-page-shell";
-import { contactEmail } from "@/data/static-pages";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createMetadata({
@@ -56,7 +55,7 @@ export default function PrivacyPolicyPage() {
       <section className="surface p-6 md:p-8">
         <h2 className="font-display text-3xl font-semibold">Contact</h2>
         <p className="mt-4 text-sm leading-7 md:text-base">
-          Questions about this policy can be sent to <a href={`mailto:${contactEmail}`} className="text-accent hover:text-cyan-700">{contactEmail}</a>.
+          Questions about this policy can be submitted through the contact form on the contact page.
         </p>
       </section>
     </StaticPageShell>

@@ -45,11 +45,28 @@ npm run start
 1. Push the project to a Git provider.
 2. Import the repository into Vercel.
 3. Set `NEXT_PUBLIC_SITE_URL` to your production domain.
-4. Deploy. The app uses static-friendly routes and frontend-only calculation logic, so no database or backend setup is required.
+4. If you want the contact form to send email, also set:
+   - `RESEND_API_KEY`
+   - `CONTACT_TO_EMAIL`
+   - `CONTACT_FROM_EMAIL` (optional, defaults to `Calc Atlas <onboarding@resend.dev>` for Resend testing)
+5. Deploy. The app uses static-friendly routes and frontend-only calculation logic, with a small server route only for contact form delivery.
+
+## Contact form setup
+
+The contact form posts to `app/api/contact/route.ts` and sends email through the Resend HTTP API. The destination email is not exposed in the client UI and should be stored only in Vercel environment variables.
+
+Suggested values:
+
+```text
+CONTACT_TO_EMAIL=you@example.com
+CONTACT_FROM_EMAIL=Calc Atlas <onboarding@resend.dev>
+```
+
+For production, replace the default sender with an address on a verified sending domain.
 
 ## Architecture overview
 
-- `app/`: Next.js App Router pages, layout, sitemap, robots, and the dynamic calculator route.
+- `app/`: Next.js App Router pages, layout, sitemap, robots, API route, and the dynamic calculator route.
 - `components/`: Reusable UI, homepage sections, and calculator-specific interactive components.
 - `data/calculators.ts`: Central registry for calculator metadata, content, categories, FAQs, examples, and related links.
 - `lib/calculators/`: Pure calculation logic separated from the UI.

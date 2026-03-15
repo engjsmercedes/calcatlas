@@ -46,5 +46,3 @@ export const trustPageLinks: StaticPageLink[] = [
     description: "Review important limitations for health, finance, and legal estimates."
   }
 ];
-
-export const contactEmail = "hello@calc-atlas.com";
