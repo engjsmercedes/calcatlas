@@ -10,7 +10,7 @@ import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculato
 import { calculateCompoundInterest } from "@/lib/calculators/compound-interest";
 import { formatCurrency, parseNumberInput } from "@/lib/utils";
 
-import { CalculatorActions, ComparisonControls, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
+import { CalculatorActions, ComparisonControls, DecisionSummaryPanel, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
 const initialState = {
   initialAmount: "10000",
@@ -160,6 +160,7 @@ export function CompoundInterestCalculator() {
                     <ResultCard label="Balance delta" value={formatCurrency(comparisonResult.finalBalance - result.finalBalance)} tone={comparisonResult.finalBalance >= result.finalBalance ? "success" : "default"} />
                     <ResultCard label="Interest delta" value={formatCurrency(comparisonResult.totalInterest - result.totalInterest)} tone={comparisonResult.totalInterest >= result.totalInterest ? "success" : "default"} />
                   </div>
+                  <DecisionSummaryPanel body={comparisonResult.finalBalance >= result.finalBalance && comparisonResult.totalContributions <= result.totalContributions ? `Scenario B is more capital-efficient: it finishes with a larger balance while asking for no more cash along the way.` : comparisonResult.finalBalance >= result.finalBalance ? `Scenario B builds a larger ending balance, but part of that gain comes from contributing more cash. It is the better choice only if the extra saving fits your budget.` : comparisonResult.totalContributions < result.totalContributions ? `Scenario B preserves more monthly cash flow, but it gives up end-balance growth. It is the better fit when flexibility matters more than maximum long-term value.` : `The primary plan remains the stronger wealth-building option because it turns the same or less cash into a better long-term balance.`} />
                 </div>
               ) : null}
             </>
@@ -172,3 +173,7 @@ export function CompoundInterestCalculator() {
     </div>
   );
 }
+
+
+
+

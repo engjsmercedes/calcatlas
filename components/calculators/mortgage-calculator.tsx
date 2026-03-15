@@ -11,7 +11,7 @@ import { amortizedMonthlyPayment } from "@/lib/calculators/borrowing";
 import { calculateMortgage, solveMortgageAnnualRate } from "@/lib/calculators/mortgage";
 import { formatCurrency, formatNumber, parseNumberInput } from "@/lib/utils";
 
-import { CalculatorActions, ComparisonControls, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
+import { CalculatorActions, ComparisonControls, DecisionSummaryPanel, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
 const initialState = {
   loanAmount: "400000",
@@ -462,6 +462,7 @@ export function MortgageCalculator() {
                       <ResultCard label="Scenario B payoff time" value={formatLoanTerm(comparisonResult.payoffMonths / 12)} />
                       <ResultCard label="Payoff delta" value={`${formatNumber((comparisonResult.payoffMonths - result.payoffMonths) / 12, 1)} years`} tone={comparisonResult.payoffMonths <= result.payoffMonths ? "success" : "default"} />
                     </div>
+                  <DecisionSummaryPanel body={comparisonResult.totalMonthlyPayment <= result.totalMonthlyPayment && comparisonResult.totalInterest <= result.totalInterest ? `Scenario B is better on both monthly affordability and long-term cost, so it is the cleaner mortgage option if the assumptions match your real quote.` : comparisonResult.totalMonthlyPayment <= result.totalMonthlyPayment ? `Scenario B lowers the monthly housing bill, but it does so at the cost of higher long-term borrowing drag. It is better only if monthly affordability is the limiting factor.` : comparisonResult.totalInterest <= result.totalInterest || comparisonResult.payoffMonths <= result.payoffMonths ? `Scenario B is more efficient over the life of the mortgage and pays off faster, but it asks for more monthly cash flow. It is the stronger choice when long-term cost matters more than short-term payment comfort.` : `The primary mortgage remains the more balanced setup because Scenario B does not improve the cash-flow-versus-cost tradeoff enough to justify switching.`} />
                   </div>
                 )
               ) : null}
@@ -536,3 +537,7 @@ export function MortgageCalculator() {
     </div>
   );
 }
+
+
+
+

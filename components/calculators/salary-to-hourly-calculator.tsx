@@ -19,7 +19,7 @@ import {
 } from "@/lib/calculators/salary";
 import { formatCurrency, formatPercent, parseNumberInput } from "@/lib/utils";
 
-import { CalculatorActions, ComparisonControls, EmptyCalculatorState, InsightPanel } from "./shared";
+import { CalculatorActions, ComparisonControls, DecisionSummaryPanel, EmptyCalculatorState, InsightPanel } from "./shared";
 
 const initialState = {
   mode: "salary-to-hourly",
@@ -398,6 +398,7 @@ export function SalaryToHourlyCalculator() {
                     <ResultCard label="Scenario B net hourly" value={`${formatCurrency(comparisonResult.net.hourly)}/hr`} />
                     <ResultCard label="Effective tax rate delta" value={formatPercent((comparisonResult.effectiveTaxRate - result.effectiveTaxRate) * 100)} tone={comparisonResult.effectiveTaxRate <= result.effectiveTaxRate ? "success" : "default"} />
                   </div>
+                  <DecisionSummaryPanel body={comparisonResult.net.monthly > result.net.monthly && comparisonResult.effectiveTaxRate <= result.effectiveTaxRate ? `Scenario B is the stronger compensation package because it improves monthly take-home without making the tax burden less efficient.` : comparisonResult.net.monthly > result.net.monthly ? `Scenario B puts more money in your pocket each month, but check whether the gain depends on tradeoffs like longer hours, fewer weeks off, or lighter retirement saving.` : comparisonResult.effectiveTaxRate < result.effectiveTaxRate ? `Scenario B is more tax-efficient, but it does not clearly beat the primary setup on actual take-home pay. Keep it only if the structure matters more than monthly cash.` : `The primary compensation setup remains the better all-around option because Scenario B does not improve usable take-home pay enough to justify switching.`} />
                 </div>
               ) : null}
             </>
@@ -407,3 +408,7 @@ export function SalaryToHourlyCalculator() {
     </div>
   );
 }
+
+
+
+

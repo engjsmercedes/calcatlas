@@ -8,7 +8,7 @@ import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculato
 import { calculateDebtPayoff } from "@/lib/calculators/expansion";
 import { formatCurrency, parseNumberInput } from "@/lib/utils";
 
-import { CalculatorActions, ComparisonControls, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
+import { CalculatorActions, ComparisonControls, DecisionSummaryPanel, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
 const initialState = {
   balance: "18000",
@@ -148,6 +148,7 @@ export function DebtPayoffCalculator() {
                   <ResultCard label="Scenario B interest" value={formatCurrency(comparisonResult.acceleratedInterest)} />
                   <ResultCard label="Interest delta" value={formatCurrency(comparisonResult.acceleratedInterest - result.acceleratedInterest)} tone={comparisonResult.acceleratedInterest <= result.acceleratedInterest ? "success" : "default"} />
                 </div>
+                <DecisionSummaryPanel body={comparisonResult.acceleratedMonths < result.acceleratedMonths && comparisonResult.acceleratedInterest <= result.acceleratedInterest ? `Scenario B is the stronger payoff plan because it clears the debt faster and reduces interest drag at the same time.` : comparisonResult.acceleratedMonths < result.acceleratedMonths ? `Scenario B gets you out of debt sooner, but it does so by demanding more monthly cash flow. It is worth it if payoff speed is the priority.` : comparisonResult.acceleratedInterest < result.acceleratedInterest ? `Scenario B saves interest without meaningfully improving payoff speed. It is the better fit if cost control matters more than finishing dramatically earlier.` : `The primary payoff plan remains the more balanced choice because Scenario B does not improve the interest-time tradeoff enough to justify the change.`} />
               </div>
             ) : null}
           </>
@@ -156,3 +157,7 @@ export function DebtPayoffCalculator() {
     </div>
   );
 }
+
+
+
+

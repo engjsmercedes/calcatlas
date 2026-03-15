@@ -88,6 +88,15 @@ export function ExamplePresetList({
   );
 }
 
+export function DecisionSummaryPanel({ body }: { body: string }) {
+  return (
+    <div className="rounded-3xl border border-accent/15 bg-accent-soft/70 p-5">
+      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">Decision summary</p>
+      <p className="mt-2 text-sm leading-7 text-slate-700 dark:text-slate-200">{body}</p>
+    </div>
+  );
+}
+
 export function ComparisonControls({
   enabled,
   onEnable,

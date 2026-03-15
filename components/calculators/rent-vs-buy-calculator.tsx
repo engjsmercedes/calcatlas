@@ -9,7 +9,7 @@ import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculato
 import { calculateRentVsBuy } from "@/lib/calculators/borrowing";
 import { formatCurrency, parseNumberInput } from "@/lib/utils";
 
-import { CalculatorActions, ComparisonControls, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
+import { CalculatorActions, ComparisonControls, DecisionSummaryPanel, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
 const initialState = {
   homePrice: "450000",
@@ -283,7 +283,7 @@ export function RentVsBuyCalculator() {
                     <ResultCard label="Rent cost delta" value={formatCurrency(comparisonResult.totalRentCost - result.totalRentCost)} tone={comparisonResult.totalRentCost <= result.totalRentCost ? "success" : "default"} />
                     <ResultCard label="Scenario B recommendation" value={comparisonResult.betterOption === "tie" ? "Close call" : comparisonResult.betterOption === "buy" ? "Buying is cheaper" : "Renting is cheaper"} />
                     <ResultCard label="Recommendation shift" value={comparisonResult.betterOption === result.betterOption ? "Same direction" : "Recommendation changed"} tone={comparisonResult.betterOption === result.betterOption ? "default" : "success"} />
-                  </div>
+                  </div>`r`n                  <DecisionSummaryPanel body={comparisonResult.betterOption !== result.betterOption ? `Scenario B changes the housing decision itself, which means one or two assumptions are driving the outcome. Focus on the break-even timing and the total cost gap before treating either answer as final.` : comparisonResult.buyNetCost < result.buyNetCost && comparisonResult.betterOption === "buy" ? `Scenario B makes buying look stronger because the ownership side gets cheaper without changing the decision direction.` : comparisonResult.totalRentCost < result.totalRentCost && comparisonResult.betterOption === "rent" ? `Scenario B strengthens the case for renting by lowering the expected rent-side cost while keeping the recommendation consistent.` : `The recommendation does not materially improve under Scenario B, so the primary setup remains the more balanced baseline for the rent-versus-buy decision.`} />
                 </div>
               ) : null}
             </>
@@ -302,3 +302,5 @@ export function RentVsBuyCalculator() {
     </div>
   );
 }
+
+

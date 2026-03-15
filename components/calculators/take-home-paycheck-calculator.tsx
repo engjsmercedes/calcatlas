@@ -10,7 +10,7 @@ import { formatCurrency, formatPercent, parseNumberInput } from "@/lib/utils";
 import { type FilingStatus, type TaxCountry, type UsState, countryOptions, filingStatusOptions, usStateOptions } from "@/lib/calculators/salary";
 import { calculateTakeHomePaycheck, practicalPayFrequencyOptions, type PracticalPayFrequency } from "@/lib/calculators/practical";
 
-import { CalculatorActions, ComparisonControls, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
+import { CalculatorActions, ComparisonControls, DecisionSummaryPanel, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
 const initialState = {
   annualSalary: "95000",
@@ -197,6 +197,7 @@ export function TakeHomePaycheckCalculator() {
                   <ResultCard label="Scenario B net annual" value={formatCurrency(comparisonResult.netAnnual)} />
                   <ResultCard label="Annual delta" value={formatCurrency(comparisonResult.netAnnual - result.netAnnual)} tone={comparisonResult.netAnnual >= result.netAnnual ? "success" : "default"} />
                 </div>
+                <DecisionSummaryPanel body={comparisonResult.netPerPaycheck > result.netPerPaycheck && comparisonResult.effectiveTaxRate <= result.effectiveTaxRate ? `Scenario B gives the stronger paycheck outcome because more money reaches you each pay cycle without raising the effective tax drag.` : comparisonResult.netPerPaycheck > result.netPerPaycheck ? `Scenario B improves per-paycheck cash flow, but review whether the gain comes from lower retirement saving or lighter deductions rather than a better compensation structure.` : comparisonResult.effectiveTaxRate < result.effectiveTaxRate ? `Scenario B is slightly more tax-efficient, but it does not clearly beat the primary setup on spendable paycheck cash. Keep it only if tax efficiency is the main goal.` : `The primary paycheck setup remains the more balanced option because Scenario B does not put more usable cash in your pocket.`} />
               </div>
             ) : null}
           </>
@@ -205,3 +206,7 @@ export function TakeHomePaycheckCalculator() {
     </div>
   );
 }
+
+
+
+
