@@ -60,12 +60,14 @@ import { TemperatureConverter } from "./temperature-converter";
 import { TipCalculator } from "./tip-calculator";
 import { WaterIntakeCalculator } from "./water-intake-calculator";
 
-export function CalculatorRenderer({ slug }: { slug: CalculatorSlug }) {
-  useRecentCalculators(slug);
+export function CalculatorRenderer({ slug, embedded = false }: { slug: CalculatorSlug; embedded?: boolean }) {
+  useRecentCalculators(embedded ? undefined : slug);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [slug]);
+    if (!embedded) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [embedded, slug]);
 
   switch (slug) {
     case "percentage-calculator":
@@ -190,4 +192,3 @@ export function CalculatorRenderer({ slug }: { slug: CalculatorSlug }) {
       return null;
   }
 }
-

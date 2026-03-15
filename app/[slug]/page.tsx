@@ -1,8 +1,9 @@
-﻿import { Suspense } from "react";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { CalculatorEmbedCard } from "@/components/calculator-embed-card";
 import { CalculatorRenderer } from "@/components/calculators/calculator-renderer";
 import { CalculatorFeedback } from "@/components/calculator-feedback";
 import { RelatedCalculators } from "@/components/related-calculators";
@@ -68,6 +69,7 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
               <CalculatorRenderer slug={calculator.slug} />
             </Suspense>
           </section>
+          <CalculatorEmbedCard calculator={calculator} />
           <section aria-labelledby="about-calculator" className="space-y-4">
             <div className="space-y-2">
               <span className="section-label">About the calculator</span>
@@ -214,4 +216,3 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
     </>
   );
 }
-
