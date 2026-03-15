@@ -1,25 +1,17 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { CalculatorCard } from "@/components/calculator-card";
 import { HomeSearch } from "@/components/home/home-search";
 import { RecentlyUsed } from "@/components/home/recently-used";
 import { StructuredData } from "@/components/structured-data";
-import { calculatorCategories, calculators } from "@/data/calculators";
+import { calculatorCategories, calculatorCategoryDetails, calculators } from "@/data/calculators";
 import { createMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
 
-const categoryDescriptions: Record<(typeof calculatorCategories)[number], string> = {
-  Finance: "Home-buying, debt, investing, and savings tools for decisions that compound over time.",
-  Business: "Pricing and profitability calculators for teams that need clean unit economics fast.",
-  Income: "Compensation and take-home tools built for offers, planning, and job comparisons.",
-  Health: "Body, nutrition, sleep, running, and strength calculators for repeat-use planning.",
-  Everyday: "Fast utility calculators for discounts, tipping, and percentage-based everyday math."
-};
-
 const groupedCalculators = calculatorCategories.map((category) => ({
   category,
-  description: categoryDescriptions[category],
+  details: calculatorCategoryDetails[category],
   items: calculators.filter((calculator) => calculator.category === category)
 }));
 
@@ -69,10 +61,10 @@ export default function HomePage() {
                 </Link>
               </div>
               <div className="flex flex-wrap gap-2 pt-1 text-sm">
-                {groupedCalculators.map(({ category, items }) => (
+                {groupedCalculators.map(({ category, details, items }) => (
                   <Link
                     key={category}
-                    href={`/#${category.toLowerCase()}`}
+                    href={`/${details.slug}`}
                     className="rounded-full border border-border bg-white/70 px-4 py-2 text-muted transition hover:border-accent hover:text-accent"
                   >
                     {category} ({items.length})
@@ -102,14 +94,21 @@ export default function HomePage() {
           </p>
         </div>
         <div className="space-y-12">
-          {groupedCalculators.map(({ category, description, items }) => (
+          {groupedCalculators.map(({ category, details, items }) => (
             <div id={category.toLowerCase()} key={category} className="space-y-5 scroll-mt-24">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-semibold">{category}</h3>
-                  <p className="max-w-2xl text-sm leading-7 text-muted">{description}</p>
+                  <Link href={`/${details.slug}`} className="text-2xl font-semibold transition hover:text-accent">
+                    {category}
+                  </Link>
+                  <p className="max-w-2xl text-sm leading-7 text-muted">{details.shortDescription}</p>
                 </div>
-                <span className="text-sm text-muted">{items.length} calculators</span>
+                <div className="flex items-center gap-4 text-sm text-muted">
+                  <span>{items.length} calculators</span>
+                  <Link href={`/${details.slug}`} className="font-medium text-accent">
+                    Browse {category.toLowerCase()} hub
+                  </Link>
+                </div>
               </div>
               <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {items.map((calculator) => (

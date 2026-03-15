@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import type { CalculatorDefinition, CalculatorSlug } from "@/data/calculators";
+import type { CalculatorCategoryDefinition, CalculatorDefinition, CalculatorSlug } from "@/data/calculators";
 
 import { siteConfig } from "./site";
 
@@ -237,3 +237,22 @@ export function createCalculatorIndexSchemas() {
 
 
 
+
+export function createCategoryMetadata(category: CalculatorCategoryDefinition) {
+  return createMetadata({
+    title: category.title,
+    description: category.shortDescription,
+    path: `/${category.slug}`,
+    keywords: [...category.searchTerms, category.title, category.category]
+  });
+}
+
+export function createCategorySchema(category: CalculatorCategoryDefinition) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: category.title,
+    description: category.shortDescription,
+    url: absoluteUrl(`/${category.slug}`)
+  };
+}

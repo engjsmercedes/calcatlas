@@ -3,7 +3,7 @@ export const siteConfig = {
   shortName: "CalcAtlas",
   description:
     "A fast, modern calculator library for finance, health, business, income, and everyday decisions.",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://calc-atlas.vercel.app",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://calcatlas.app",
   ogImage: "/og-image.png",
   nav: [
     { href: "/calculators", label: "All calculators" },

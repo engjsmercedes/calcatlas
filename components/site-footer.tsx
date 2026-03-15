@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { calculators } from "@/data/calculators";
+import { calculatorCategoryPages, calculators } from "@/data/calculators";
 import { trustPageLinks } from "@/data/static-pages";
 import { siteConfig } from "@/lib/site";
 
@@ -24,11 +24,11 @@ export function SiteFooter() {
             A calculator library designed for speed, clarity, and search intent. Each tool is lightweight, shareable, and built to expand cleanly.
           </p>
           <div className="flex flex-wrap gap-2 text-xs text-muted">
-            <span className="rounded-full border border-border px-3 py-1">Finance</span>
-            <span className="rounded-full border border-border px-3 py-1">Health</span>
-            <span className="rounded-full border border-border px-3 py-1">Business</span>
-            <span className="rounded-full border border-border px-3 py-1">Income</span>
-            <span className="rounded-full border border-border px-3 py-1">Everyday</span>
+            {calculatorCategoryPages.map((category) => (
+              <Link key={category.slug} href={`/${category.slug}`} className="rounded-full border border-border px-3 py-1 transition hover:border-accent hover:text-accent">
+                {category.category}
+              </Link>
+            ))}
           </div>
         </div>
         <div className="space-y-4">

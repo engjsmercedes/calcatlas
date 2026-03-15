@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { calculators } from "@/data/calculators";
+import { calculatorCategoryPages, calculators } from "@/data/calculators";
 import { trustPageLinks } from "@/data/static-pages";
 import { siteConfig } from "@/lib/site";
 
@@ -20,6 +20,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.9
     },
+    ...calculatorCategoryPages.map((category) => ({
+      url: `${siteConfig.url}/${category.slug}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.85
+    })),
     ...trustPageLinks.map((page) => ({
       url: `${siteConfig.url}${page.href}`,
       lastModified,

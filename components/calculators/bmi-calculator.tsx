@@ -1,9 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useMemo } from "react";
 
 import { InputField } from "@/components/ui/input-field";
 import { PillTabs } from "@/components/ui/pill-tabs";
+import { RangeGauge } from "@/components/ui/range-gauge";
 import { ResultCard } from "@/components/ui/result-card";
 import { SelectField } from "@/components/ui/select-field";
 import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculator-state";
@@ -44,7 +45,7 @@ export function BmiCalculator() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-      <div className="surface p-6 md:p-8 space-y-5">
+      <div className="surface space-y-5 p-6 md:p-8">
         <PillTabs
           options={[
             { label: "Imperial", value: "imperial" },
@@ -78,6 +79,20 @@ export function BmiCalculator() {
           <EmptyCalculatorState title="Enter height and weight" body="BMI needs only height and weight. Optional age and gender can help with interpretation, but the score itself is based on height and weight." />
         ) : (
           <>
+            <RangeGauge
+              title="BMI scale"
+              value={result.bmi}
+              min={15}
+              max={40}
+              centerLabel={formatNumber(result.bmi)}
+              unitLabel={result.category}
+              segments={[
+                { label: "Under", max: 18.5, color: "#fbbf24" },
+                { label: "Healthy", max: 24.9, color: "#10b981" },
+                { label: "Over", max: 29.9, color: "#f59e0b" },
+                { label: "Obesity", max: 40, color: "#ef4444" }
+              ]}
+            />
             <div className="surface p-6 md:p-8 space-y-4">
               <div>
                 <p className="section-label">BMI result</p>

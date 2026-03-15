@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { CalculatorCard } from "@/components/calculator-card";
 import { StructuredData } from "@/components/structured-data";
-import { calculatorCategories, calculators } from "@/data/calculators";
+import { calculatorCategories, calculatorCategoryDetails, calculators } from "@/data/calculators";
 import { createCalculatorIndexSchemas, createMetadata } from "@/lib/seo";
 
 const groupedCalculators = calculatorCategories.map((category) => ({
   category,
+  details: calculatorCategoryDetails[category],
   items: calculators.filter((calculator) => calculator.category === category)
 }));
 
@@ -31,9 +33,24 @@ export default function CalculatorsPage() {
           </p>
         </div>
       </section>
+      <section className="page-shell pb-8 md:pb-12">
+        <div className="surface p-6 md:p-8">
+          <div className="flex flex-wrap gap-3">
+            {groupedCalculators.map(({ category, details, items }) => (
+              <Link
+                key={category}
+                href={`/${details.slug}`}
+                className="rounded-full border border-border px-4 py-2 text-sm text-muted transition hover:border-accent hover:text-accent"
+              >
+                {category} ({items.length})
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
       <section className="page-shell pb-16 md:pb-24">
         <div className="space-y-12">
-          {groupedCalculators.map(({ category, items }) => (
+          {groupedCalculators.map(({ category, details, items }) => (
             <section key={category} aria-labelledby={`${category.toLowerCase()}-calculators`} className="space-y-5">
               <div className="flex items-center justify-between gap-4">
                 <div className="space-y-2">
@@ -41,8 +58,14 @@ export default function CalculatorsPage() {
                   <h2 id={`${category.toLowerCase()}-calculators`} className="text-2xl font-semibold">
                     {category} calculators
                   </h2>
+                  <p className="max-w-2xl text-sm leading-7 text-muted">{details.shortDescription}</p>
                 </div>
-                <span className="text-sm text-muted">{items.length} tools</span>
+                <div className="text-right text-sm text-muted">
+                  <p>{items.length} tools</p>
+                  <Link href={`/${details.slug}`} className="font-medium text-accent">
+                    Open category hub
+                  </Link>
+                </div>
               </div>
               <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {items.map((calculator) => (
