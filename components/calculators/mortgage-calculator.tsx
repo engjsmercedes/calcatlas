@@ -10,7 +10,7 @@ import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculato
 import { calculateMortgage } from "@/lib/calculators/mortgage";
 import { formatCurrency, formatNumber, parseNumberInput } from "@/lib/utils";
 
-import { CalculatorActions, EmptyCalculatorState, InsightPanel } from "./shared";
+import { CalculatorActions, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
 const initialState = {
   loanAmount: "400000",
@@ -48,20 +48,58 @@ export function MortgageCalculator() {
   return (
     <div className="space-y-8">
       <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="surface p-6 md:p-8">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <InputField label="Loan amount" prefix="$" value={state.loanAmount} onChange={(event) => setState((current) => ({ ...current, loanAmount: event.target.value }))} />
-            <InputField label="Interest rate" hint="Annual %" value={state.annualRate} onChange={(event) => setState((current) => ({ ...current, annualRate: event.target.value }))} />
-            <InputField label="Loan term" hint="Years" value={state.years} onChange={(event) => setState((current) => ({ ...current, years: event.target.value }))} />
-            <InputField label="Property tax" hint="Annual" prefix="$" value={state.propertyTaxAnnual} onChange={(event) => setState((current) => ({ ...current, propertyTaxAnnual: event.target.value }))} />
-            <InputField label="Home insurance" hint="Annual" prefix="$" value={state.insuranceAnnual} onChange={(event) => setState((current) => ({ ...current, insuranceAnnual: event.target.value }))} />
-            <InputField label="HOA dues" hint="Monthly" prefix="$" value={state.hoaMonthly} onChange={(event) => setState((current) => ({ ...current, hoaMonthly: event.target.value }))} />
-            <InputField label="PMI" hint="Monthly" prefix="$" value={state.pmiMonthly} onChange={(event) => setState((current) => ({ ...current, pmiMonthly: event.target.value }))} />
-            <InputField label="Extra payment" hint="Monthly" prefix="$" value={state.extraMonthlyPayment} onChange={(event) => setState((current) => ({ ...current, extraMonthlyPayment: event.target.value }))} />
+        <div className="space-y-4">
+          <div className="surface p-6 md:p-8">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <InputField label="Loan amount" prefix="$" value={state.loanAmount} onChange={(event) => setState((current) => ({ ...current, loanAmount: event.target.value }))} />
+              <InputField label="Interest rate" hint="Annual %" value={state.annualRate} onChange={(event) => setState((current) => ({ ...current, annualRate: event.target.value }))} />
+              <InputField label="Loan term" hint="Years" value={state.years} onChange={(event) => setState((current) => ({ ...current, years: event.target.value }))} />
+              <InputField label="Property tax" hint="Annual" prefix="$" value={state.propertyTaxAnnual} onChange={(event) => setState((current) => ({ ...current, propertyTaxAnnual: event.target.value }))} />
+              <InputField label="Home insurance" hint="Annual" prefix="$" value={state.insuranceAnnual} onChange={(event) => setState((current) => ({ ...current, insuranceAnnual: event.target.value }))} />
+              <InputField label="HOA dues" hint="Monthly" prefix="$" value={state.hoaMonthly} onChange={(event) => setState((current) => ({ ...current, hoaMonthly: event.target.value }))} />
+              <InputField label="PMI" hint="Monthly" prefix="$" value={state.pmiMonthly} onChange={(event) => setState((current) => ({ ...current, pmiMonthly: event.target.value }))} />
+              <InputField label="Extra payment" hint="Monthly" prefix="$" value={state.extraMonthlyPayment} onChange={(event) => setState((current) => ({ ...current, extraMonthlyPayment: event.target.value }))} />
+            </div>
+            <div className="mt-6">
+              <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
+            </div>
           </div>
-          <div className="mt-6">
-            <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
-          </div>
+          <ExamplePresetList
+            title="Try an example"
+            body="Use a preset scenario to compare a standard mortgage against a more aggressive payoff plan."
+            items={[
+              {
+                label: "Standard 30-year loan",
+                description: "$400,000 at 6.5% for 30 years with taxes and insurance but no extra payment.",
+                onApply: () =>
+                  setState({
+                    loanAmount: "400000",
+                    annualRate: "6.5",
+                    years: "30",
+                    propertyTaxAnnual: "4800",
+                    insuranceAnnual: "1800",
+                    hoaMonthly: "0",
+                    pmiMonthly: "0",
+                    extraMonthlyPayment: "0"
+                  })
+              },
+              {
+                label: "Faster payoff scenario",
+                description: "Same mortgage with an extra $300 monthly principal payment to reduce interest over time.",
+                onApply: () =>
+                  setState({
+                    loanAmount: "400000",
+                    annualRate: "6.5",
+                    years: "30",
+                    propertyTaxAnnual: "4800",
+                    insuranceAnnual: "1800",
+                    hoaMonthly: "0",
+                    pmiMonthly: "0",
+                    extraMonthlyPayment: "300"
+                  })
+              }
+            ]}
+          />
         </div>
         <div className="space-y-4">
           {!result ? (
@@ -99,7 +137,7 @@ export function MortgageCalculator() {
               { label: "Cumulative interest paid", color: "#f59e0b", values: result.points.map((point) => point.cumulativeInterest) }
             ]}
           />
-          <div className="surface p-6 md:p-8 space-y-5">
+          <div className="surface space-y-5 p-6 md:p-8">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <p className="section-label">Amortization schedule</p>

@@ -10,7 +10,7 @@ import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculato
 import { calculateCompoundInterest } from "@/lib/calculators/compound-interest";
 import { formatCurrency, parseNumberInput } from "@/lib/utils";
 
-import { CalculatorActions, EmptyCalculatorState, InsightPanel } from "./shared";
+import { CalculatorActions, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
 const initialState = {
   initialAmount: "10000",
@@ -50,55 +50,94 @@ export function CompoundInterestCalculator() {
   return (
     <div className="space-y-8">
       <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="surface p-6 md:p-8">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <InputField
-              label="Initial amount"
-              prefix="$"
-              value={state.initialAmount}
-              onChange={(event) => setState((current) => ({ ...current, initialAmount: event.target.value }))}
-            />
-            <InputField
-              label="Contribution amount"
-              prefix="$"
-              value={state.contributionAmount}
-              onChange={(event) => setState((current) => ({ ...current, contributionAmount: event.target.value }))}
-            />
-            <SelectField
-              label="Contribution frequency"
-              value={state.contributionFrequency}
-              onChange={(event) => setState((current) => ({ ...current, contributionFrequency: event.target.value }))}
-            >
-              <option value="monthly">Monthly</option>
-              <option value="quarterly">Quarterly</option>
-              <option value="annually">Annually</option>
-            </SelectField>
-            <InputField
-              label="Annual rate"
-              hint="Expected yearly return %"
-              value={state.annualRate}
-              onChange={(event) => setState((current) => ({ ...current, annualRate: event.target.value }))}
-            />
-            <InputField
-              label="Years"
-              hint="Projection length"
-              value={state.years}
-              onChange={(event) => setState((current) => ({ ...current, years: event.target.value }))}
-            />
-            <SelectField
-              label="Compounding frequency"
-              value={state.compoundingFrequency}
-              onChange={(event) => setState((current) => ({ ...current, compoundingFrequency: event.target.value }))}
-            >
-              <option value="annually">Annually</option>
-              <option value="quarterly">Quarterly</option>
-              <option value="monthly">Monthly</option>
-              <option value="daily">Daily</option>
-            </SelectField>
+        <div className="space-y-4">
+          <div className="surface p-6 md:p-8">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <InputField
+                label="Initial amount"
+                prefix="$"
+                value={state.initialAmount}
+                onChange={(event) => setState((current) => ({ ...current, initialAmount: event.target.value }))}
+              />
+              <InputField
+                label="Contribution amount"
+                prefix="$"
+                value={state.contributionAmount}
+                onChange={(event) => setState((current) => ({ ...current, contributionAmount: event.target.value }))}
+              />
+              <SelectField
+                label="Contribution frequency"
+                value={state.contributionFrequency}
+                onChange={(event) => setState((current) => ({ ...current, contributionFrequency: event.target.value }))}
+              >
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="annually">Annually</option>
+              </SelectField>
+              <InputField
+                label="Annual rate"
+                hint="Expected yearly return %"
+                value={state.annualRate}
+                onChange={(event) => setState((current) => ({ ...current, annualRate: event.target.value }))}
+              />
+              <InputField
+                label="Years"
+                hint="Projection length"
+                value={state.years}
+                onChange={(event) => setState((current) => ({ ...current, years: event.target.value }))}
+              />
+              <SelectField
+                label="Compounding frequency"
+                hint="Short timelines usually change only a little"
+                value={state.compoundingFrequency}
+                onChange={(event) => setState((current) => ({ ...current, compoundingFrequency: event.target.value }))}
+              >
+                <option value="annually">Annually</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="monthly">Monthly</option>
+                <option value="daily">Daily</option>
+              </SelectField>
+            </div>
+            <div className="mt-6 space-y-4">
+              <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
+              <InsightPanel
+                title="How compounding frequency works"
+                body="Compounding frequency controls how often returns get added back into the balance. Over short periods, or when most money is contributed gradually across the year, the difference between annual, monthly, and daily compounding is usually small. It becomes more noticeable over longer timelines, larger balances, and higher rates."
+              />
+            </div>
           </div>
-          <div className="mt-6">
-            <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
-          </div>
+          <ExamplePresetList
+            title="Try an example"
+            body="Use a preset scenario to see how time horizon and compounding assumptions change the outcome in practice."
+            items={[
+              {
+                label: "Short-term savings",
+                description: "$1,000 upfront, $500 monthly, 7% for 1 year. Good for seeing why compounding frequency barely moves on short timelines.",
+                onApply: () =>
+                  setState({
+                    initialAmount: "1000",
+                    contributionAmount: "500",
+                    contributionFrequency: "monthly",
+                    annualRate: "7",
+                    years: "1",
+                    compoundingFrequency: "annually"
+                  })
+              },
+              {
+                label: "Long-term investing",
+                description: "$10,000 upfront, $500 monthly, 7% for 20 years. Better for seeing how compounding and time start to matter together.",
+                onApply: () =>
+                  setState({
+                    initialAmount: "10000",
+                    contributionAmount: "500",
+                    contributionFrequency: "monthly",
+                    annualRate: "7",
+                    years: "20",
+                    compoundingFrequency: "monthly"
+                  })
+              }
+            ]}
+          />
         </div>
         <div className="space-y-4">
           {!result ? (

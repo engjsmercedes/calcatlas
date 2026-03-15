@@ -9,7 +9,7 @@ import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculato
 import { calculateRentVsBuy } from "@/lib/calculators/borrowing";
 import { formatCurrency, parseNumberInput } from "@/lib/utils";
 
-import { CalculatorActions, EmptyCalculatorState, InsightPanel } from "./shared";
+import { CalculatorActions, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
 const initialState = {
   homePrice: "450000",
@@ -67,24 +67,70 @@ export function RentVsBuyCalculator() {
   return (
     <div className="space-y-8">
       <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="surface p-6 md:p-8">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <InputField label="Home price" prefix="$" value={state.homePrice} onChange={(event) => setState((current) => ({ ...current, homePrice: event.target.value }))} />
-            <InputField label="Down payment" prefix="$" value={state.downPayment} onChange={(event) => setState((current) => ({ ...current, downPayment: event.target.value }))} />
-            <InputField label="Mortgage rate" hint="Annual %" value={state.mortgageRate} onChange={(event) => setState((current) => ({ ...current, mortgageRate: event.target.value }))} />
-            <InputField label="Loan term" hint="Years" value={state.loanTermYears} onChange={(event) => setState((current) => ({ ...current, loanTermYears: event.target.value }))} />
-            <InputField label="Monthly rent" prefix="$" value={state.monthlyRent} onChange={(event) => setState((current) => ({ ...current, monthlyRent: event.target.value }))} />
-            <InputField label="Years staying" value={state.yearsInHome} onChange={(event) => setState((current) => ({ ...current, yearsInHome: event.target.value }))} />
-            <InputField label="Home appreciation" hint="Annual %" value={state.annualHomeAppreciation} onChange={(event) => setState((current) => ({ ...current, annualHomeAppreciation: event.target.value }))} />
-            <InputField label="Rent increase" hint="Annual %" value={state.annualRentIncrease} onChange={(event) => setState((current) => ({ ...current, annualRentIncrease: event.target.value }))} />
-            <InputField label="Property tax" hint="Annual % of price" value={state.propertyTaxRate} onChange={(event) => setState((current) => ({ ...current, propertyTaxRate: event.target.value }))} />
-            <InputField label="Maintenance" hint="Annual % of price" value={state.maintenanceRate} onChange={(event) => setState((current) => ({ ...current, maintenanceRate: event.target.value }))} />
-            <InputField label="Closing costs" hint="Percent" value={state.closingCostsRate} onChange={(event) => setState((current) => ({ ...current, closingCostsRate: event.target.value }))} />
-            <InputField label="Selling costs" hint="Percent" value={state.sellingCostsRate} onChange={(event) => setState((current) => ({ ...current, sellingCostsRate: event.target.value }))} />
+        <div className="space-y-4">
+          <div className="surface p-6 md:p-8">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <InputField label="Home price" prefix="$" value={state.homePrice} onChange={(event) => setState((current) => ({ ...current, homePrice: event.target.value }))} />
+              <InputField label="Down payment" prefix="$" value={state.downPayment} onChange={(event) => setState((current) => ({ ...current, downPayment: event.target.value }))} />
+              <InputField label="Mortgage rate" hint="Annual %" value={state.mortgageRate} onChange={(event) => setState((current) => ({ ...current, mortgageRate: event.target.value }))} />
+              <InputField label="Loan term" hint="Years" value={state.loanTermYears} onChange={(event) => setState((current) => ({ ...current, loanTermYears: event.target.value }))} />
+              <InputField label="Monthly rent" prefix="$" value={state.monthlyRent} onChange={(event) => setState((current) => ({ ...current, monthlyRent: event.target.value }))} />
+              <InputField label="Years staying" value={state.yearsInHome} onChange={(event) => setState((current) => ({ ...current, yearsInHome: event.target.value }))} />
+              <InputField label="Home appreciation" hint="Annual %" value={state.annualHomeAppreciation} onChange={(event) => setState((current) => ({ ...current, annualHomeAppreciation: event.target.value }))} />
+              <InputField label="Rent increase" hint="Annual %" value={state.annualRentIncrease} onChange={(event) => setState((current) => ({ ...current, annualRentIncrease: event.target.value }))} />
+              <InputField label="Property tax" hint="Annual % of price" value={state.propertyTaxRate} onChange={(event) => setState((current) => ({ ...current, propertyTaxRate: event.target.value }))} />
+              <InputField label="Maintenance" hint="Annual % of price" value={state.maintenanceRate} onChange={(event) => setState((current) => ({ ...current, maintenanceRate: event.target.value }))} />
+              <InputField label="Closing costs" hint="Percent" value={state.closingCostsRate} onChange={(event) => setState((current) => ({ ...current, closingCostsRate: event.target.value }))} />
+              <InputField label="Selling costs" hint="Percent" value={state.sellingCostsRate} onChange={(event) => setState((current) => ({ ...current, sellingCostsRate: event.target.value }))} />
+            </div>
+            <div className="mt-6">
+              <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
+            </div>
           </div>
-          <div className="mt-6">
-            <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
-          </div>
+          <ExamplePresetList
+            title="Try an example"
+            body="Use presets to see how a longer stay versus a shorter stay changes the rent-versus-buy picture."
+            items={[
+              {
+                label: "Longer stay",
+                description: "$450,000 home, $90,000 down, $2,600 rent, and a 7-year stay. Good for seeing when ownership has time to build equity.",
+                onApply: () =>
+                  setState({
+                    homePrice: "450000",
+                    downPayment: "90000",
+                    mortgageRate: "6.3",
+                    loanTermYears: "30",
+                    monthlyRent: "2600",
+                    yearsInHome: "7",
+                    annualHomeAppreciation: "3",
+                    annualRentIncrease: "4",
+                    propertyTaxRate: "1.1",
+                    maintenanceRate: "1",
+                    closingCostsRate: "3",
+                    sellingCostsRate: "6"
+                  })
+              },
+              {
+                label: "Shorter stay",
+                description: "Same scenario but only a 3-year stay. Useful for seeing how transaction costs make renting more competitive over shorter horizons.",
+                onApply: () =>
+                  setState({
+                    homePrice: "450000",
+                    downPayment: "90000",
+                    mortgageRate: "6.3",
+                    loanTermYears: "30",
+                    monthlyRent: "2600",
+                    yearsInHome: "3",
+                    annualHomeAppreciation: "3",
+                    annualRentIncrease: "4",
+                    propertyTaxRate: "1.1",
+                    maintenanceRate: "1",
+                    closingCostsRate: "3",
+                    sellingCostsRate: "6"
+                  })
+              }
+            ]}
+          />
         </div>
         <div className="space-y-4">
           {!result ? (

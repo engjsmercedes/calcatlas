@@ -9,7 +9,7 @@ import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculato
 import { calculateLoan } from "@/lib/calculators/borrowing";
 import { formatCurrency, formatNumber, parseNumberInput } from "@/lib/utils";
 
-import { CalculatorActions, EmptyCalculatorState, InsightPanel } from "./shared";
+import { CalculatorActions, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
 const initialState = {
   amount: "25000",
@@ -53,16 +53,46 @@ export function LoanCalculator() {
   return (
     <div className="space-y-8">
       <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="surface p-6 md:p-8">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <InputField label="Loan amount" prefix="$" value={state.amount} onChange={(event) => setState((current) => ({ ...current, amount: event.target.value }))} />
-            <InputField label="Interest rate" hint="Annual %" value={state.annualRate} onChange={(event) => setState((current) => ({ ...current, annualRate: event.target.value }))} />
-            <InputField label="Loan term" hint="Years" value={state.years} onChange={(event) => setState((current) => ({ ...current, years: event.target.value }))} />
-            <InputField label="Extra payment" prefix="$" hint="Monthly" value={state.extraPaymentMonthly} onChange={(event) => setState((current) => ({ ...current, extraPaymentMonthly: event.target.value }))} />
+        <div className="space-y-4">
+          <div className="surface p-6 md:p-8">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <InputField label="Loan amount" prefix="$" value={state.amount} onChange={(event) => setState((current) => ({ ...current, amount: event.target.value }))} />
+              <InputField label="Interest rate" hint="Annual %" value={state.annualRate} onChange={(event) => setState((current) => ({ ...current, annualRate: event.target.value }))} />
+              <InputField label="Loan term" hint="Years" value={state.years} onChange={(event) => setState((current) => ({ ...current, years: event.target.value }))} />
+              <InputField label="Extra payment" prefix="$" hint="Monthly" value={state.extraPaymentMonthly} onChange={(event) => setState((current) => ({ ...current, extraPaymentMonthly: event.target.value }))} />
+            </div>
+            <div className="mt-6">
+              <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
+            </div>
           </div>
-          <div className="mt-6">
-            <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
-          </div>
+          <ExamplePresetList
+            title="Try an example"
+            body="Use a preset to compare a standard repayment plan against a faster payoff scenario."
+            items={[
+              {
+                label: "Standard personal loan",
+                description: "$25,000 at 7.2% over 5 years with no extra monthly payment.",
+                onApply: () =>
+                  setState({
+                    amount: "25000",
+                    annualRate: "7.2",
+                    years: "5",
+                    extraPaymentMonthly: "0"
+                  })
+              },
+              {
+                label: "Accelerated payoff",
+                description: "Same loan with an extra $100 monthly payment to cut interest and shorten payoff.",
+                onApply: () =>
+                  setState({
+                    amount: "25000",
+                    annualRate: "7.2",
+                    years: "5",
+                    extraPaymentMonthly: "100"
+                  })
+              }
+            ]}
+          />
         </div>
         <div className="space-y-4">
           {!result ? (

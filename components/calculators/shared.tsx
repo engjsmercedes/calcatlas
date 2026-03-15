@@ -53,3 +53,37 @@ export function InsightPanel({ title, body }: { title: string; body: string }) {
     </div>
   );
 }
+
+export function ExamplePresetList({
+  title,
+  body,
+  items
+}: {
+  title: string;
+  body: string;
+  items: Array<{
+    label: string;
+    description: string;
+    onApply: () => void;
+  }>;
+}) {
+  return (
+    <div className="rounded-3xl border border-border bg-slate-50/80 p-5 dark:bg-slate-950/30">
+      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">{title}</p>
+      <p className="mt-2 text-sm leading-7 text-slate-700 dark:text-slate-200">{body}</p>
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        {items.map((item) => (
+          <button
+            key={item.label}
+            type="button"
+            onClick={item.onApply}
+            className="rounded-2xl border border-border bg-white px-4 py-4 text-left transition hover:border-accent hover:bg-accent-soft dark:bg-slate-950/60"
+          >
+            <p className="text-sm font-semibold text-slate-950 dark:text-white">{item.label}</p>
+            <p className="mt-1 text-sm leading-6 text-muted">{item.description}</p>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}

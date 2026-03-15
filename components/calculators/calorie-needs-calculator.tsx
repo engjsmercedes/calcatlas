@@ -9,7 +9,7 @@ import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculato
 import { calculateCalorieNeeds } from "@/lib/calculators/health";
 import { formatNumber, parseNumberInput } from "@/lib/utils";
 
-import { CalculatorActions, EmptyCalculatorState, InsightPanel } from "./shared";
+import { CalculatorActions, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
 const initialState = {
   age: "30",
@@ -41,29 +41,63 @@ export function CalorieNeedsCalculator() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-      <div className="surface p-6 md:p-8 space-y-5">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <InputField label="Age" value={state.age} onChange={(event) => setState((current) => ({ ...current, age: event.target.value }))} />
-          <SelectField label="Gender" value={state.sex} onChange={(event) => setState((current) => ({ ...current, sex: event.target.value }))}>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </SelectField>
-          <InputField label="Height (cm)" value={state.heightCm} onChange={(event) => setState((current) => ({ ...current, heightCm: event.target.value }))} />
-          <InputField label="Weight (kg)" value={state.weightKg} onChange={(event) => setState((current) => ({ ...current, weightKg: event.target.value }))} />
-          <SelectField label="Activity level" value={state.activityLevel} onChange={(event) => setState((current) => ({ ...current, activityLevel: event.target.value }))}>
-            <option value="sedentary">Sedentary</option>
-            <option value="light">Lightly active</option>
-            <option value="moderate">Moderately active</option>
-            <option value="active">Active</option>
-            <option value="very-active">Very active</option>
-          </SelectField>
-          <SelectField label="Goal" value={state.goal} onChange={(event) => setState((current) => ({ ...current, goal: event.target.value }))}>
-            <option value="maintain">Maintain</option>
-            <option value="lose">Lose</option>
-            <option value="gain">Gain</option>
-          </SelectField>
+      <div className="space-y-4">
+        <div className="surface space-y-5 p-6 md:p-8">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <InputField label="Age" value={state.age} onChange={(event) => setState((current) => ({ ...current, age: event.target.value }))} />
+            <SelectField label="Gender" value={state.sex} onChange={(event) => setState((current) => ({ ...current, sex: event.target.value }))}>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </SelectField>
+            <InputField label="Height (cm)" value={state.heightCm} onChange={(event) => setState((current) => ({ ...current, heightCm: event.target.value }))} />
+            <InputField label="Weight (kg)" value={state.weightKg} onChange={(event) => setState((current) => ({ ...current, weightKg: event.target.value }))} />
+            <SelectField label="Activity level" value={state.activityLevel} onChange={(event) => setState((current) => ({ ...current, activityLevel: event.target.value }))}>
+              <option value="sedentary">Sedentary</option>
+              <option value="light">Lightly active</option>
+              <option value="moderate">Moderately active</option>
+              <option value="active">Active</option>
+              <option value="very-active">Very active</option>
+            </SelectField>
+            <SelectField label="Goal" value={state.goal} onChange={(event) => setState((current) => ({ ...current, goal: event.target.value }))}>
+              <option value="maintain">Maintain</option>
+              <option value="lose">Lose</option>
+              <option value="gain">Gain</option>
+            </SelectField>
+          </div>
+          <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
         </div>
-        <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
+        <ExamplePresetList
+          title="Try an example"
+          body="Activity level does matter here. Calorie targets are based on body size and an activity multiplier, so changing activity level can move the maintenance estimate a lot more than it would on BMI."
+          items={[
+            {
+              label: "Desk-job maintenance",
+              description: "30-year-old male, 178 cm, 77 kg, sedentary. Useful for a lower-activity maintenance baseline.",
+              onApply: () =>
+                setState({
+                  age: "30",
+                  sex: "male",
+                  heightCm: "178",
+                  weightKg: "77",
+                  activityLevel: "sedentary",
+                  goal: "maintain"
+                })
+            },
+            {
+              label: "Training 4-5 days/week",
+              description: "Same body size but moderately active. Good for seeing how activity level changes maintenance calories.",
+              onApply: () =>
+                setState({
+                  age: "30",
+                  sex: "male",
+                  heightCm: "178",
+                  weightKg: "77",
+                  activityLevel: "moderate",
+                  goal: "maintain"
+                })
+            }
+          ]}
+        />
       </div>
       <div className="space-y-4">
         {!result ? <EmptyCalculatorState title="Add the basics" body="Age, sex, height, weight, and activity level are enough to estimate maintenance calories with the Mifflin-St Jeor equation." /> : (

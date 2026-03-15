@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo } from "react";
 
@@ -13,7 +13,7 @@ import {
 } from "@/lib/calculators/essentials";
 import { formatCurrency, formatPercent, parseNumberInput } from "@/lib/utils";
 
-import { CalculatorActions, EmptyCalculatorState, InsightPanel } from "./shared";
+import { CalculatorActions, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
 const initialState = {
   annualIncome: "95000",
@@ -43,29 +43,61 @@ export function TaxCalculator() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-      <div className="surface p-6 md:p-8">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <InputField label="Annual income" prefix="$" value={state.annualIncome} onChange={(event) => setState((current) => ({ ...current, annualIncome: event.target.value }))} />
-          <SelectField label="Filing status" value={state.filingStatus} onChange={(event) => setState((current) => ({ ...current, filingStatus: event.target.value }))}>
-            {taxFilingStatusOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </SelectField>
-          <SelectField label="State" hint="US estimate" value={state.state} onChange={(event) => setState((current) => ({ ...current, state: event.target.value }))}>
-            {taxStateOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </SelectField>
-          <InputField label="Pre-tax deductions" prefix="$" value={state.preTaxDeductions} onChange={(event) => setState((current) => ({ ...current, preTaxDeductions: event.target.value }))} />
-          <InputField label="Post-tax deductions" prefix="$" value={state.postTaxDeductions} onChange={(event) => setState((current) => ({ ...current, postTaxDeductions: event.target.value }))} />
+      <div className="space-y-4">
+        <div className="surface p-6 md:p-8">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <InputField label="Annual income" prefix="$" value={state.annualIncome} onChange={(event) => setState((current) => ({ ...current, annualIncome: event.target.value }))} />
+            <SelectField label="Filing status" value={state.filingStatus} onChange={(event) => setState((current) => ({ ...current, filingStatus: event.target.value }))}>
+              {taxFilingStatusOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </SelectField>
+            <SelectField label="State" hint="US estimate" value={state.state} onChange={(event) => setState((current) => ({ ...current, state: event.target.value }))}>
+              {taxStateOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </SelectField>
+            <InputField label="Pre-tax deductions" prefix="$" value={state.preTaxDeductions} onChange={(event) => setState((current) => ({ ...current, preTaxDeductions: event.target.value }))} />
+            <InputField label="Post-tax deductions" prefix="$" value={state.postTaxDeductions} onChange={(event) => setState((current) => ({ ...current, postTaxDeductions: event.target.value }))} />
+          </div>
+          <div className="mt-6">
+            <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
+          </div>
         </div>
-        <div className="mt-6">
-          <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
-        </div>
+        <ExamplePresetList
+          title="Try an example"
+          body="Use presets to compare different income and filing scenarios without re-entering the whole tax setup."
+          items={[
+            {
+              label: "Single filer in California",
+              description: "$95,000 income with $5,000 pre-tax deductions and $1,200 post-tax deductions.",
+              onApply: () =>
+                setState({
+                  annualIncome: "95000",
+                  filingStatus: "single",
+                  state: "ca",
+                  preTaxDeductions: "5000",
+                  postTaxDeductions: "1200"
+                })
+            },
+            {
+              label: "Married filer in Texas",
+              description: "$140,000 income with no state income tax and moderate deductions to compare take-home pay.",
+              onApply: () =>
+                setState({
+                  annualIncome: "140000",
+                  filingStatus: "married",
+                  state: "tx",
+                  preTaxDeductions: "8000",
+                  postTaxDeductions: "2400"
+                })
+            }
+          ]}
+        />
       </div>
       <div className="space-y-4">
         {!result ? (

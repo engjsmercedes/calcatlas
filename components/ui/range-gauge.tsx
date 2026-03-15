@@ -36,28 +36,30 @@ export function RangeGauge({
           {unitLabel ? <p className="mt-2 text-sm text-muted">{unitLabel}</p> : null}
         </div>
         <div className="relative px-1 pt-12">
-          <div
-            className="absolute top-0 -translate-x-1/2"
-            style={{ left: `${position}%` }}
-          >
+          <div className="absolute top-0 -translate-x-1/2" style={{ left: `${position}%` }}>
             <div className="rounded-2xl border border-border bg-white px-3 py-2 text-sm font-semibold shadow-card dark:bg-slate-950">
               {centerLabel}
             </div>
-            <div className="mx-auto h-4 w-4 rotate-45 border-b border-r border-border bg-white -mt-2 dark:bg-slate-950" />
+            <div className="mx-auto -mt-2 h-4 w-4 rotate-45 border-b border-r border-border bg-white dark:bg-slate-950" />
           </div>
           <div className="overflow-hidden rounded-full border border-border bg-slate-100 dark:bg-slate-900">
             <div className="flex h-16">
-              {segments.map((segment) => {
+              {segments.map((segment, index) => {
                 const start = previousMax;
                 const width = ((segment.max - start) / Math.max(max - min, 1)) * 100;
                 previousMax = segment.max;
                 return (
                   <div
                     key={segment.label}
-                    className="flex items-center justify-center px-2 text-center text-sm font-semibold text-white"
-                    style={{ width: `${width}%`, backgroundColor: segment.color }}
+                    className="flex items-center justify-center px-2 text-center text-[10px] font-semibold leading-tight text-white sm:text-sm"
+                    style={{
+                      width: `${width}%`,
+                      backgroundColor: segment.color,
+                      paddingLeft: index === 0 ? "0.9rem" : undefined,
+                      paddingRight: index === segments.length - 1 ? "0.9rem" : undefined
+                    }}
                   >
-                    {segment.label}
+                    <span className="block max-w-full whitespace-normal break-words">{segment.label}</span>
                   </div>
                 );
               })}
