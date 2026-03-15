@@ -8,10 +8,14 @@ import { useRecentCalculators } from "@/lib/hooks/use-recent-calculators";
 import { AgeCalculator } from "./age-calculator";
 import { AutoLoanCalculator } from "./auto-loan-calculator";
 import { BmiCalculator } from "./bmi-calculator";
+import { BmrCalculator } from "./bmr-calculator";
 import { BodyFatCalculator } from "./body-fat-calculator";
+import { BreakEvenCalculator } from "./break-even-calculator";
 import { CalorieNeedsCalculator } from "./calorie-needs-calculator";
+import { CommissionCalculator } from "./commission-calculator";
 import { CompoundInterestCalculator } from "./compound-interest-calculator";
 import { CreditCardPayoffCalculator } from "./credit-card-payoff-calculator";
+import { DebtPayoffCalculator } from "./debt-payoff-calculator";
 import { DateDifferenceCalculator } from "./date-difference-calculator";
 import { DebtToIncomeCalculator } from "./debt-to-income-calculator";
 import { DiscountCalculator } from "./discount-calculator";
@@ -23,15 +27,18 @@ import { StepsToCaloriesCalculator } from "./steps-to-calories-calculator";
 import { PregnancyDueDateCalculator } from "./pregnancy-due-date-calculator";
 import { OvulationCalculator } from "./ovulation-calculator";
 import { HeartRateZoneCalculator } from "./heart-rate-zone-calculator";
+import { InterestCalculator } from "./interest-calculator";
 import { LoanCalculator } from "./loan-calculator";
 import { MacroCalculator } from "./macro-calculator";
 import { MarginCalculator } from "./margin-calculator";
+import { MortgageAffordabilityCalculator } from "./mortgage-affordability-calculator";
 import { MortgageCalculator } from "./mortgage-calculator";
 import { NetWorthCalculator } from "./net-worth-calculator";
 import { OneRepMaxCalculator } from "./one-rep-max-calculator";
 import { PercentageCalculator } from "./percentage-calculator";
 import { ProteinIntakeCalculator } from "./protein-intake-calculator";
 import { RentVsBuyCalculator } from "./rent-vs-buy-calculator";
+import { RetirementCalculator } from "./retirement-calculator";
 import { RoiCalculator } from "./roi-calculator";
 import { RunningPaceCalculator } from "./running-pace-calculator";
 import { SalaryToHourlyCalculator } from "./salary-to-hourly-calculator";
@@ -60,14 +67,26 @@ export function CalculatorRenderer({ slug }: { slug: CalculatorSlug }) {
       return <PercentageCalculator />;
     case "discount-calculator":
       return <DiscountCalculator />;
+    case "interest-calculator":
+      return <InterestCalculator />;
     case "tip-calculator":
       return <TipCalculator />;
     case "margin-calculator":
       return <MarginCalculator />;
+    case "markup-calculator":
+      return <MarginCalculator />;
+    case "break-even-calculator":
+      return <BreakEvenCalculator />;
+    case "commission-calculator":
+      return <CommissionCalculator />;
     case "mortgage-calculator":
       return <MortgageCalculator />;
+    case "mortgage-affordability-calculator":
+      return <MortgageAffordabilityCalculator />;
     case "loan-calculator":
       return <LoanCalculator />;
+    case "debt-payoff-calculator":
+      return <DebtPayoffCalculator />;
     case "auto-loan-calculator":
       return <AutoLoanCalculator />;
     case "credit-card-payoff-calculator":
@@ -80,6 +99,12 @@ export function CalculatorRenderer({ slug }: { slug: CalculatorSlug }) {
       return <RentVsBuyCalculator />;
     case "savings-goal-calculator":
       return <SavingsGoalCalculator />;
+    case "savings-calculator":
+      return <SavingsGoalCalculator />;
+    case "investment-calculator":
+      return <CompoundInterestCalculator />;
+    case "retirement-calculator":
+      return <RetirementCalculator />;
     case "inflation-calculator":
       return <InflationCalculator />;
     case "tax-calculator":
@@ -92,9 +117,15 @@ export function CalculatorRenderer({ slug }: { slug: CalculatorSlug }) {
       return <CompoundInterestCalculator />;
     case "salary-to-hourly-calculator":
       return <SalaryToHourlyCalculator />;
+    case "salary-calculator":
+      return <SalaryToHourlyCalculator />;
     case "bmi-calculator":
       return <BmiCalculator />;
+    case "bmr-calculator":
+      return <BmrCalculator />;
     case "calorie-needs-calculator":
+      return <CalorieNeedsCalculator />;
+    case "calorie-calculator":
       return <CalorieNeedsCalculator />;
     case "body-fat-calculator":
       return <BodyFatCalculator />;

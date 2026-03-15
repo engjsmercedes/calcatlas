@@ -11,43 +11,43 @@ export const categorySections: Record<CalculatorCategory, CategorySectionDefinit
     {
       title: "Home buying and housing",
       description: "Mortgage planning, affordability, and rent-versus-buy decisions.",
-      slugs: ["mortgage-calculator", "down-payment-calculator", "debt-to-income-calculator", "rent-vs-buy-calculator"]
+      slugs: ["mortgage-calculator", "mortgage-affordability-calculator", "down-payment-calculator", "debt-to-income-calculator", "rent-vs-buy-calculator"]
     },
     {
       title: "Debt and borrowing",
       description: "Loan, auto loan, and credit payoff tools for financing decisions.",
-      slugs: ["loan-calculator", "auto-loan-calculator", "credit-card-payoff-calculator", "tax-calculator"]
+      slugs: ["loan-calculator", "interest-calculator", "auto-loan-calculator", "credit-card-payoff-calculator", "debt-payoff-calculator", "tax-calculator"]
     },
     {
       title: "Investing and savings",
       description: "Return, compounding, savings goals, inflation, and net-worth planning.",
-      slugs: ["roi-calculator", "compound-interest-calculator", "savings-goal-calculator", "inflation-calculator", "net-worth-calculator"]
+      slugs: ["roi-calculator", "investment-calculator", "compound-interest-calculator", "retirement-calculator", "savings-calculator", "inflation-calculator", "net-worth-calculator"]
     }
   ],
   Business: [
     {
       title: "Pricing and profitability",
       description: "Quick unit-economics tools for margins, markup, and return decisions.",
-      slugs: ["margin-calculator"]
+      slugs: ["margin-calculator", "markup-calculator", "break-even-calculator", "commission-calculator"]
     }
   ],
   Income: [
     {
       title: "Compensation and take-home pay",
       description: "Tools for salary comparisons, tax estimates, and pay planning.",
-      slugs: ["salary-to-hourly-calculator"]
+      slugs: ["salary-calculator", "salary-to-hourly-calculator"]
     }
   ],
   Health: [
     {
       title: "Body composition",
       description: "Weight, BMI, body-fat, and healthy-range screening tools.",
-      slugs: ["bmi-calculator", "body-fat-calculator", "ideal-weight-calculator"]
+      slugs: ["bmi-calculator", "bmr-calculator", "body-fat-calculator", "ideal-weight-calculator"]
     },
     {
       title: "Nutrition and hydration",
       description: "Calorie, TDEE, macro, protein, and water-intake planning tools.",
-      slugs: ["calorie-needs-calculator", "tdee-calculator", "macro-calculator", "protein-intake-calculator", "water-intake-calculator"]
+      slugs: ["calorie-calculator", "calorie-needs-calculator", "tdee-calculator", "macro-calculator", "protein-intake-calculator", "water-intake-calculator"]
     },
     {
       title: "Recovery and performance",
