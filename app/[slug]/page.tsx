@@ -1,9 +1,10 @@
-﻿import { Suspense } from "react";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { CalculatorRenderer } from "@/components/calculators/calculator-renderer";
+import { CalculatorFeedback } from "@/components/calculator-feedback";
 import { RelatedCalculators } from "@/components/related-calculators";
 import { StructuredData } from "@/components/structured-data";
 import { FaqList } from "@/components/ui/faq-list";
@@ -140,6 +141,9 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
         </div>
       </section>
       <section className="page-shell pb-10 md:pb-14">
+        <CalculatorFeedback calculatorSlug={calculator.slug} calculatorTitle={calculator.title} />
+      </section>
+      <section className="page-shell pb-10 md:pb-14">
         <section aria-labelledby="faq" className="space-y-5">
           <div className="space-y-2">
             <span className="section-label">FAQ</span>
@@ -167,3 +171,5 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
     </>
   );
 }
+
+

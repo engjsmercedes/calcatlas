@@ -3,7 +3,11 @@ export function cn(...values: Array<string | false | null | undefined>) {
 }
 
 export function parseNumberInput(value: string) {
-  const normalized = value.replace(/,/g, "").trim();
+  const normalized = value
+    .replace(/[$,%\s]/g, "")
+    .replace(/,/g, "")
+    .trim();
+
   if (!normalized) {
     return undefined;
   }
@@ -40,3 +44,4 @@ export function round(value: number, decimals = 2) {
   const factor = 10 ** decimals;
   return Math.round(value * factor) / factor;
 }
+
