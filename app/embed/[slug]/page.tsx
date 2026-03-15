@@ -44,6 +44,10 @@ export default function EmbedCalculatorPage({
     actions?: string;
     examples?: string;
     compare?: string;
+    results?: string;
+    insights?: string;
+    charts?: string;
+    tables?: string;
   };
 }) {
   const calculator = getCalculator(params.slug);
@@ -58,17 +62,29 @@ export default function EmbedCalculatorPage({
   const showActions = searchParams?.actions !== "0";
   const showExamples = searchParams?.examples !== "0";
   const showComparison = searchParams?.compare !== "0";
+  const showResults = searchParams?.results !== "0";
+  const showInsights = searchParams?.insights !== "0";
+  const showCharts = searchParams?.charts !== "0";
+  const showTables = searchParams?.tables !== "0";
 
   return (
     <EmbedOptionsProvider
       value={{
         showActions,
         showExamples,
-        showComparison
+        showComparison,
+        showResults,
+        showInsights,
+        showCharts,
+        showTables
       }}
     >
       <div className="min-h-screen bg-transparent px-3 py-3 md:px-4 md:py-4">
-        <div className={`mx-auto max-w-6xl rounded-[32px] border border-border bg-white/95 p-4 shadow-[0_18px_60px_rgba(15,23,42,0.12)] dark:bg-slate-950/95 ${compact ? "md:p-5" : "md:p-8"}`}>
+        <div
+          className={`mx-auto max-w-6xl rounded-[32px] border border-border bg-white/95 p-4 shadow-[0_18px_60px_rgba(15,23,42,0.12)] dark:bg-slate-950/95 ${
+            compact ? "md:p-5" : "md:p-8"
+          }`}
+        >
           {showTitle ? (
             <div className="mb-6 space-y-3">
               <span className="section-label">Embedded calculator</span>
@@ -84,7 +100,12 @@ export default function EmbedCalculatorPage({
           {showPoweredBy ? (
             <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-border pt-4 text-xs leading-6 text-muted">
               <span>Powered by Calc Atlas</span>
-              <Link href={absoluteUrl(`/${calculator.slug}`)} className="font-medium text-accent" target="_blank" rel="noopener noreferrer">
+              <Link
+                href={absoluteUrl(`/${calculator.slug}`)}
+                className="font-medium text-accent"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Open full calculator
               </Link>
             </div>

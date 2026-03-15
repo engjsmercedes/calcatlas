@@ -13,31 +13,42 @@ function buildEmbedUrl(slug: string, options: {
   showActions: boolean;
   showExamples: boolean;
   showComparison: boolean;
+  showResults: boolean;
+  showInsights: boolean;
+  showCharts: boolean;
+  showTables: boolean;
 }) {
   const params = new URLSearchParams();
 
   if (!options.showTitle) {
     params.set("title", "0");
   }
-
   if (options.compact) {
     params.set("compact", "1");
   }
-
   if (!options.showPoweredBy) {
     params.set("powered", "0");
   }
-
   if (!options.showActions) {
     params.set("actions", "0");
   }
-
   if (!options.showExamples) {
     params.set("examples", "0");
   }
-
   if (!options.showComparison) {
     params.set("compare", "0");
+  }
+  if (!options.showResults) {
+    params.set("results", "0");
+  }
+  if (!options.showInsights) {
+    params.set("insights", "0");
+  }
+  if (!options.showCharts) {
+    params.set("charts", "0");
+  }
+  if (!options.showTables) {
+    params.set("tables", "0");
   }
 
   const query = params.toString();
@@ -52,6 +63,10 @@ export function CalculatorEmbedCard({ calculator }: { calculator: CalculatorDefi
   const [showActions, setShowActions] = useState(true);
   const [showExamples, setShowExamples] = useState(true);
   const [showComparison, setShowComparison] = useState(true);
+  const [showResults, setShowResults] = useState(true);
+  const [showInsights, setShowInsights] = useState(true);
+  const [showCharts, setShowCharts] = useState(true);
+  const [showTables, setShowTables] = useState(true);
 
   const embedUrl = useMemo(
     () =>
@@ -61,10 +76,15 @@ export function CalculatorEmbedCard({ calculator }: { calculator: CalculatorDefi
         showPoweredBy,
         showActions,
         showExamples,
-        showComparison
+        showComparison,
+        showResults,
+        showInsights,
+        showCharts,
+        showTables
       }),
-    [calculator.slug, compact, showActions, showComparison, showExamples, showPoweredBy, showTitle]
+    [calculator.slug, compact, showActions, showCharts, showComparison, showExamples, showInsights, showPoweredBy, showResults, showTables, showTitle]
   );
+
   const embedCode = useMemo(
     () => `<iframe src="${embedUrl}" title="${calculator.title}" width="100%" height="980" style="border:0;overflow:hidden;border-radius:24px;" loading="lazy"></iframe>`,
     [calculator.title, embedUrl]
@@ -84,35 +104,21 @@ export function CalculatorEmbedCard({ calculator }: { calculator: CalculatorDefi
           Embed this calculator on another site
         </h2>
         <p className="max-w-3xl text-sm leading-7 text-muted">
-          Use the hosted embed to place this tool on a blog, landing page, or resource hub without copying the logic into another codebase.
+          Choose which sections to include, then copy the hosted iframe without moving the calculation logic into another codebase.
         </p>
       </div>
       <div className="surface space-y-5 p-6 md:p-8">
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3 text-sm text-slate-700 dark:text-slate-200">
-          <label className="flex items-center gap-2">
-            <input checked={showTitle} onChange={(event) => setShowTitle(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />
-            Show calculator title
-          </label>
-          <label className="flex items-center gap-2">
-            <input checked={compact} onChange={(event) => setCompact(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />
-            Compact embed mode
-          </label>
-          <label className="flex items-center gap-2">
-            <input checked={showPoweredBy} onChange={(event) => setShowPoweredBy(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />
-            Show powered by link
-          </label>
-          <label className="flex items-center gap-2">
-            <input checked={showActions} onChange={(event) => setShowActions(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />
-            Show action buttons
-          </label>
-          <label className="flex items-center gap-2">
-            <input checked={showExamples} onChange={(event) => setShowExamples(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />
-            Show examples and presets
-          </label>
-          <label className="flex items-center gap-2">
-            <input checked={showComparison} onChange={(event) => setShowComparison(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />
-            Show comparison tools
-          </label>
+        <div className="grid gap-3 text-sm text-slate-700 dark:text-slate-200 md:grid-cols-2 xl:grid-cols-3">
+          <label className="flex items-center gap-2"><input checked={showTitle} onChange={(event) => setShowTitle(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />Show calculator title</label>
+          <label className="flex items-center gap-2"><input checked={compact} onChange={(event) => setCompact(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />Compact embed mode</label>
+          <label className="flex items-center gap-2"><input checked={showPoweredBy} onChange={(event) => setShowPoweredBy(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />Show powered by link</label>
+          <label className="flex items-center gap-2"><input checked={showActions} onChange={(event) => setShowActions(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />Show action buttons</label>
+          <label className="flex items-center gap-2"><input checked={showExamples} onChange={(event) => setShowExamples(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />Show examples and presets</label>
+          <label className="flex items-center gap-2"><input checked={showComparison} onChange={(event) => setShowComparison(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />Show comparison tools</label>
+          <label className="flex items-center gap-2"><input checked={showResults} onChange={(event) => setShowResults(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />Show result cards</label>
+          <label className="flex items-center gap-2"><input checked={showInsights} onChange={(event) => setShowInsights(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />Show insight notes</label>
+          <label className="flex items-center gap-2"><input checked={showCharts} onChange={(event) => setShowCharts(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />Show charts and graphs</label>
+          <label className="flex items-center gap-2"><input checked={showTables} onChange={(event) => setShowTables(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />Show data tables</label>
         </div>
         <div className="rounded-3xl border border-border bg-slate-50/80 p-4 dark:bg-slate-950/30">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Embed URL</p>
@@ -123,12 +129,8 @@ export function CalculatorEmbedCard({ calculator }: { calculator: CalculatorDefi
           <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-all text-xs leading-6">{embedCode}</pre>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Button type="button" variant="primary" onClick={handleCopy}>
-            {copied ? "Embed code copied" : "Copy embed code"}
-          </Button>
-          <Button type="button" variant="secondary" onClick={() => window.open(embedUrl, "_blank", "noopener,noreferrer")}>
-            Open embed preview
-          </Button>
+          <Button type="button" variant="primary" onClick={handleCopy}>{copied ? "Embed code copied" : "Copy embed code"}</Button>
+          <Button type="button" variant="secondary" onClick={() => window.open(embedUrl, "_blank", "noopener,noreferrer")}>Open embed preview</Button>
         </div>
       </div>
     </section>

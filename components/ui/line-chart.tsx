@@ -1,3 +1,4 @@
+import { useEmbedOptions } from "@/components/embed-options";
 import { formatNumber } from "@/lib/utils";
 
 interface LineChartSeries {
@@ -13,6 +14,12 @@ export function LineChart({
   labels: number[];
   series: LineChartSeries[];
 }) {
+  const { showCharts } = useEmbedOptions();
+
+  if (!showCharts) {
+    return null;
+  }
+
   const width = 680;
   const height = 320;
   const padding = 32;

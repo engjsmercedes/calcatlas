@@ -1,3 +1,4 @@
+import { useEmbedOptions } from "@/components/embed-options";
 import { cn } from "@/lib/utils";
 
 export function ResultCard({
@@ -9,6 +10,12 @@ export function ResultCard({
   value: string;
   tone?: "default" | "success" | "warning";
 }) {
+  const { showResults } = useEmbedOptions();
+
+  if (!showResults) {
+    return null;
+  }
+
   return (
     <div
       className={cn(

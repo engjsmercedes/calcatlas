@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 
+import { useEmbedOptions } from "@/components/embed-options";
 import { InputField } from "@/components/ui/input-field";
 import { LineChart } from "@/components/ui/line-chart";
 import { PillTabs } from "@/components/ui/pill-tabs";
@@ -179,6 +180,7 @@ function resolveMortgageCore(inputs: {
 }
 
 export function MortgageCalculator() {
+  const { showTables } = useEmbedOptions();
   const [scheduleView, setScheduleView] = useState<"annual" | "monthly">("annual");
   const [comparisonEnabled, setComparisonEnabled] = useState(false);
   const [comparisonState, setComparisonState] = useState(initialState);
@@ -483,64 +485,69 @@ export function MortgageCalculator() {
               { label: "Cumulative interest paid", color: "#f59e0b", values: result.points.map((point) => point.cumulativeInterest) }
             ]}
           />
-          <div className="surface space-y-5 p-6 md:p-8">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <p className="section-label">Amortization schedule</p>
-                <h3 className="mt-3 text-2xl font-semibold">See how principal and interest change over time</h3>
+          {showTables ? (
+            <div className="surface space-y-5 p-6 md:p-8">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <p className="section-label">Amortization schedule</p>
+                  <h3 className="mt-3 text-2xl font-semibold">See how principal and interest change over time</h3>
+                </div>
+                <PillTabs
+                  options={[
+                    { label: "Annual schedule", value: "annual" },
+                    { label: "Monthly schedule", value: "monthly" }
+                  ]}
+                  value={scheduleView}
+                  onChange={setScheduleView}
+                />
               </div>
-              <PillTabs
-                options={[
-                  { label: "Annual schedule", value: "annual" },
-                  { label: "Monthly schedule", value: "monthly" }
-                ]}
-                value={scheduleView}
-                onChange={setScheduleView}
-              />
+              <div className="overflow-x-auto rounded-3xl border border-border">
+                <table className="min-w-full divide-y divide-border text-sm">
+                  <thead className="bg-slate-50/80 dark:bg-slate-900/40">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-semibold">{scheduleView === "annual" ? "Year" : "Payment"}</th>
+                      <th className="px-4 py-3 text-left font-semibold">Payment</th>
+                      <th className="px-4 py-3 text-left font-semibold">Principal</th>
+                      <th className="px-4 py-3 text-left font-semibold">Interest</th>
+                      <th className="px-4 py-3 text-left font-semibold">Extra</th>
+                      <th className="px-4 py-3 text-left font-semibold">Ending balance</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {scheduleView === "annual"
+                      ? result.yearlySchedule.map((row) => (
+                          <tr key={`y-${row.year}`}>
+                            <td className="px-4 py-3">{row.year}</td>
+                            <td className="px-4 py-3">{formatCurrency(row.payment)}</td>
+                            <td className="px-4 py-3">{formatCurrency(row.principal)}</td>
+                            <td className="px-4 py-3">{formatCurrency(row.interest)}</td>
+                            <td className="px-4 py-3">{formatCurrency(row.extraPayment)}</td>
+                            <td className="px-4 py-3">{formatCurrency(row.endingBalance)}</td>
+                          </tr>
+                        ))
+                      : result.monthlySchedule.map((row) => (
+                          <tr key={`m-${row.paymentNumber}`}>
+                            <td className="px-4 py-3">{row.paymentNumber}</td>
+                            <td className="px-4 py-3">{formatCurrency(row.payment)}</td>
+                            <td className="px-4 py-3">{formatCurrency(row.principal)}</td>
+                            <td className="px-4 py-3">{formatCurrency(row.interest)}</td>
+                            <td className="px-4 py-3">{formatCurrency(row.extraPayment)}</td>
+                            <td className="px-4 py-3">{formatCurrency(row.endingBalance)}</td>
+                          </tr>
+                        ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <div className="overflow-x-auto rounded-3xl border border-border">
-              <table className="min-w-full divide-y divide-border text-sm">
-                <thead className="bg-slate-50/80 dark:bg-slate-900/40">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-semibold">{scheduleView === "annual" ? "Year" : "Payment"}</th>
-                    <th className="px-4 py-3 text-left font-semibold">Payment</th>
-                    <th className="px-4 py-3 text-left font-semibold">Principal</th>
-                    <th className="px-4 py-3 text-left font-semibold">Interest</th>
-                    <th className="px-4 py-3 text-left font-semibold">Extra</th>
-                    <th className="px-4 py-3 text-left font-semibold">Ending balance</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {scheduleView === "annual"
-                    ? result.yearlySchedule.map((row) => (
-                        <tr key={`y-${row.year}`}>
-                          <td className="px-4 py-3">{row.year}</td>
-                          <td className="px-4 py-3">{formatCurrency(row.payment)}</td>
-                          <td className="px-4 py-3">{formatCurrency(row.principal)}</td>
-                          <td className="px-4 py-3">{formatCurrency(row.interest)}</td>
-                          <td className="px-4 py-3">{formatCurrency(row.extraPayment)}</td>
-                          <td className="px-4 py-3">{formatCurrency(row.endingBalance)}</td>
-                        </tr>
-                      ))
-                    : result.monthlySchedule.map((row) => (
-                        <tr key={`m-${row.paymentNumber}`}>
-                          <td className="px-4 py-3">{row.paymentNumber}</td>
-                          <td className="px-4 py-3">{formatCurrency(row.payment)}</td>
-                          <td className="px-4 py-3">{formatCurrency(row.principal)}</td>
-                          <td className="px-4 py-3">{formatCurrency(row.interest)}</td>
-                          <td className="px-4 py-3">{formatCurrency(row.extraPayment)}</td>
-                          <td className="px-4 py-3">{formatCurrency(row.endingBalance)}</td>
-                        </tr>
-                      ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          ) : null}
         </>
       ) : null}
     </div>
   );
 }
+
+
+
 
 
 

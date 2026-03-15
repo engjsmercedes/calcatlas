@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import { useEmbedOptions } from "@/components/embed-options";
+import { Button } from "@/components/ui/button";
 
 export function CalculatorActions({
   onReset,
@@ -52,6 +52,12 @@ export function EmptyCalculatorState({ title, body }: { title: string; body: str
 }
 
 export function InsightPanel({ title, body }: { title: string; body: string }) {
+  const { showInsights } = useEmbedOptions();
+
+  if (!showInsights) {
+    return null;
+  }
+
   return (
     <div className="rounded-3xl border border-accent/15 bg-accent-soft p-5">
       <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">{title}</p>

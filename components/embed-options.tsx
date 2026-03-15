@@ -6,12 +6,20 @@ export interface EmbedOptions {
   showActions: boolean;
   showExamples: boolean;
   showComparison: boolean;
+  showResults: boolean;
+  showInsights: boolean;
+  showCharts: boolean;
+  showTables: boolean;
 }
 
 const defaultEmbedOptions: EmbedOptions = {
   showActions: true,
   showExamples: true,
-  showComparison: true
+  showComparison: true,
+  showResults: true,
+  showInsights: true,
+  showCharts: true,
+  showTables: true
 };
 
 const EmbedOptionsContext = createContext<EmbedOptions>(defaultEmbedOptions);
