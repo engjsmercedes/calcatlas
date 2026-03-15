@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { siteConfig } from "@/lib/site";
 
+import { LogoMark } from "./logo-mark";
 import { ThemeToggle } from "./theme-toggle";
 
 export function SiteHeader() {
@@ -9,9 +10,7 @@ export function SiteHeader() {
     <header className="print-hidden sticky top-0 z-40 border-b border-border/80 bg-canvas/80 backdrop-blur-xl">
       <div className="page-shell flex items-center justify-between gap-4 py-4">
         <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent text-sm font-bold text-white dark:text-slate-950">
-            CA
-          </span>
+          <LogoMark className="h-10 w-10 shrink-0" />
           <div>
             <p className="text-base font-semibold text-slate-950 dark:text-white">{siteConfig.name}</p>
             <p className="text-xs text-muted">Fast calculators for real decisions</p>
