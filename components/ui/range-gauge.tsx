@@ -1,4 +1,4 @@
-﻿import { cn, formatNumber } from "@/lib/utils";
+import { formatNumber } from "@/lib/utils";
 
 interface RangeGaugeSegment {
   label: string;
@@ -23,78 +23,51 @@ export function RangeGauge({
   centerLabel: string;
   unitLabel?: string;
 }) {
-  const width = 320;
-  const height = 200;
-  const centerX = width / 2;
-  const centerY = 168;
-  const outerRadius = 120;
-  const innerRadius = 74;
   const clamped = Math.min(Math.max(value, min), max);
-  const fraction = (clamped - min) / Math.max(max - min, 1);
-  const angle = Math.PI * (1 - fraction);
-  const needleLength = outerRadius - 10;
-  const needleX = centerX + Math.cos(angle - Math.PI) * needleLength;
-  const needleY = centerY + Math.sin(angle - Math.PI) * needleLength;
-
-  let segmentStart = Math.PI;
-  const arcs = segments.map((segment) => {
-    const segmentFraction = (segment.max - min) / Math.max(max - min, 1);
-    const segmentEnd = Math.PI * (1 - segmentFraction);
-    const startX = centerX + Math.cos(segmentStart) * outerRadius;
-    const startY = centerY + Math.sin(segmentStart) * outerRadius;
-    const endX = centerX + Math.cos(segmentEnd) * outerRadius;
-    const endY = centerY + Math.sin(segmentEnd) * outerRadius;
-    const innerStartX = centerX + Math.cos(segmentStart) * innerRadius;
-    const innerStartY = centerY + Math.sin(segmentStart) * innerRadius;
-    const innerEndX = centerX + Math.cos(segmentEnd) * innerRadius;
-    const innerEndY = centerY + Math.sin(segmentEnd) * innerRadius;
-    const largeArcFlag = segmentStart - segmentEnd > Math.PI ? 1 : 0;
-    const path = [
-      `M ${startX} ${startY}`,
-      `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 0 ${endX} ${endY}`,
-      `L ${innerEndX} ${innerEndY}`,
-      `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 1 ${innerStartX} ${innerStartY}`,
-      "Z"
-    ].join(" ");
-    const midAngle = (segmentStart + segmentEnd) / 2;
-    const labelX = centerX + Math.cos(midAngle) * (outerRadius + 18);
-    const labelY = centerY + Math.sin(midAngle) * (outerRadius + 18);
-    segmentStart = segmentEnd;
-    return { ...segment, path, labelX, labelY };
-  });
+  const position = ((clamped - min) / Math.max(max - min, 1)) * 100;
+  let previousMax = min;
 
   return (
-    <div className="surface p-5">
+    <div className="surface p-5 md:p-6">
       {title ? <p className="section-label mb-4">{title}</p> : null}
-      <svg viewBox={`0 0 ${width} ${height}`} className="mx-auto w-full max-w-[20rem] overflow-visible">
-        {arcs.map((segment) => (
-          <path key={segment.label} d={segment.path} fill={segment.color} opacity={0.95} />
-        ))}
-        {arcs.map((segment) => (
-          <text
-            key={`${segment.label}-text`}
-            x={segment.labelX}
-            y={segment.labelY}
-            textAnchor="middle"
-            className={cn("fill-slate-600 text-[11px] font-semibold dark:fill-slate-300")}
+      <div className="space-y-5">
+        <div className="text-center">
+          <div className="text-5xl font-semibold tracking-tight text-slate-950 dark:text-white">{centerLabel}</div>
+          {unitLabel ? <p className="mt-2 text-sm text-muted">{unitLabel}</p> : null}
+        </div>
+        <div className="relative px-1 pt-12">
+          <div
+            className="absolute top-0 -translate-x-1/2"
+            style={{ left: `${position}%` }}
           >
-            {segment.label}
-          </text>
-        ))}
-        <line x1={centerX} y1={centerY} x2={needleX} y2={needleY} stroke="#0f172a" strokeWidth="4" strokeLinecap="round" />
-        <circle cx={centerX} cy={centerY} r="8" fill="#0f172a" />
-        <text x={centerX} y={132} textAnchor="middle" className="fill-slate-950 text-[34px] font-semibold dark:fill-white">
-          {centerLabel}
-        </text>
-        {unitLabel ? (
-          <text x={centerX} y={150} textAnchor="middle" className="fill-slate-500 text-[12px] dark:fill-slate-400">
-            {unitLabel}
-          </text>
-        ) : null}
-      </svg>
-      <div className="mt-3 flex items-center justify-between text-xs text-muted">
-        <span>{formatNumber(min)}</span>
-        <span>{formatNumber(max)}</span>
+            <div className="rounded-2xl border border-border bg-white px-3 py-2 text-sm font-semibold shadow-card dark:bg-slate-950">
+              {centerLabel}
+            </div>
+            <div className="mx-auto h-4 w-4 rotate-45 border-b border-r border-border bg-white -mt-2 dark:bg-slate-950" />
+          </div>
+          <div className="overflow-hidden rounded-full border border-border bg-slate-100 dark:bg-slate-900">
+            <div className="flex h-16">
+              {segments.map((segment) => {
+                const start = previousMax;
+                const width = ((segment.max - start) / Math.max(max - min, 1)) * 100;
+                previousMax = segment.max;
+                return (
+                  <div
+                    key={segment.label}
+                    className="flex items-center justify-center px-2 text-center text-sm font-semibold text-white"
+                    style={{ width: `${width}%`, backgroundColor: segment.color }}
+                  >
+                    {segment.label}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-between text-xs text-muted">
+          <span>{formatNumber(min)}</span>
+          <span>{formatNumber(max)}</span>
+        </div>
       </div>
     </div>
   );

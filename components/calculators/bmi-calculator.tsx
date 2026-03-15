@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo } from "react";
 
@@ -60,6 +60,10 @@ export function BmiCalculator() {
             <InputField label="Height (inches)" value={state.heightInches} onChange={(event) => setState((current) => ({ ...current, heightInches: event.target.value }))} />
             <InputField label="Weight (lb)" value={state.weightLb} onChange={(event) => setState((current) => ({ ...current, weightLb: event.target.value }))} />
             <InputField label="Age" hint="Optional" value={state.age} onChange={(event) => setState((current) => ({ ...current, age: event.target.value }))} />
+            <SelectField label="Gender" value={state.sex} onChange={(event) => setState((current) => ({ ...current, sex: event.target.value }))}>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </SelectField>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
@@ -80,32 +84,32 @@ export function BmiCalculator() {
         ) : (
           <>
             <RangeGauge
-              title="BMI scale"
+              title="BMI categories"
               value={result.bmi}
               min={15}
               max={40}
-              centerLabel={formatNumber(result.bmi)}
+              centerLabel={formatNumber(result.bmi, 1)}
               unitLabel={result.category}
               segments={[
-                { label: "Under", max: 18.5, color: "#fbbf24" },
-                { label: "Healthy", max: 24.9, color: "#10b981" },
-                { label: "Over", max: 29.9, color: "#f59e0b" },
-                { label: "Obesity", max: 40, color: "#ef4444" }
+                { label: "Underweight", max: 18.5, color: "#3b82f6" },
+                { label: "Healthy", max: 24.9, color: "#22c55e" },
+                { label: "Overweight", max: 29.9, color: "#f59e0b" },
+                { label: "Obese", max: 40, color: "#ef4444" }
               ]}
             />
-            <div className="surface p-6 md:p-8 space-y-4">
+            <div className="surface space-y-4 p-6 md:p-8">
               <div>
                 <p className="section-label">BMI result</p>
-                <h3 className="mt-4 text-3xl font-semibold">{formatNumber(result.bmi)}</h3>
+                <h3 className="mt-4 text-3xl font-semibold">{formatNumber(result.bmi, 1)}</h3>
                 <p className="mt-2 text-sm leading-7">This BMI falls into the <strong>{result.category}</strong> category based on standard adult BMI ranges.</p>
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
-                <ResultCard label="BMI" value={formatNumber(result.bmi)} tone="success" />
+                <ResultCard label="BMI" value={formatNumber(result.bmi, 1)} tone="success" />
                 <ResultCard label="Category" value={result.category} />
-                <ResultCard label="Healthy range" value={`${formatNumber(result.healthyWeightRangeLb.min)}-${formatNumber(result.healthyWeightRangeLb.max)} lb`} />
+                <ResultCard label="Healthy range" value={`${formatNumber(result.healthyWeightRangeLb.min, 1)}-${formatNumber(result.healthyWeightRangeLb.max, 1)} lb`} />
               </div>
             </div>
-            <InsightPanel title="Interpretation" body={`For this height, a healthy-weight range is about ${formatNumber(result.healthyWeightRangeKg.min)} to ${formatNumber(result.healthyWeightRangeKg.max)} kg. BMI is a quick screening tool, not a diagnosis, so body composition and fitness level still matter.`} />
+            <InsightPanel title="Interpretation" body={`For this height, a healthy-weight range is about ${formatNumber(result.healthyWeightRangeKg.min, 1)} to ${formatNumber(result.healthyWeightRangeKg.max, 1)} kg. BMI is a quick screening tool, not a diagnosis, so body composition and fitness level still matter.`} />
           </>
         )}
       </div>
