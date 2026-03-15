@@ -96,7 +96,18 @@ const calculatorIntroExtensions: Record<CalculatorSlug, string> = {
   "protein-intake-calculator": "The page is intentionally range-based because that reflects how protein guidance works in practice. Instead of pretending there is one perfect number, it gives users a realistic target band that can support health, fat loss, or muscle gain goals.",
   "sleep-cycle-calculator": "It is designed to answer one of the most common sleep timing questions quickly: when should I go to bed or wake up if I want to align with fuller sleep cycles. The page keeps the recommendation simple while still explaining the basic 90-minute-cycle assumption.",
   "running-pace-calculator": "The page helps runners move between race results, training pace, and finish-time planning without juggling multiple conversions. By showing mile pace, kilometer pace, and speed together, it becomes useful for both outdoor running and treadmill-based training.",
-  "one-rep-max-calculator": "It is built for lifters who want a practical estimate from a recent working set instead of testing a true max every time. The page adds rep-range equivalents so the result can support actual programming, not just a headline strength number."
+  "one-rep-max-calculator": "It is built for lifters who want a practical estimate from a recent working set instead of testing a true max every time. The page adds rep-range equivalents so the result can support actual programming, not just a headline strength number.",
+  "unit-converter": "This page works as a general-purpose unit switcher for the most common measurement categories people need on mobile and desktop. Instead of burying users in a giant conversion matrix, it keeps the conversion type, source unit, and target unit easy to scan and share.",
+  "speed-converter": "The page is focused on the speed units people actually move between in travel, running, weather, and technical work. Keeping it separate from a generic converter makes it easier to use when users only need mph, km/h, m/s, or knots quickly.",
+  "length-converter": "It is designed for room measurements, travel distances, and basic spec comparisons where users need to move between imperial and metric lengths fast. The dedicated page reduces friction compared with a broad all-purpose unit tool.",
+  "weight-converter": "The page works well for body-weight tracking, shipping, travel, and kitchen math because it covers the common metric and imperial units people repeatedly search for. Showing the result in a cleaner dedicated layout makes repeat use easier.",
+  "temperature-converter": "This page is useful because temperature conversions come up repeatedly in weather, cooking, and science contexts where the formula is easy to forget. Keeping Celsius, Fahrenheit, and Kelvin together makes it faster to reuse than a general converter.",
+  "time-zone-converter": "It is built for remote work, client scheduling, and travel coordination where users need named-zone accuracy instead of rough UTC-offset math. Showing both source and converted local times makes the output easier to trust at a glance.",
+  "tdee-calculator": "The page is built to answer a high-intent nutrition question clearly: how many calories do I likely burn in a full day once activity is accounted for. By separating BMR, activity multiplier, and total daily energy expenditure, it makes the estimate easier to understand and adjust.",
+  "pregnancy-due-date-calculator": "This page is designed for early planning use when people want a practical due-date estimate tied to a last period or known conception date. Keeping the result simple while showing nearby ovulation timing makes it more useful than a single due date alone.",
+  "ovulation-calculator": "It turns cycle timing into a more readable fertile-window estimate so users can plan around likely ovulation without doing menstrual-cycle math by hand. The page stays careful about uncertainty instead of pretending the estimate is exact.",
+  "heart-rate-zone-calculator": "The page gives cardio users a more practical training answer than max heart rate alone by turning the estimate into usable zone ranges. Supporting resting heart rate also makes it more helpful for people who want a more individualized range.",
+  "steps-to-calories-calculator": "It helps users move from a step count to a more concrete walking-distance and calorie estimate, which makes daily activity totals easier to interpret. Including height-based stride context gives the output more realism than a flat per-step guess."
 };
 
 export function getCalculatorLead(calculator: CalculatorDefinition) {
@@ -168,9 +179,9 @@ export function getCalculatorGuide(calculator: CalculatorDefinition) {
     default:
       return {
         measures: `This calculator measures the main input-to-output relationship behind ${calculator.title.toLowerCase()} in a way that is fast to reuse.`,
-        affects: "The selected mode, the quality of the starting inputs, and the chosen assumptions all influence the final number.",
-        uses: "People use the result to answer a quick practical question and then move directly into the next decision.",
-        related: "Related calculators below keep users inside the same problem cluster without duplicating navigation."
+        affects: calculator.slug.includes("converter") ? "The value entered, the source unit or zone, and the target unit or zone are what determine the converted result." : "The selected mode, the quality of the starting inputs, and the chosen assumptions all influence the final number.",
+        uses: calculator.slug.includes("converter") ? "People use the output to switch systems quickly, compare units, and avoid manual conversion mistakes during real tasks." : "People use the result to answer a quick practical question and then move directly into the next decision.",
+        related: calculator.slug.includes("converter") ? "Related utility pages below help users keep moving through adjacent measurement, date, and time tasks without starting from scratch." : "Related calculators below keep users inside the same problem cluster without duplicating navigation."
       };
   }
 }

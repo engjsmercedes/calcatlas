@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect } from "react";
 
@@ -18,6 +18,11 @@ import { DiscountCalculator } from "./discount-calculator";
 import { DownPaymentCalculator } from "./down-payment-calculator";
 import { IdealWeightCalculator } from "./ideal-weight-calculator";
 import { InflationCalculator } from "./inflation-calculator";
+import { TdeeCalculator } from "./tdee-calculator";
+import { StepsToCaloriesCalculator } from "./steps-to-calories-calculator";
+import { PregnancyDueDateCalculator } from "./pregnancy-due-date-calculator";
+import { OvulationCalculator } from "./ovulation-calculator";
+import { HeartRateZoneCalculator } from "./heart-rate-zone-calculator";
 import { LoanCalculator } from "./loan-calculator";
 import { MacroCalculator } from "./macro-calculator";
 import { MarginCalculator } from "./margin-calculator";
@@ -34,6 +39,12 @@ import { SavingsGoalCalculator } from "./savings-goal-calculator";
 import { SleepCycleCalculator } from "./sleep-cycle-calculator";
 import { TaxCalculator } from "./tax-calculator";
 import { TimeDurationCalculator } from "./time-duration-calculator";
+import { TimeZoneConverter } from "./time-zone-converter";
+import { UnitConverter } from "./unit-converter";
+import { SpeedConverter } from "./speed-converter";
+import { LengthConverter } from "./length-converter";
+import { WeightConverter } from "./weight-converter";
+import { TemperatureConverter } from "./temperature-converter";
 import { TipCalculator } from "./tip-calculator";
 import { WaterIntakeCalculator } from "./water-intake-calculator";
 
@@ -93,16 +104,38 @@ export function CalculatorRenderer({ slug }: { slug: CalculatorSlug }) {
       return <IdealWeightCalculator />;
     case "macro-calculator":
       return <MacroCalculator />;
+    case "tdee-calculator":
+      return <TdeeCalculator />;
     case "protein-intake-calculator":
       return <ProteinIntakeCalculator />;
     case "sleep-cycle-calculator":
       return <SleepCycleCalculator />;
+    case "pregnancy-due-date-calculator":
+      return <PregnancyDueDateCalculator />;
+    case "ovulation-calculator":
+      return <OvulationCalculator />;
+    case "heart-rate-zone-calculator":
+      return <HeartRateZoneCalculator />;
+    case "steps-to-calories-calculator":
+      return <StepsToCaloriesCalculator />;
     case "age-calculator":
       return <AgeCalculator />;
     case "date-difference-calculator":
       return <DateDifferenceCalculator />;
     case "time-duration-calculator":
       return <TimeDurationCalculator />;
+    case "unit-converter":
+      return <UnitConverter />;
+    case "speed-converter":
+      return <SpeedConverter />;
+    case "length-converter":
+      return <LengthConverter />;
+    case "weight-converter":
+      return <WeightConverter />;
+    case "temperature-converter":
+      return <TemperatureConverter />;
+    case "time-zone-converter":
+      return <TimeZoneConverter />;
     case "running-pace-calculator":
       return <RunningPaceCalculator />;
     case "one-rep-max-calculator":
@@ -111,3 +144,4 @@ export function CalculatorRenderer({ slug }: { slug: CalculatorSlug }) {
       return null;
   }
 }
+

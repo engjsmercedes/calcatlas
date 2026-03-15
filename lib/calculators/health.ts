@@ -4,6 +4,7 @@ export type ActivityLevel = "sedentary" | "light" | "moderate" | "active" | "ver
 export type WeightGoal = "lose" | "maintain" | "gain";
 export type MacroStyle = "balanced" | "higher-protein" | "lower-carb";
 export type ProteinGoal = "general" | "fat-loss" | "muscle-gain";
+export type DueDateMode = "last-period" | "conception";
 
 const POUNDS_PER_KILOGRAM = 2.2046226218;
 const INCHES_PER_CENTIMETER = 0.3937007874;
@@ -385,6 +386,168 @@ export function calculateOneRepMax(weight: number, reps: number) {
   return {
     oneRepMax,
     repTable
+  };
+}
+
+export function calculateTdee(inputs: {
+  age: number;
+  sex: Sex;
+  heightCm: number;
+  weightKg: number;
+  activityLevel: ActivityLevel;
+  goal: WeightGoal;
+}) {
+  const calories = calculateCalorieNeeds(inputs);
+  if (!calories) {
+    return undefined;
+  }
+
+  const targetCalories = inputs.goal === "lose" ? calories.lose : inputs.goal === "gain" ? calories.gain : calories.maintenance;
+
+  return {
+    bmr: calories.bmr,
+    tdee: calories.maintenance,
+    targetCalories,
+    activityMultiplier: activityMultipliers[inputs.activityLevel]
+  };
+}
+
+export function calculatePregnancyDueDate(inputs: {
+  mode: DueDateMode;
+  referenceDate: string;
+  cycleLength: number;
+}) {
+  if (!inputs.referenceDate) {
+    return undefined;
+  }
+
+  const reference = new Date(`${inputs.referenceDate}T00:00:00`);
+  if (Number.isNaN(reference.getTime())) {
+    return undefined;
+  }
+
+  const cycleLength = Number.isFinite(inputs.cycleLength) && inputs.cycleLength > 0 ? inputs.cycleLength : 28;
+  const dueDate = new Date(reference.getTime());
+  const ovulationDate = new Date(reference.getTime());
+
+  if (inputs.mode === "last-period") {
+    dueDate.setDate(dueDate.getDate() + 280);
+    ovulationDate.setDate(ovulationDate.getDate() + Math.max(0, cycleLength - 14));
+  } else {
+    dueDate.setDate(dueDate.getDate() + 266);
+  }
+
+  const fertileStart = new Date(ovulationDate.getTime());
+  fertileStart.setDate(fertileStart.getDate() - 5);
+  const fertileEnd = new Date(ovulationDate.getTime());
+  fertileEnd.setDate(fertileEnd.getDate() + 1);
+
+  return {
+    dueDate,
+    ovulationDate,
+    fertileStart,
+    fertileEnd,
+    currentWeek: Math.max(0, Math.floor(((Date.now() - (inputs.mode === "last-period" ? reference.getTime() : reference.getTime() - 14 * 24 * 60 * 60 * 1000)) / (7 * 24 * 60 * 60 * 1000))))
+  };
+}
+
+export function calculateOvulation(inputs: {
+  lastPeriodDate: string;
+  cycleLength: number;
+}) {
+  if (!inputs.lastPeriodDate) {
+    return undefined;
+  }
+
+  const start = new Date(`${inputs.lastPeriodDate}T00:00:00`);
+  if (Number.isNaN(start.getTime())) {
+    return undefined;
+  }
+
+  const cycleLength = Number.isFinite(inputs.cycleLength) && inputs.cycleLength > 0 ? inputs.cycleLength : 28;
+  const ovulationDate = new Date(start.getTime());
+  ovulationDate.setDate(ovulationDate.getDate() + Math.max(0, cycleLength - 14));
+
+  const fertileStart = new Date(ovulationDate.getTime());
+  fertileStart.setDate(fertileStart.getDate() - 5);
+
+  const fertileEnd = new Date(ovulationDate.getTime());
+  fertileEnd.setDate(fertileEnd.getDate() + 1);
+
+  const nextPeriod = new Date(start.getTime());
+  nextPeriod.setDate(nextPeriod.getDate() + cycleLength);
+
+  return {
+    ovulationDate,
+    fertileStart,
+    fertileEnd,
+    nextPeriod
+  };
+}
+
+export function calculateHeartRateZones(inputs: {
+  age: number;
+  restingHeartRate?: number;
+}) {
+  if (inputs.age <= 0) {
+    return undefined;
+  }
+
+  const maxHeartRate = 220 - inputs.age;
+  const resting = inputs.restingHeartRate && inputs.restingHeartRate > 0 ? inputs.restingHeartRate : undefined;
+  const reserve = resting ? maxHeartRate - resting : undefined;
+
+  const zoneBands = [
+    { label: "Zone 1", min: 0.5, max: 0.6, purpose: "Easy recovery work and warm-ups." },
+    { label: "Zone 2", min: 0.6, max: 0.7, purpose: "Aerobic base building and longer steady efforts." },
+    { label: "Zone 3", min: 0.7, max: 0.8, purpose: "Moderate tempo work and endurance development." },
+    { label: "Zone 4", min: 0.8, max: 0.9, purpose: "Threshold work and harder sustained intervals." },
+    { label: "Zone 5", min: 0.9, max: 1, purpose: "High-intensity intervals and short maximal efforts." }
+  ];
+
+  return {
+    maxHeartRate,
+    method: reserve ? "karvonen" : "percent-max",
+    zones: zoneBands.map((zone) => ({
+      ...zone,
+      minBpm: Math.round(reserve !== undefined && resting !== undefined ? resting + reserve * zone.min : maxHeartRate * zone.min),
+      maxBpm: Math.round(reserve !== undefined && resting !== undefined ? resting + reserve * zone.max : maxHeartRate * zone.max)
+    }))
+  };
+}
+
+export function calculateStepsToCalories(inputs: {
+  unitSystem: UnitSystem;
+  steps: number;
+  weightKg?: number;
+  weightLb?: number;
+  heightCm?: number;
+  heightFeet?: number;
+  heightInches?: number;
+}) {
+  if (inputs.steps <= 0) {
+    return undefined;
+  }
+
+  const weightLb = inputs.unitSystem === "metric" ? kilogramsToPounds(inputs.weightKg || 0) : inputs.weightLb || 0;
+  if (weightLb <= 0) {
+    return undefined;
+  }
+
+  const heightInches =
+    inputs.unitSystem === "metric"
+      ? centimetersToInches(inputs.heightCm || 0)
+      : feetAndInchesToTotalInches(inputs.heightFeet || 0, inputs.heightInches || 0);
+
+  const strideInches = heightInches > 0 ? heightInches * 0.413 : 30;
+  const distanceMiles = (inputs.steps * strideInches) / 63360;
+  const calories = 0.53 * weightLb * distanceMiles;
+
+  return {
+    distanceMiles,
+    distanceKilometers: distanceMiles / MILES_PER_KILOMETER,
+    calories,
+    strideInches
   };
 }
 

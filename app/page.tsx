@@ -6,6 +6,7 @@ import { HomeSearch } from "@/components/home/home-search";
 import { RecentlyUsed } from "@/components/home/recently-used";
 import { StructuredData } from "@/components/structured-data";
 import { calculatorCategories, calculatorCategoryDetails, calculators } from "@/data/calculators";
+import { subtopicHubs } from "@/data/subtopic-hubs";
 import { createMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
 
@@ -73,6 +74,28 @@ export default function HomePage() {
               </div>
             </div>
             <HomeSearch calculators={calculators} />
+          </div>
+        </div>
+      </section>
+      <section className="page-shell pb-8 md:pb-12">
+        <div className="surface p-6 md:p-8">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="space-y-2">
+              <span className="section-label">Popular clusters</span>
+              <h2 className="text-2xl font-semibold">Go straight into the biggest decision paths</h2>
+              <p className="max-w-3xl text-sm leading-7 text-muted">These subtopic hubs group the calculators people usually need together for borrowing, investing, and take-home-pay planning.</p>
+            </div>
+          </div>
+          <div className="mt-5 flex flex-wrap gap-3">
+            {subtopicHubs.map((hub) => (
+              <Link
+                key={hub.slug}
+                href={`/${hub.slug}`}
+                className="rounded-full border border-border bg-white/70 px-4 py-2 text-sm text-muted transition hover:border-accent hover:text-accent"
+              >
+                {hub.title}
+              </Link>
+            ))}
           </div>
         </div>
       </section>

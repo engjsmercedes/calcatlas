@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { CalculatorCard } from "@/components/calculator-card";
 import { buildCategorySections } from "@/data/category-sections";
+import { subtopicHubs } from "@/data/subtopic-hubs";
 import type { CalculatorCategoryDefinition, CalculatorDefinition } from "@/data/calculators";
 
 export function CategoryHubPage({
@@ -75,6 +76,23 @@ export function CategoryHubPage({
             </p>
           </div>
         </div>
+        {category.category === "Finance" ? (
+          <div className="mt-6 surface p-6">
+            <h2 className="text-lg font-semibold text-slate-950 dark:text-white">Popular finance subtopic hubs</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">Jump into the highest-intent finance clusters for borrowing, long-term growth, and take-home-pay planning.</p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {subtopicHubs.map((hub) => (
+                <Link
+                  key={hub.slug}
+                  href={`/${hub.slug}`}
+                  className="rounded-full border border-border px-4 py-2 text-sm text-muted transition hover:border-accent hover:text-accent"
+                >
+                  {hub.title}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </section>
       <section className="page-shell pb-10 md:pb-14">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">

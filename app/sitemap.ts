@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { calculatorCategoryPages, calculators } from "@/data/calculators";
+import { subtopicHubs } from "@/data/subtopic-hubs";
 import { trustPageLinks } from "@/data/static-pages";
 import { siteConfig } from "@/lib/site";
 
@@ -25,6 +26,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "weekly" as const,
       priority: 0.85
+    })),
+    ...subtopicHubs.map((hub) => ({
+      url: `${siteConfig.url}/${hub.slug}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.82
     })),
     ...trustPageLinks.map((page) => ({
       url: `${siteConfig.url}${page.href}`,

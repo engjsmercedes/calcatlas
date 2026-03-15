@@ -46,13 +46,18 @@ export const categorySections: Record<CalculatorCategory, CategorySectionDefinit
     },
     {
       title: "Nutrition and hydration",
-      description: "Calorie, macro, protein, and water-intake planning tools.",
-      slugs: ["calorie-needs-calculator", "macro-calculator", "protein-intake-calculator", "water-intake-calculator"]
+      description: "Calorie, TDEE, macro, protein, and water-intake planning tools.",
+      slugs: ["calorie-needs-calculator", "tdee-calculator", "macro-calculator", "protein-intake-calculator", "water-intake-calculator"]
     },
     {
       title: "Recovery and performance",
-      description: "Sleep, running, and strength calculators for repeat training use.",
-      slugs: ["sleep-cycle-calculator", "running-pace-calculator", "one-rep-max-calculator"]
+      description: "Sleep, running, heart-rate, steps, and strength calculators for repeat training use.",
+      slugs: ["sleep-cycle-calculator", "running-pace-calculator", "heart-rate-zone-calculator", "steps-to-calories-calculator", "one-rep-max-calculator"]
+    },
+    {
+      title: "Cycle and pregnancy planning",
+      description: "Ovulation and due-date estimates for timing and planning context.",
+      slugs: ["pregnancy-due-date-calculator", "ovulation-calculator"]
     }
   ],
   Everyday: [
@@ -63,8 +68,13 @@ export const categorySections: Record<CalculatorCategory, CategorySectionDefinit
     },
     {
       title: "Date and time",
-      description: "Age, date-gap, and time-duration tools for planning and schedules.",
-      slugs: ["age-calculator", "date-difference-calculator", "time-duration-calculator"]
+      description: "Age, date-gap, time-duration, and cross-time-zone tools for planning and schedules.",
+      slugs: ["age-calculator", "date-difference-calculator", "time-duration-calculator", "time-zone-converter"]
+    },
+    {
+      title: "Converters and units",
+      description: "Fast everyday converters for length, weight, speed, temperature, and mixed unit checks.",
+      slugs: ["unit-converter", "length-converter", "weight-converter", "speed-converter", "temperature-converter"]
     }
   ]
 };

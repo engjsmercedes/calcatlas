@@ -9,7 +9,7 @@ import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculato
 import { calculateSavingsGoal } from "@/lib/calculators/planning";
 import { formatCurrency, formatNumber, parseNumberInput } from "@/lib/utils";
 
-import { CalculatorActions, EmptyCalculatorState, InsightPanel } from "./shared";
+import { CalculatorActions, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
 const initialState = {
   currentSavings: "15000",
@@ -49,6 +49,34 @@ export function SavingsGoalCalculator() {
             <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
           </div>
         </div>
+        <ExamplePresetList
+          title="Try an example"
+          body="Use presets to compare a more conservative emergency-fund plan against a more aggressive long-term savings push."
+          items={[
+            {
+              label: "Emergency fund build",
+              description: "$5,000 saved today, $15,000 target, and steady monthly deposits for a shorter-term goal.",
+              onApply: () =>
+                setState({
+                  currentSavings: "5000",
+                  targetAmount: "15000",
+                  monthlyContribution: "500",
+                  annualRate: "4"
+                })
+            },
+            {
+              label: "Six-figure goal",
+              description: "$15,000 saved already with an $850 monthly contribution and moderate growth toward a larger target.",
+              onApply: () =>
+                setState({
+                  currentSavings: "15000",
+                  targetAmount: "100000",
+                  monthlyContribution: "850",
+                  annualRate: "5.5"
+                })
+            }
+          ]}
+        />
         <div className="space-y-4">
           {!result ? (
             <EmptyCalculatorState title="Set the savings target" body="Add current savings, the goal amount, monthly contributions, and an expected return to estimate how long it could take to get there." />
