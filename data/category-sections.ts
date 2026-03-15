@@ -28,14 +28,14 @@ export const categorySections: Record<CalculatorCategory, CategorySectionDefinit
     {
       title: "Pricing and profitability",
       description: "Quick unit-economics tools for margins, markup, and return decisions.",
-      slugs: ["margin-calculator", "markup-calculator", "break-even-calculator", "commission-calculator"]
+      slugs: ["margin-calculator", "markup-calculator", "break-even-calculator", "commission-calculator", "sales-tax-calculator", "budget-calculator"]
     }
   ],
   Income: [
     {
       title: "Compensation and take-home pay",
       description: "Tools for salary comparisons, tax estimates, and pay planning.",
-      slugs: ["salary-calculator", "salary-to-hourly-calculator"]
+      slugs: ["salary-calculator", "salary-to-hourly-calculator", "take-home-paycheck-calculator", "hourly-paycheck-calculator", "overtime-calculator"]
     }
   ],
   Health: [

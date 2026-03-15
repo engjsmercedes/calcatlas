@@ -36,7 +36,7 @@ export const subtopicHubs: SubtopicHubDefinition[] = [
     intro: "This tax and income hub is for users comparing offers, checking take-home pay, and planning around taxes rather than looking at gross income in isolation.",
     guide: "Compensation decisions are rarely about one number. Grouping salary conversion, tax estimates, and related planning tools makes it easier to compare gross pay against actual usable income and downstream housing affordability.",
     searchTerms: ["tax calculators", "income calculators", "salary and take-home pay calculators", "paycheck planning tools"],
-    slugs: ["salary-calculator", "salary-to-hourly-calculator", "tax-calculator", "debt-to-income-calculator", "mortgage-affordability-calculator", "mortgage-calculator"]
+    slugs: ["salary-calculator", "salary-to-hourly-calculator", "take-home-paycheck-calculator", "hourly-paycheck-calculator", "overtime-calculator", "tax-calculator", "sales-tax-calculator", "budget-calculator", "debt-to-income-calculator", "mortgage-affordability-calculator", "mortgage-calculator"]
   },
   {
     slug: "date-and-time-calculators",

@@ -115,6 +115,11 @@ const calculatorIntroExtensions: Record<CalculatorSlug, string> = {
   "calorie-calculator": "It is built around the higher-volume way people phrase the calorie question online, while still showing maintenance, loss, and gain targets in a practical format. Pairing activity level with goal-based outputs makes it a stronger planning page than a static calorie estimate.",
   "mortgage-affordability-calculator": "The page is built around the actual home-buying question many users start with: how much house can I afford based on income, debts, and down payment. Connecting affordability to taxes, insurance, and monthly debt load makes the answer much more useful than a simple income multiple.",
   "debt-payoff-calculator": "It turns a debt balance into a clearer action plan by showing payoff time, total interest, and the savings from paying more each month. That makes the page more practical than a simple amortization estimate because users can see the tradeoff in plain language.",
+  "take-home-paycheck-calculator": "This page is built for the common pay-planning question people actually have after they see a salary number: what does each paycheck look like after taxes, retirement savings, and deductions. That makes it more useful for budgeting and offer comparison than gross annual pay alone.",
+  "hourly-paycheck-calculator": "It gives hourly workers a more practical paycheck estimate by combining regular hours, overtime, taxes, and deductions into one view. That makes it easier to compare schedules and roles that may look similar on a base hourly rate alone.",
+  "overtime-calculator": "The page isolates overtime math so users can quickly see how premium pay changes a shift or weekly total. That makes it useful for scheduling, shift bidding, and deciding whether extra hours materially change earnings.",
+  "sales-tax-calculator": "It is built for quick checkout and pricing checks where users need to add sales tax or work backward from a receipt total without manual math. Supporting both directions makes it more useful than a single add-tax-only tool.",
+  "budget-calculator": "This page turns monthly income and spending into a cleaner cash-flow snapshot so users can see whether their plan actually leaves room for savings and irregular costs. Showing essential versus flexible spending makes the result easier to use than a single leftover number.",
   "tdee-calculator": "The page is built to answer a high-intent nutrition question clearly: how many calories do I likely burn in a full day once activity is accounted for. By separating BMR, activity multiplier, and total daily energy expenditure, it makes the estimate easier to understand and adjust.",
   "pregnancy-due-date-calculator": "This page is designed for early planning use when people want a practical due-date estimate tied to a last period or known conception date. Keeping the result simple while showing nearby ovulation timing makes it more useful than a single due date alone.",
   "ovulation-calculator": "It turns cycle timing into a more readable fertile-window estimate so users can plan around likely ovulation without doing menstrual-cycle math by hand. The page stays careful about uncertainty instead of pretending the estimate is exact.",
@@ -160,6 +165,9 @@ export function getCalculatorResultExplanation(calculator: CalculatorDefinition)
       }
       if (calculator.category === "Health") {
         return `${calculator.title} pairs the number with plain-language context so users can interpret the result more responsibly and use it as a starting point for planning.`;
+      }
+      if (calculator.category === "Income") {
+        return `${calculator.title} translates pay assumptions into take-home context so users can understand what the number means before comparing jobs or building a budget.`;
       }
       return `${calculator.title} updates results instantly as inputs change, then explains what the number means in plain language so the output is easier to act on.`;
   }

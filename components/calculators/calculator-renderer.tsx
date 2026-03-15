@@ -10,6 +10,11 @@ import { AutoLoanCalculator } from "./auto-loan-calculator";
 import { BmiCalculator } from "./bmi-calculator";
 import { BmrCalculator } from "./bmr-calculator";
 import { BodyFatCalculator } from "./body-fat-calculator";
+import { TakeHomePaycheckCalculator } from "./take-home-paycheck-calculator";
+import { SalesTaxCalculator } from "./sales-tax-calculator";
+import { OvertimeCalculator } from "./overtime-calculator";
+import { HourlyPaycheckCalculator } from "./hourly-paycheck-calculator";
+import { BudgetCalculator } from "./budget-calculator";
 import { BreakEvenCalculator } from "./break-even-calculator";
 import { CalorieNeedsCalculator } from "./calorie-needs-calculator";
 import { CommissionCalculator } from "./commission-calculator";
@@ -79,6 +84,10 @@ export function CalculatorRenderer({ slug }: { slug: CalculatorSlug }) {
       return <BreakEvenCalculator />;
     case "commission-calculator":
       return <CommissionCalculator />;
+    case "sales-tax-calculator":
+      return <SalesTaxCalculator />;
+    case "budget-calculator":
+      return <BudgetCalculator />;
     case "mortgage-calculator":
       return <MortgageCalculator />;
     case "mortgage-affordability-calculator":
@@ -119,6 +128,12 @@ export function CalculatorRenderer({ slug }: { slug: CalculatorSlug }) {
       return <SalaryToHourlyCalculator />;
     case "salary-calculator":
       return <SalaryToHourlyCalculator />;
+    case "take-home-paycheck-calculator":
+      return <TakeHomePaycheckCalculator />;
+    case "hourly-paycheck-calculator":
+      return <HourlyPaycheckCalculator />;
+    case "overtime-calculator":
+      return <OvertimeCalculator />;
     case "bmi-calculator":
       return <BmiCalculator />;
     case "bmr-calculator":
