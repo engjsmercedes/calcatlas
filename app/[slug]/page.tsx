@@ -11,6 +11,7 @@ import { calculators, getCalculator, getRelatedCalculators } from "@/data/calcul
 import {
   createCalculatorMetadata,
   createCalculatorSchemas,
+  getCalculatorLead,
   getCalculatorResultExplanation
 } from "@/lib/seo";
 
@@ -32,6 +33,7 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
 
   const related = getRelatedCalculators(calculator.related);
   const resultExplanation = getCalculatorResultExplanation(calculator);
+  const calculatorLead = getCalculatorLead(calculator);
 
   return (
     <>
@@ -47,6 +49,7 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
               <div className="space-y-4">
                 <h1 className="font-display text-4xl font-semibold md:text-5xl">{calculator.title}</h1>
                 <p className="max-w-3xl text-base leading-8 md:text-lg">{calculator.intro}</p>
+                <p className="max-w-3xl text-sm leading-7 md:text-base">{calculatorLead}</p>
               </div>
               <div className="surface p-6">
                 <p className="text-sm leading-7">{calculator.detail}</p>

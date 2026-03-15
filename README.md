@@ -49,7 +49,8 @@ npm run start
    - `RESEND_API_KEY`
    - `CONTACT_TO_EMAIL`
    - `CONTACT_FROM_EMAIL` (optional, defaults to `Calc Atlas <onboarding@resend.dev>` for Resend testing)
-5. Deploy. The app uses static-friendly routes and frontend-only calculation logic, with a small server route only for contact form delivery.
+5. If you want Google Analytics page tracking, set `NEXT_PUBLIC_GA_ID` to your Google Analytics Measurement ID.
+6. Deploy. The app uses static-friendly routes and frontend-only calculation logic, with a small server route only for contact form delivery.
 
 ## Contact form setup
 
@@ -63,6 +64,10 @@ CONTACT_FROM_EMAIL=Calc Atlas <onboarding@resend.dev>
 ```
 
 For production, replace the default sender with an address on a verified sending domain.
+
+## Analytics setup
+
+Set `NEXT_PUBLIC_GA_ID` to a Google Analytics 4 Measurement ID such as `G-XXXXXXXXXX`. The app will then send page views for the homepage, trust pages, calculator pages, and query-string-based calculator states.
 
 ## Architecture overview
 
@@ -86,6 +91,7 @@ For production, replace the default sender with an address on a verified sending
 - Homepage hero messaging: `app/page.tsx`
 - Favicon/icon: `app/icon.svg`
 - Colors and global styling: `app/globals.css`
+- Dynamic sharing images: `app/opengraph-image.tsx` and `app/[slug]/opengraph-image.tsx`
 
 ## Notes
 
