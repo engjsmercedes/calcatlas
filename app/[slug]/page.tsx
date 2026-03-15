@@ -42,32 +42,16 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
   return (
     <>
       <StructuredData data={createCalculatorSchemas(calculator)} />
-      <section className="page-shell py-10 md:py-14">
+      <section className="page-shell py-6 md:py-10">
         <div className="space-y-8">
           <div className="space-y-4">
             <Link href="/calculators" className="text-sm font-medium text-accent">
               Back to all calculators
             </Link>
-            <span className="section-label">{calculator.category}</span>
-            <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
-              <div className="space-y-4">
-                <h1 className="font-display text-4xl font-semibold md:text-5xl">{calculator.title}</h1>
-                <p className="max-w-3xl text-base leading-8 md:text-lg">{calculator.intro}</p>
-                <p className="max-w-3xl text-sm leading-7 md:text-base">{calculatorLead}</p>
-              </div>
-              <div className="surface p-6">
-                <p className="text-sm leading-7">{calculator.detail}</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {calculator.features.map((feature) => (
-                    <span key={feature} className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted">
-                      {feature}
-                    </span>
-                  ))}
-                  <span className="rounded-full border border-accent/20 bg-accent-soft px-3 py-1 text-xs font-medium text-accent">
-                    Shareable results
-                  </span>
-                </div>
-              </div>
+            <div className="space-y-3">
+              <span className="section-label">{calculator.category}</span>
+              <h1 className="font-display text-4xl font-semibold md:text-5xl">{calculator.title}</h1>
+              <p className="max-w-3xl text-base leading-8 md:text-lg">{calculator.intro}</p>
             </div>
           </div>
           <section aria-labelledby="use-calculator" className="space-y-4">
@@ -87,6 +71,20 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
               <h2 id="about-calculator" className="font-display text-3xl font-semibold">
                 Understand what this tool measures
               </h2>
+              <p className="max-w-3xl text-sm leading-7 md:text-base">{calculatorLead}</p>
+            </div>
+            <div className="surface p-6 md:p-8">
+              <p className="text-sm leading-7">{calculator.detail}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {calculator.features.map((feature) => (
+                  <span key={feature} className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted">
+                    {feature}
+                  </span>
+                ))}
+                <span className="rounded-full border border-accent/20 bg-accent-soft px-3 py-1 text-xs font-medium text-accent">
+                  Shareable results
+                </span>
+              </div>
             </div>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               <div className="surface p-6">
