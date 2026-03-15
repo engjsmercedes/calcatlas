@@ -87,3 +87,42 @@ export function ExamplePresetList({
     </div>
   );
 }
+
+export function ComparisonControls({
+  enabled,
+  onEnable,
+  onDisable,
+  onCopyCurrent,
+  title,
+  body
+}: {
+  enabled: boolean;
+  onEnable: () => void;
+  onDisable: () => void;
+  onCopyCurrent: () => void;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="rounded-3xl border border-border bg-slate-50/80 p-5 dark:bg-slate-950/30">
+      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">{title}</p>
+      <p className="mt-2 text-sm leading-7 text-slate-700 dark:text-slate-200">{body}</p>
+      <div className="mt-4 flex flex-wrap gap-3">
+        {!enabled ? (
+          <Button type="button" variant="secondary" onClick={onEnable}>
+            Add comparison
+          </Button>
+        ) : (
+          <>
+            <Button type="button" variant="secondary" onClick={onCopyCurrent}>
+              Copy current into comparison
+            </Button>
+            <Button type="button" variant="ghost" onClick={onDisable}>
+              Remove comparison
+            </Button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

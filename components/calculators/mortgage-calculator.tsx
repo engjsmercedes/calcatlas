@@ -11,7 +11,7 @@ import { amortizedMonthlyPayment } from "@/lib/calculators/borrowing";
 import { calculateMortgage, solveMortgageAnnualRate } from "@/lib/calculators/mortgage";
 import { formatCurrency, formatNumber, parseNumberInput } from "@/lib/utils";
 
-import { CalculatorActions, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
+import { CalculatorActions, ComparisonControls, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
 const initialState = {
   loanAmount: "400000",
@@ -180,6 +180,8 @@ function resolveMortgageCore(inputs: {
 
 export function MortgageCalculator() {
   const [scheduleView, setScheduleView] = useState<"annual" | "monthly">("annual");
+  const [comparisonEnabled, setComparisonEnabled] = useState(false);
+  const [comparisonState, setComparisonState] = useState(initialState);
   const { state, setState, hasActiveValues, copyShareLink, reset } = useShareableCalculatorState({
     initialState,
     keys: ["loanAmount", "annualRate", "targetPrincipalInterest", "years", "propertyTaxAnnual", "insuranceAnnual", "hoaMonthly", "pmiMonthly", "extraMonthlyPayment"]
@@ -222,6 +224,54 @@ export function MortgageCalculator() {
       extraMonthlyPayment
     });
   }, [extraMonthlyPayment, hoaMonthly, insuranceAnnual, pmiMonthly, propertyTaxAnnual, resolved]);
+
+  const comparisonLoanAmount = parseNumberInput(comparisonState.loanAmount);
+  const comparisonAnnualRate = parseNumberInput(comparisonState.annualRate);
+  const comparisonPrincipalInterest = parseNumberInput(comparisonState.targetPrincipalInterest);
+  const comparisonYears = parseNumberInput(comparisonState.years);
+  const comparisonPropertyTaxAnnual = parseNumberInput(comparisonState.propertyTaxAnnual) ?? 0;
+  const comparisonInsuranceAnnual = parseNumberInput(comparisonState.insuranceAnnual) ?? 0;
+  const comparisonHoaMonthly = parseNumberInput(comparisonState.hoaMonthly) ?? 0;
+  const comparisonPmiMonthly = parseNumberInput(comparisonState.pmiMonthly) ?? 0;
+  const comparisonExtraMonthlyPayment = parseNumberInput(comparisonState.extraMonthlyPayment) ?? 0;
+
+  const comparisonResolved = useMemo(
+    () =>
+      comparisonEnabled
+        ? resolveMortgageCore({
+            loanAmount: comparisonLoanAmount,
+            annualRate: comparisonAnnualRate,
+            years: comparisonYears,
+            principalInterest: comparisonPrincipalInterest
+          })
+        : undefined,
+    [comparisonAnnualRate, comparisonEnabled, comparisonLoanAmount, comparisonPrincipalInterest, comparisonYears]
+  );
+
+  const comparisonResult = useMemo(() => {
+    if (!comparisonEnabled || !comparisonResolved || "error" in comparisonResolved) {
+      return undefined;
+    }
+
+    return calculateMortgage({
+      loanAmount: comparisonResolved.loanAmount,
+      annualRate: comparisonResolved.annualRate,
+      years: comparisonResolved.years,
+      propertyTaxAnnual: comparisonPropertyTaxAnnual,
+      insuranceAnnual: comparisonInsuranceAnnual,
+      hoaMonthly: comparisonHoaMonthly,
+      pmiMonthly: comparisonPmiMonthly,
+      extraMonthlyPayment: comparisonExtraMonthlyPayment
+    });
+  }, [
+    comparisonEnabled,
+    comparisonExtraMonthlyPayment,
+    comparisonHoaMonthly,
+    comparisonInsuranceAnnual,
+    comparisonPmiMonthly,
+    comparisonPropertyTaxAnnual,
+    comparisonResolved
+  ]);
 
   return (
     <div className="space-y-8">
@@ -306,6 +356,36 @@ export function MortgageCalculator() {
               }
             ]}
           />
+          <ComparisonControls
+            enabled={comparisonEnabled}
+            onEnable={() => {
+              setComparisonEnabled(true);
+              setComparisonState(state);
+            }}
+            onDisable={() => setComparisonEnabled(false)}
+            onCopyCurrent={() => setComparisonState(state)}
+            title="Compare two mortgage scenarios"
+            body="Compare monthly payment, total interest, and payoff speed across two mortgage setups without losing the shareable primary scenario."
+          />
+          {comparisonEnabled ? (
+            <div className="surface p-6 md:p-8">
+              <div className="mb-6">
+                <p className="section-label">Comparison scenario</p>
+                <h3 className="mt-3 text-2xl font-semibold">Set the second mortgage option</h3>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <InputField label="Loan amount" prefix="$" value={comparisonState.loanAmount} onChange={(event) => setComparisonState((current) => ({ ...current, loanAmount: event.target.value }))} />
+                <InputField label="Interest rate" hint="Annual %" value={comparisonState.annualRate} onChange={(event) => setComparisonState((current) => ({ ...current, annualRate: event.target.value }))} />
+                <InputField label="Loan term" hint="Years" value={comparisonState.years} onChange={(event) => setComparisonState((current) => ({ ...current, years: event.target.value }))} />
+                <InputField label="Principal + interest" hint="Monthly core payment" prefix="$" value={comparisonState.targetPrincipalInterest} onChange={(event) => setComparisonState((current) => ({ ...current, targetPrincipalInterest: event.target.value }))} />
+                <InputField label="Property tax" hint="Annual" prefix="$" value={comparisonState.propertyTaxAnnual} onChange={(event) => setComparisonState((current) => ({ ...current, propertyTaxAnnual: event.target.value }))} />
+                <InputField label="Home insurance" hint="Annual" prefix="$" value={comparisonState.insuranceAnnual} onChange={(event) => setComparisonState((current) => ({ ...current, insuranceAnnual: event.target.value }))} />
+                <InputField label="HOA dues" hint="Monthly" prefix="$" value={comparisonState.hoaMonthly} onChange={(event) => setComparisonState((current) => ({ ...current, hoaMonthly: event.target.value }))} />
+                <InputField label="PMI" hint="Monthly" prefix="$" value={comparisonState.pmiMonthly} onChange={(event) => setComparisonState((current) => ({ ...current, pmiMonthly: event.target.value }))} />
+                <InputField label="Extra payment" hint="Monthly" prefix="$" value={comparisonState.extraMonthlyPayment} onChange={(event) => setComparisonState((current) => ({ ...current, extraMonthlyPayment: event.target.value }))} />
+              </div>
+            </div>
+          ) : null}
         </div>
         <div className="space-y-4">
           {!resolved ? (
@@ -354,6 +434,37 @@ export function MortgageCalculator() {
                         : `On this ${formatLoanTerm(resolved.years)} mortgage, the interest cost alone adds up to ${formatCurrency(result.totalInterest)}. Adding extra monthly principal can shorten payoff and save about ${formatCurrency(result.interestSavedWithExtra)} in interest.`
                 }
               />
+              {comparisonEnabled ? (
+                !comparisonResolved ? (
+                  <EmptyCalculatorState
+                    title="Set the comparison mortgage"
+                    body="Use any three of the four core mortgage fields in the comparison scenario to see the side-by-side deltas."
+                  />
+                ) : "error" in comparisonResolved || !comparisonResult ? (
+                  <EmptyCalculatorState
+                    title="Comparison inputs conflict"
+                    body={"error" in comparisonResolved ? comparisonResolved.error ?? "The comparison values conflict with each other." : "Add enough comparison inputs to calculate the second scenario."}
+                  />
+                ) : (
+                  <div className="surface space-y-4 p-6 md:p-8">
+                    <div>
+                      <p className="section-label">Comparison summary</p>
+                      <h3 className="mt-4 text-2xl font-semibold">How the second mortgage changes the outcome</h3>
+                      <p className="mt-2 text-sm leading-7">
+                        Compared with the primary scenario, the second option changes the total monthly payment by {formatCurrency(comparisonResult.totalMonthlyPayment - result.totalMonthlyPayment)}, total interest by {formatCurrency(comparisonResult.totalInterest - result.totalInterest)}, and payoff time by {formatNumber((comparisonResult.payoffMonths - result.payoffMonths) / 12, 1)} years.
+                      </p>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <ResultCard label="Scenario B monthly payment" value={formatCurrency(comparisonResult.totalMonthlyPayment)} />
+                      <ResultCard label="Monthly payment delta" value={formatCurrency(comparisonResult.totalMonthlyPayment - result.totalMonthlyPayment)} tone={comparisonResult.totalMonthlyPayment <= result.totalMonthlyPayment ? "success" : "default"} />
+                      <ResultCard label="Scenario B total interest" value={formatCurrency(comparisonResult.totalInterest)} />
+                      <ResultCard label="Interest delta" value={formatCurrency(comparisonResult.totalInterest - result.totalInterest)} tone={comparisonResult.totalInterest <= result.totalInterest ? "success" : "default"} />
+                      <ResultCard label="Scenario B payoff time" value={formatLoanTerm(comparisonResult.payoffMonths / 12)} />
+                      <ResultCard label="Payoff delta" value={`${formatNumber((comparisonResult.payoffMonths - result.payoffMonths) / 12, 1)} years`} tone={comparisonResult.payoffMonths <= result.payoffMonths ? "success" : "default"} />
+                    </div>
+                  </div>
+                )
+              ) : null}
             </>
           )}
         </div>
@@ -425,4 +536,3 @@ export function MortgageCalculator() {
     </div>
   );
 }
-

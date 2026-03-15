@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { InputField } from "@/components/ui/input-field";
 import { PillTabs } from "@/components/ui/pill-tabs";
@@ -19,7 +19,7 @@ import {
 } from "@/lib/calculators/salary";
 import { formatCurrency, formatPercent, parseNumberInput } from "@/lib/utils";
 
-import { CalculatorActions, EmptyCalculatorState, InsightPanel } from "./shared";
+import { CalculatorActions, ComparisonControls, EmptyCalculatorState, InsightPanel } from "./shared";
 
 const initialState = {
   mode: "salary-to-hourly",
@@ -37,6 +37,8 @@ const initialState = {
 };
 
 export function SalaryToHourlyCalculator() {
+  const [comparisonEnabled, setComparisonEnabled] = useState(false);
+  const [comparisonState, setComparisonState] = useState(initialState);
   const { state, setState, hasActiveValues, copyShareLink, reset } = useShareableCalculatorState({
     initialState,
     keys: [
@@ -72,6 +74,27 @@ export function SalaryToHourlyCalculator() {
         bonusAnnual: parseNumberInput(state.bonusAnnual) || 0
       }),
     [state]
+  );
+
+  const comparisonResult = useMemo(
+    () =>
+      comparisonEnabled
+        ? estimateSalary({
+            mode: comparisonState.mode as SalaryMode,
+            annualSalary: parseNumberInput(comparisonState.annualSalary) || 0,
+            hourlyRate: parseNumberInput(comparisonState.hourlyRate) || 0,
+            hoursPerWeek: parseNumberInput(comparisonState.hoursPerWeek) || 0,
+            weeksPerYear: parseNumberInput(comparisonState.weeksPerYear) || 0,
+            country: comparisonState.country as TaxCountry,
+            state: comparisonState.state as UsState,
+            filingStatus: comparisonState.filingStatus as FilingStatus,
+            retirementPercent: parseNumberInput(comparisonState.retirementPercent) || 0,
+            preTaxDeductionsAnnual: parseNumberInput(comparisonState.preTaxDeductionsAnnual) || 0,
+            postTaxDeductionsAnnual: parseNumberInput(comparisonState.postTaxDeductionsAnnual) || 0,
+            bonusAnnual: parseNumberInput(comparisonState.bonusAnnual) || 0
+          })
+        : undefined,
+    [comparisonEnabled, comparisonState]
   );
 
   const breakdownSegments = result
@@ -213,6 +236,71 @@ export function SalaryToHourlyCalculator() {
             </div>
 
             <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
+            <ComparisonControls
+              enabled={comparisonEnabled}
+              onEnable={() => {
+                setComparisonEnabled(true);
+                setComparisonState(state);
+              }}
+              onDisable={() => setComparisonEnabled(false)}
+              onCopyCurrent={() => setComparisonState(state)}
+              title="Compare two compensation setups"
+              body="Compare offers, freelance rates, or tax and deduction assumptions without replacing the main scenario or losing the shareable URL."
+            />
+            {comparisonEnabled ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <SelectField
+                  label="Compare mode"
+                  value={comparisonState.mode}
+                  onChange={(event) => setComparisonState((current) => ({ ...current, mode: event.target.value }))}
+                >
+                  <option value="salary-to-hourly">Salary to hourly</option>
+                  <option value="hourly-to-salary">Hourly to salary</option>
+                </SelectField>
+                {comparisonState.mode === "salary-to-hourly" ? (
+                  <InputField
+                    label="Compare annual salary"
+                    prefix="$"
+                    value={comparisonState.annualSalary}
+                    onChange={(event) => setComparisonState((current) => ({ ...current, annualSalary: event.target.value }))}
+                  />
+                ) : (
+                  <InputField
+                    label="Compare hourly rate"
+                    prefix="$"
+                    value={comparisonState.hourlyRate}
+                    onChange={(event) => setComparisonState((current) => ({ ...current, hourlyRate: event.target.value }))}
+                  />
+                )}
+                <InputField label="Compare annual bonus" prefix="$" value={comparisonState.bonusAnnual} onChange={(event) => setComparisonState((current) => ({ ...current, bonusAnnual: event.target.value }))} />
+                <InputField label="Compare hours per week" value={comparisonState.hoursPerWeek} onChange={(event) => setComparisonState((current) => ({ ...current, hoursPerWeek: event.target.value }))} />
+                <InputField label="Compare weeks per year" value={comparisonState.weeksPerYear} onChange={(event) => setComparisonState((current) => ({ ...current, weeksPerYear: event.target.value }))} />
+                <SelectField label="Compare country" value={comparisonState.country} onChange={(event) => setComparisonState((current) => ({ ...current, country: event.target.value, state: event.target.value === "us" ? current.state : "none" }))}>
+                  {countryOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </SelectField>
+                <SelectField label="Compare filing status" value={comparisonState.filingStatus} onChange={(event) => setComparisonState((current) => ({ ...current, filingStatus: event.target.value }))}>
+                  {filingStatusOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </SelectField>
+                <SelectField label="Compare state" value={comparisonState.country === "us" ? comparisonState.state : "none"} disabled={comparisonState.country !== "us"} onChange={(event) => setComparisonState((current) => ({ ...current, state: event.target.value }))}>
+                  {usStateOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </SelectField>
+                <InputField label="Compare retirement %" value={comparisonState.retirementPercent} onChange={(event) => setComparisonState((current) => ({ ...current, retirementPercent: event.target.value }))} />
+                <InputField label="Compare pre-tax deductions" prefix="$" value={comparisonState.preTaxDeductionsAnnual} onChange={(event) => setComparisonState((current) => ({ ...current, preTaxDeductionsAnnual: event.target.value }))} />
+                <InputField label="Compare post-tax deductions" prefix="$" value={comparisonState.postTaxDeductionsAnnual} onChange={(event) => setComparisonState((current) => ({ ...current, postTaxDeductionsAnnual: event.target.value }))} />
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -293,6 +381,25 @@ export function SalaryToHourlyCalculator() {
                     : `${formatCurrency(hourlyInput || 0)} per hour can turn into roughly ${formatCurrency(result.gross.annual)} gross annual pay and ${formatCurrency(result.net.annual)} estimated take-home pay with the selected assumptions. ${result.marginalContext}`
                 }
               />
+              {comparisonEnabled && comparisonResult ? (
+                <div className="surface space-y-4 p-6 md:p-8">
+                  <div>
+                    <p className="section-label">Comparison summary</p>
+                    <h3 className="mt-4 text-2xl font-semibold">How the second compensation setup compares</h3>
+                    <p className="mt-2 text-sm leading-7">
+                      The comparison scenario changes monthly take-home by {formatCurrency(comparisonResult.net.monthly - result.net.monthly)}, annual take-home by {formatCurrency(comparisonResult.net.annual - result.net.annual)}, and net hourly pay by {formatCurrency(comparisonResult.net.hourly - result.net.hourly)}.
+                    </p>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <ResultCard label="Scenario B net monthly" value={formatCurrency(comparisonResult.net.monthly)} />
+                    <ResultCard label="Monthly delta" value={formatCurrency(comparisonResult.net.monthly - result.net.monthly)} tone={comparisonResult.net.monthly >= result.net.monthly ? "success" : "default"} />
+                    <ResultCard label="Scenario B net annual" value={formatCurrency(comparisonResult.net.annual)} />
+                    <ResultCard label="Annual delta" value={formatCurrency(comparisonResult.net.annual - result.net.annual)} tone={comparisonResult.net.annual >= result.net.annual ? "success" : "default"} />
+                    <ResultCard label="Scenario B net hourly" value={`${formatCurrency(comparisonResult.net.hourly)}/hr`} />
+                    <ResultCard label="Effective tax rate delta" value={formatPercent((comparisonResult.effectiveTaxRate - result.effectiveTaxRate) * 100)} tone={comparisonResult.effectiveTaxRate <= result.effectiveTaxRate ? "success" : "default"} />
+                  </div>
+                </div>
+              ) : null}
             </>
           )}
         </div>
