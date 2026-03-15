@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo } from "react";
 
@@ -16,6 +16,21 @@ const initialState = {
   breakMinutes: "30"
 };
 
+function NativeFieldLabel({ label, tooltip }: { label: string; tooltip: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-sm font-semibold text-slate-900 dark:text-white">{label}</span>
+      <span
+        className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-border text-[11px] font-semibold text-muted"
+        title={tooltip}
+        aria-label={tooltip}
+      >
+        ?
+      </span>
+    </div>
+  );
+}
+
 export function TimeDurationCalculator() {
   const { state, setState, hasActiveValues, copyShareLink, reset } = useShareableCalculatorState({
     initialState,
@@ -32,14 +47,14 @@ export function TimeDurationCalculator() {
       <div className="surface p-6 md:p-8">
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block space-y-2">
-            <span className="text-sm font-semibold text-slate-900 dark:text-white">Start time</span>
+            <NativeFieldLabel label="Start time" tooltip="Time the interval begins. If the end time is earlier, the calculator treats it as an overnight span." />
             <input type="time" className="input-base" value={state.startTime} onChange={(event) => setState((current) => ({ ...current, startTime: event.target.value }))} />
           </label>
           <label className="block space-y-2">
-            <span className="text-sm font-semibold text-slate-900 dark:text-white">End time</span>
+            <NativeFieldLabel label="End time" tooltip="Time the interval ends. Use with the start time to measure the total elapsed duration." />
             <input type="time" className="input-base" value={state.endTime} onChange={(event) => setState((current) => ({ ...current, endTime: event.target.value }))} />
           </label>
-          <InputField label="Break time" hint="Minutes" value={state.breakMinutes} onChange={(event) => setState((current) => ({ ...current, breakMinutes: event.target.value }))} />
+          <InputField label="Break time" hint="Minutes" tooltip="Optional break deducted from the total elapsed time." value={state.breakMinutes} onChange={(event) => setState((current) => ({ ...current, breakMinutes: event.target.value }))} />
         </div>
         <div className="mt-6">
           <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />

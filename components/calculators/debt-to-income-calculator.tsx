@@ -16,8 +16,8 @@ const initialState = {
   carLoans: "450",
   studentLoans: "250",
   creditCards: "150",
-  personalLoans: "0",
-  otherDebts: "0"
+  personalLoans: "",
+  otherDebts: ""
 };
 
 export function DebtToIncomeCalculator() {
@@ -91,3 +91,4 @@ export function DebtToIncomeCalculator() {
     </div>
   );
 }
+

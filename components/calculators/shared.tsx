@@ -99,11 +99,12 @@ export function DecisionSummaryPanel({
 }) {
   const [aiBody, setAiBody] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const effectivePrompt = (aiPrompt ?? body).trim();
 
   useEffect(() => {
     let isMounted = true;
 
-    if (!calculator || !aiPrompt) {
+    if (!calculator || !effectivePrompt) {
       setAiBody(null);
       return;
     }
@@ -117,7 +118,7 @@ export function DecisionSummaryPanel({
       },
       body: JSON.stringify({
         calculator,
-        prompt: aiPrompt
+        prompt: effectivePrompt
       })
     })
       .then(async (response) => {
@@ -149,7 +150,7 @@ export function DecisionSummaryPanel({
     return () => {
       isMounted = false;
     };
-  }, [aiPrompt, body, calculator]);
+  }, [calculator, effectivePrompt]);
 
   return (
     <div className="rounded-3xl border border-accent/15 bg-accent-soft/70 p-5">
@@ -198,5 +199,3 @@ export function ComparisonControls({
     </div>
   );
 }
-
-

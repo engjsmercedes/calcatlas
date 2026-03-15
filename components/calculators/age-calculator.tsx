@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo } from "react";
 
@@ -15,6 +15,21 @@ const initialState = {
   compareDate: today
 };
 
+function NativeFieldLabel({ label, tooltip }: { label: string; tooltip: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-sm font-semibold text-slate-900 dark:text-white">{label}</span>
+      <span
+        className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-border text-[11px] font-semibold text-muted"
+        title={tooltip}
+        aria-label={tooltip}
+      >
+        ?
+      </span>
+    </div>
+  );
+}
+
 export function AgeCalculator() {
   const { state, setState, hasActiveValues, copyShareLink, reset } = useShareableCalculatorState({
     initialState,
@@ -28,11 +43,11 @@ export function AgeCalculator() {
       <div className="surface p-6 md:p-8">
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block space-y-2">
-            <span className="text-sm font-semibold text-slate-900 dark:text-white">Birth date</span>
+            <NativeFieldLabel label="Birth date" tooltip="Date of birth used as the starting point for the age calculation." />
             <input type="date" className="input-base" value={state.birthDate} onChange={(event) => setState((current) => ({ ...current, birthDate: event.target.value }))} />
           </label>
           <label className="block space-y-2">
-            <span className="text-sm font-semibold text-slate-900 dark:text-white">Age on date</span>
+            <NativeFieldLabel label="Age on date" tooltip="Date you want to measure age against, usually today or a future eligibility date." />
             <input type="date" className="input-base" value={state.compareDate} onChange={(event) => setState((current) => ({ ...current, compareDate: event.target.value }))} />
           </label>
         </div>

@@ -14,7 +14,7 @@ const initialState = {
   balance: "18000",
   annualRate: "10",
   monthlyPayment: "450",
-  extraPaymentMonthly: "150"
+  extraPaymentMonthly: ""
 };
 
 function formatMonths(months: number) {
@@ -76,7 +76,7 @@ export function DebtPayoffCalculator() {
           body="Use presets to compare a standard payoff plan against a more aggressive schedule with extra monthly cash flow directed to debt."
           items={[
             { label: "Base payoff plan", description: "$18,000 balance at 10% with a $450 payment and $150 extra.", onApply: () => setState(initialState) },
-            { label: "Lower payment pressure", description: "$18,000 balance at 10% with a $350 payment and no extra.", onApply: () => setState({ balance: "18000", annualRate: "10", monthlyPayment: "350", extraPaymentMonthly: "0" }) }
+            { label: "Lower payment pressure", description: "$18,000 balance at 10% with a $350 payment and no extra.", onApply: () => setState({ balance: "18000", annualRate: "10", monthlyPayment: "350", extraPaymentMonthly: "" }) }
           ]}
         />
         <ComparisonControls
@@ -157,6 +157,7 @@ export function DebtPayoffCalculator() {
     </div>
   );
 }
+
 
 
 

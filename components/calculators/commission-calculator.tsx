@@ -13,7 +13,7 @@ import { CalculatorActions, EmptyCalculatorState, ExamplePresetList, InsightPane
 const initialState = {
   salesAmount: "24000",
   commissionRate: "8",
-  basePay: "0",
+  basePay: "",
   bonusThreshold: "30000",
   bonusAmount: "1000"
 };
@@ -89,3 +89,4 @@ export function CommissionCalculator() {
     </div>
   );
 }
+

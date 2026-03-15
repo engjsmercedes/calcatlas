@@ -14,7 +14,7 @@ import { CalculatorActions, EmptyCalculatorState, InsightPanel } from "./shared"
 const initialState = {
   vehiclePrice: "38000",
   downPayment: "5000",
-  tradeInValue: "0",
+  tradeInValue: "",
   salesTaxRate: "7",
   fees: "900",
   annualRate: "6.4",
@@ -110,4 +110,5 @@ export function AutoLoanCalculator() {
     </div>
   );
 }
+
 

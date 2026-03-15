@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo } from "react";
 
@@ -16,6 +16,21 @@ const initialState = {
   includeEndDate: "no"
 };
 
+function NativeFieldLabel({ label, tooltip }: { label: string; tooltip: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-sm font-semibold text-slate-900 dark:text-white">{label}</span>
+      <span
+        className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-border text-[11px] font-semibold text-muted"
+        title={tooltip}
+        aria-label={tooltip}
+      >
+        ?
+      </span>
+    </div>
+  );
+}
+
 export function DateDifferenceCalculator() {
   const { state, setState, hasActiveValues, copyShareLink, reset } = useShareableCalculatorState({
     initialState,
@@ -32,14 +47,14 @@ export function DateDifferenceCalculator() {
       <div className="surface p-6 md:p-8">
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block space-y-2">
-            <span className="text-sm font-semibold text-slate-900 dark:text-white">Start date</span>
+            <NativeFieldLabel label="Start date" tooltip="First date in the range you want to measure from." />
             <input type="date" className="input-base" value={state.startDate} onChange={(event) => setState((current) => ({ ...current, startDate: event.target.value }))} />
           </label>
           <label className="block space-y-2">
-            <span className="text-sm font-semibold text-slate-900 dark:text-white">End date</span>
+            <NativeFieldLabel label="End date" tooltip="Second date in the range you want to measure to." />
             <input type="date" className="input-base" value={state.endDate} onChange={(event) => setState((current) => ({ ...current, endDate: event.target.value }))} />
           </label>
-          <SelectField label="Count the end date?" value={state.includeEndDate} onChange={(event) => setState((current) => ({ ...current, includeEndDate: event.target.value }))}>
+          <SelectField label="Count the end date?" tooltip="Choose yes if the ending day itself should be included in the total day count." value={state.includeEndDate} onChange={(event) => setState((current) => ({ ...current, includeEndDate: event.target.value }))}>
             <option value="no">No</option>
             <option value="yes">Yes</option>
           </SelectField>
