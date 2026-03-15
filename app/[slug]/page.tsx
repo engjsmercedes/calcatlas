@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+﻿import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -11,8 +11,10 @@ import { calculators, getCalculator, getRelatedCalculators } from "@/data/calcul
 import {
   createCalculatorMetadata,
   createCalculatorSchemas,
+  getCalculatorGuide,
   getCalculatorLead,
-  getCalculatorResultExplanation
+  getCalculatorResultExplanation,
+  getCalculatorShareNote
 } from "@/lib/seo";
 
 export function generateStaticParams() {
@@ -34,6 +36,8 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
   const related = getRelatedCalculators(calculator.related);
   const resultExplanation = getCalculatorResultExplanation(calculator);
   const calculatorLead = getCalculatorLead(calculator);
+  const guide = getCalculatorGuide(calculator);
+  const shareNote = getCalculatorShareNote(calculator);
 
   return (
     <>
@@ -59,6 +63,9 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
                       {feature}
                     </span>
                   ))}
+                  <span className="rounded-full border border-accent/20 bg-accent-soft px-3 py-1 text-xs font-medium text-accent">
+                    Shareable results
+                  </span>
                 </div>
               </div>
             </div>
@@ -70,8 +77,23 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
                 Understand what this tool measures
               </h2>
             </div>
-            <div className="surface p-6 md:p-8">
-              <p className="max-w-4xl text-sm leading-7 md:text-base">{calculator.detail}</p>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <div className="surface p-6">
+                <h3 className="text-lg font-semibold text-slate-950 dark:text-white">What it measures</h3>
+                <p className="mt-3 text-sm leading-7">{guide.measures}</p>
+              </div>
+              <div className="surface p-6">
+                <h3 className="text-lg font-semibold text-slate-950 dark:text-white">What affects the result</h3>
+                <p className="mt-3 text-sm leading-7">{guide.affects}</p>
+              </div>
+              <div className="surface p-6">
+                <h3 className="text-lg font-semibold text-slate-950 dark:text-white">How people use it</h3>
+                <p className="mt-3 text-sm leading-7">{guide.uses}</p>
+              </div>
+              <div className="surface p-6">
+                <h3 className="text-lg font-semibold text-slate-950 dark:text-white">How to keep the result</h3>
+                <p className="mt-3 text-sm leading-7">{shareNote}</p>
+              </div>
             </div>
           </section>
           <section aria-labelledby="use-calculator" className="space-y-4">
@@ -138,7 +160,10 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
               Explore nearby tools
             </h2>
           </div>
-          <RelatedCalculators calculators={related} />
+          <div className="space-y-3">
+            <p className="max-w-3xl text-sm leading-7 text-muted">{guide.related}</p>
+            <RelatedCalculators calculators={related} />
+          </div>
         </section>
       </section>
     </>

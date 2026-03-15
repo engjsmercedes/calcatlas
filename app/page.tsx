@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 
 import { CalculatorCard } from "@/components/calculator-card";
@@ -9,8 +9,17 @@ import { calculatorCategories, calculators } from "@/data/calculators";
 import { createMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
 
+const categoryDescriptions: Record<(typeof calculatorCategories)[number], string> = {
+  Finance: "Home-buying, debt, investing, and savings tools for decisions that compound over time.",
+  Business: "Pricing and profitability calculators for teams that need clean unit economics fast.",
+  Income: "Compensation and take-home tools built for offers, planning, and job comparisons.",
+  Health: "Body, nutrition, sleep, running, and strength calculators for repeat-use planning.",
+  Everyday: "Fast utility calculators for discounts, tipping, and percentage-based everyday math."
+};
+
 const groupedCalculators = calculatorCategories.map((category) => ({
   category,
+  description: categoryDescriptions[category],
   items: calculators.filter((calculator) => calculator.category === category)
 }));
 
@@ -47,7 +56,7 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-3 text-sm text-muted">
-                <span className="rounded-full border border-border bg-white/70 px-4 py-2">16 launch calculators</span>
+                <span className="rounded-full border border-border bg-white/70 px-4 py-2">{calculators.length} calculators live</span>
                 <span className="rounded-full border border-border bg-white/70 px-4 py-2">Shareable URLs</span>
                 <span className="rounded-full border border-border bg-white/70 px-4 py-2">Fast static-friendly pages</span>
               </div>
@@ -58,6 +67,17 @@ export default function HomePage() {
                 <Link href="/calculators" className="button-base border border-border bg-panel text-text hover:border-accent hover:text-accent">
                   Browse all calculators
                 </Link>
+              </div>
+              <div className="flex flex-wrap gap-2 pt-1 text-sm">
+                {groupedCalculators.map(({ category, items }) => (
+                  <Link
+                    key={category}
+                    href={`/#${category.toLowerCase()}`}
+                    className="rounded-full border border-border bg-white/70 px-4 py-2 text-muted transition hover:border-accent hover:text-accent"
+                  >
+                    {category} ({items.length})
+                  </Link>
+                ))}
               </div>
             </div>
             <HomeSearch calculators={calculators} />
@@ -78,14 +98,17 @@ export default function HomePage() {
           <span className="section-label">Categories</span>
           <h2 className="font-display text-3xl font-semibold">Finance, business, income, health, and everyday math</h2>
           <p className="max-w-2xl text-sm leading-7">
-            The app now spans sixteen calculators across five categories, all on the same scalable page pattern so new tools can be added without reworking the site.
+            Calc Atlas groups calculators by the major decision areas people actually search for, making it easier to jump from one answer into the next related tool without losing context.
           </p>
         </div>
         <div className="space-y-12">
-          {groupedCalculators.map(({ category, items }) => (
-            <div key={category} className="space-y-5">
-              <div className="flex items-center justify-between gap-4">
-                <h3 className="text-2xl font-semibold">{category}</h3>
+          {groupedCalculators.map(({ category, description, items }) => (
+            <div id={category.toLowerCase()} key={category} className="space-y-5 scroll-mt-24">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-semibold">{category}</h3>
+                  <p className="max-w-2xl text-sm leading-7 text-muted">{description}</p>
+                </div>
                 <span className="text-sm text-muted">{items.length} calculators</span>
               </div>
               <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">

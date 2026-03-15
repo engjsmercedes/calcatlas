@@ -1,7 +1,17 @@
 export type CalculatorSlug =
   | "percentage-calculator"
+  | "discount-calculator"
+  | "tip-calculator"
   | "margin-calculator"
   | "mortgage-calculator"
+  | "loan-calculator"
+  | "auto-loan-calculator"
+  | "credit-card-payoff-calculator"
+  | "debt-to-income-calculator"
+  | "rent-vs-buy-calculator"
+  | "down-payment-calculator"
+  | "savings-goal-calculator"
+  | "inflation-calculator"
   | "roi-calculator"
   | "compound-interest-calculator"
   | "salary-to-hourly-calculator"
@@ -65,6 +75,46 @@ export const calculators: CalculatorDefinition[] = [
     related: ["margin-calculator", "mortgage-calculator"]
   },
   {
+    slug: "discount-calculator",
+    title: "Discount Calculator",
+    shortDescription: "Calculate sale price, total savings, and effective discount from original price and percent off.",
+    intro: "This discount calculator helps shoppers and operators turn a percent-off offer into a real sale price and savings amount instantly.",
+    detail: "Enter the original price and discount rate to calculate final price, dollars saved, and the remaining percentage paid. It is designed for quick mobile use when comparing deals, promotions, and markdowns.",
+    category: "Everyday",
+    searchTerms: ["percent off calculator", "sale price calculator", "discount price"],
+    features: ["Final sale price", "Dollar savings", "Effective paid percentage"],
+    faqs: [
+      { question: "How do you calculate a discount?", answer: "Multiply the original price by the discount percentage to find savings, then subtract that amount from the original price." },
+      { question: "Can I use this for store sales and markdowns?", answer: "Yes. The calculator works well for retail discounts, promotional offers, and quick price comparisons." },
+      { question: "What does effective paid percentage mean?", answer: "It shows the portion of the original price you still pay after the discount, which can be useful when comparing multiple offers." }
+    ],
+    examples: [
+      { title: "Retail markdown", description: "Calculate the final price of a $120 item at 25% off.", outcome: "The calculator shows the discounted price and exactly how much cash the sale saves." },
+      { title: "Promotion comparison", description: "Check whether two similar items with different discount rates are really that different in final price.", outcome: "This helps compare deals more quickly than doing percentage math in your head." }
+    ],
+    related: ["percentage-calculator", "tip-calculator"]
+  },
+  {
+    slug: "tip-calculator",
+    title: "Tip Calculator",
+    shortDescription: "Calculate tip amount, total bill, and per-person split for restaurants, services, and group checks.",
+    intro: "This tip calculator makes it easy to estimate gratuity, see the full bill total, and split the cost across a group without extra mental math.",
+    detail: "Enter the bill amount, choose a tip percentage, and optionally add a group size to calculate tip amount, grand total, and cost per person. It is optimized for fast mobile use at the table.",
+    category: "Everyday",
+    searchTerms: ["restaurant tip calculator", "split bill calculator", "gratuity calculator"],
+    features: ["Tip amount", "Total bill", "Split per person"],
+    faqs: [
+      { question: "How do I calculate a restaurant tip?", answer: "Multiply the bill by the tip percentage, then add that amount to the original bill total." },
+      { question: "Can I split the bill evenly?", answer: "Yes. Enter the number of people and the calculator will divide the final total into an even per-person amount." },
+      { question: "Should tip be calculated before or after tax?", answer: "Practices vary. This tool is a quick planning calculator, so use the bill amount that matches how you prefer to tip." }
+    ],
+    examples: [
+      { title: "Dinner check", description: "Estimate a 20% tip on an $86 dinner bill.", outcome: "You instantly see the gratuity and the full amount to pay." },
+      { title: "Group meal", description: "Split a tipped total across four people after brunch.", outcome: "The result shows a clean per-person amount so the group can settle up quickly." }
+    ],
+    related: ["discount-calculator", "percentage-calculator"]
+  },
+  {
     slug: "margin-calculator",
     title: "Margin Calculator",
     shortDescription: "Work backward from cost, price, margin, markup, or profit to plan healthier pricing.",
@@ -103,6 +153,66 @@ export const calculators: CalculatorDefinition[] = [
       { title: "Refinance check", description: "Compare a shorter term at a lower rate against the current mortgage.", outcome: "The monthly payment may rise while total interest drops significantly." }
     ],
     related: ["salary-to-hourly-calculator", "compound-interest-calculator"]
+  },
+  {
+    slug: "down-payment-calculator",
+    title: "Down Payment Calculator",
+    shortDescription: "Estimate down payment amount, remaining loan balance, and monthly payment impact from home price and percent down.",
+    intro: "This down payment calculator helps homebuyers turn a percentage target into a real cash amount and see how it changes the estimated mortgage size.",
+    detail: "Enter the home price, down payment percent or dollar amount, and mortgage assumptions to calculate cash needed up front, resulting loan amount, and an estimated monthly principal-and-interest payment.",
+    category: "Finance",
+    searchTerms: ["home down payment calculator", "down payment amount", "how much down payment"],
+    features: ["Percent or dollar input", "Loan amount estimate", "Monthly payment impact"],
+    faqs: [
+      { question: "How much should a down payment be?", answer: "It depends on loan type, cash reserves, and monthly budget. This calculator helps translate the percentage into a real dollar amount and borrowing need." },
+      { question: "Does a bigger down payment lower the monthly payment?", answer: "Yes. A larger down payment reduces the loan amount, which usually lowers the monthly principal-and-interest payment." },
+      { question: "Can I compare different down payment levels?", answer: "Yes. Change the down payment input to compare how much cash is needed upfront versus how much borrowing remains." }
+    ],
+    examples: [
+      { title: "20% down planning", description: "Estimate how much cash is needed for a 20% down payment on a $450,000 home.", outcome: "You can quickly see the upfront amount and the smaller mortgage balance that remains." },
+      { title: "Lower down payment option", description: "Compare a 10% down payment against a larger contribution.", outcome: "The calculator shows the tradeoff between cash needed today and the resulting monthly payment." }
+    ],
+    related: ["mortgage-calculator", "debt-to-income-calculator"]
+  },
+  {
+    slug: "savings-goal-calculator",
+    title: "Savings Goal Calculator",
+    shortDescription: "Estimate how long it could take to reach a savings target using a starting balance, monthly contributions, and growth rate.",
+    intro: "This savings goal calculator helps you estimate how long it may take to reach a target balance and how much of that result comes from contributions versus growth.",
+    detail: "Enter your target, current savings, monthly contribution, and expected annual return to estimate the timeline to goal, final balance at the target date, and the role compounding plays along the way.",
+    category: "Finance",
+    searchTerms: ["savings target calculator", "how long to save calculator", "goal savings planner"],
+    features: ["Time-to-goal estimate", "Contribution vs growth breakdown", "Monthly savings planning"],
+    faqs: [
+      { question: "How long will it take to reach my savings goal?", answer: "That depends on your starting balance, monthly contribution, and expected growth rate. This calculator combines all three to estimate the timeline." },
+      { question: "Does investment return make a big difference?", answer: "Over longer periods, even modest growth assumptions can materially affect how fast you reach a target." },
+      { question: "Can I use this for emergency funds or house savings?", answer: "Yes. The tool works for general savings goals such as emergency funds, travel, large purchases, or home down payments." }
+    ],
+    examples: [
+      { title: "Emergency fund target", description: "Estimate how long it takes to grow a fund to $15,000 with steady monthly contributions.", outcome: "The calculator shows the timeline and how much of the result comes from your deposits versus growth." },
+      { title: "Faster saving scenario", description: "Increase monthly contributions to see how much sooner the target might be reached.", outcome: "The result makes it easier to judge whether a more aggressive savings pace is worth it." }
+    ],
+    related: ["compound-interest-calculator", "inflation-calculator"]
+  },
+  {
+    slug: "inflation-calculator",
+    title: "Inflation Calculator",
+    shortDescription: "Estimate future cost, inflation-adjusted value, and purchasing power change over time using an annual inflation rate.",
+    intro: "This inflation calculator helps you see how prices and purchasing power can change over time instead of leaving inflation as an abstract percentage.",
+    detail: "Enter a current amount, annual inflation rate, and number of years to estimate what the same item may cost in the future and how much value today's money may lose over time.",
+    category: "Finance",
+    searchTerms: ["inflation calculator", "future cost calculator", "purchasing power calculator"],
+    features: ["Future price estimate", "Inflation-adjusted value", "Purchasing power context"],
+    faqs: [
+      { question: "How does inflation affect purchasing power?", answer: "Inflation means the same amount of money buys less over time, so future prices rise while today's purchasing power falls." },
+      { question: "What inflation rate should I use?", answer: "Use a rate that matches your planning assumption or the time period you want to model. This tool is best used for scenario planning rather than exact prediction." },
+      { question: "Can I use this for retirement or budgeting estimates?", answer: "Yes. Inflation planning is useful for retirement projections, long-term budgeting, and understanding future lifestyle costs." }
+    ],
+    examples: [
+      { title: "Long-term budget planning", description: "Estimate how much a $2,000 monthly expense could cost years from now at a steady inflation rate.", outcome: "The calculator turns a percentage assumption into a clearer future-dollar estimate." },
+      { title: "Purchasing power check", description: "Measure how much value $10,000 today might represent after a decade of inflation.", outcome: "You can see how inflation changes the real value of money over longer periods." }
+    ],
+    related: ["compound-interest-calculator", "savings-goal-calculator"]
   },
   {
     slug: "roi-calculator",
@@ -363,7 +473,107 @@ export const calculators: CalculatorDefinition[] = [
       { title: "Building rep targets", description: "Use the rep table to pick approximate loads for higher-rep training.", outcome: "You get a fast reference for 2-10 rep estimates." }
     ],
     related: ["protein-intake-calculator", "macro-calculator"]
-  }
+  },
+  {
+    slug: "loan-calculator",
+    title: "Loan Calculator",
+    shortDescription: "Estimate monthly payment, total interest, and payoff time for a personal or general-purpose loan.",
+    intro: "This loan calculator helps you estimate the monthly payment and lifetime borrowing cost for a standard amortizing loan.",
+    detail: "Enter the loan amount, interest rate, and term to estimate monthly payment, total interest, and total paid. You can also add an extra monthly payment to see how faster payoff changes the outcome.",
+    category: "Finance",
+    searchTerms: ["personal loan calculator", "monthly loan payment", "loan payoff calculator"],
+    features: ["Monthly payment estimate", "Extra payment comparison", "Balance payoff chart"],
+    faqs: [
+      { question: "How is loan payment calculated?", answer: "This calculator uses the standard amortizing loan formula based on principal, interest rate, and loan term." },
+      { question: "What does an extra payment do?", answer: "An extra payment reduces principal faster, which can shorten the payoff period and reduce total interest." },
+      { question: "Can I use this for personal loans or small business loans?", answer: "Yes. As long as the loan follows a standard amortizing structure, the calculator can be used as a planning estimate." }
+    ],
+    examples: [
+      { title: "Personal loan planning", description: "Estimate payment on a $25,000 loan at 7.2% over 5 years.", outcome: "You can see the monthly cost, lifetime interest, and what happens if you pay extra each month." },
+      { title: "Faster payoff check", description: "Add an extra $100 per month to a fixed-rate loan.", outcome: "The calculator shows how much time and interest could be saved." }
+    ],
+    related: ["credit-card-payoff-calculator", "auto-loan-calculator"]
+  },
+  {
+    slug: "auto-loan-calculator",
+    title: "Auto Loan Calculator",
+    shortDescription: "Estimate auto loan payment, amount financed, total interest, and compare common car-loan terms.",
+    intro: "This auto loan calculator helps you estimate the real monthly cost of financing a vehicle after taxes, fees, trade-in value, and down payment.",
+    detail: "Enter vehicle price, cash due, trade-in value, sales tax, fees, rate, and term to estimate monthly payment and the total cost of borrowing. A built-in term comparison shows how 48, 60, and 72 month loans differ.",
+    category: "Finance",
+    searchTerms: ["car payment calculator", "auto financing calculator", "vehicle loan calculator"],
+    features: ["Amount financed estimate", "48/60/72-month comparison", "Loan balance chart"],
+    faqs: [
+      { question: "What is amount financed?", answer: "Amount financed is the portion of the vehicle purchase you borrow after cash down, trade-in value, taxes, and fees are applied." },
+      { question: "Why compare 48, 60, and 72 month terms?", answer: "These are common auto-loan terms, and comparing them helps show the tradeoff between monthly payment and total interest." },
+      { question: "Can I include taxes and fees?", answer: "Yes. This calculator includes sales tax and upfront fees so the financing estimate is closer to a real vehicle purchase." }
+    ],
+    examples: [
+      { title: "Dealer offer comparison", description: "Compare a 60-month and 72-month loan for the same car purchase.", outcome: "You can see whether the lower monthly payment is worth the extra total interest." },
+      { title: "Down payment planning", description: "Change the down payment to see how it affects amount financed and monthly cost.", outcome: "A larger down payment usually lowers both the monthly payment and interest paid." }
+    ],
+    related: ["loan-calculator", "debt-to-income-calculator"]
+  },
+  {
+    slug: "credit-card-payoff-calculator",
+    title: "Credit Card Payoff Calculator",
+    shortDescription: "Estimate payoff time, total interest, and interest savings from paying extra on a credit card balance.",
+    intro: "This credit card payoff calculator shows how long it could take to clear a balance and how much interest you might save by paying more than the current monthly payment.",
+    detail: "Enter your current balance, APR, monthly payment, and any extra monthly amount to estimate payoff time, total interest, and the impact of faster repayment on revolving debt.",
+    category: "Finance",
+    searchTerms: ["credit card payoff calculator", "credit card interest calculator", "pay off debt faster"],
+    features: ["Payoff timeline", "Extra payment comparison", "Interest savings estimate"],
+    faqs: [
+      { question: "Why does extra payment matter so much on credit cards?", answer: "Credit cards often have high APRs, so extra payments reduce principal faster and can save meaningful interest over time." },
+      { question: "What if my payment is too low?", answer: "If your monthly payment does not cover the monthly interest charge, the balance may not fall. The calculator warns when the payment is too low." },
+      { question: "Can I use this for multiple cards?", answer: "It is best for one balance at a time. For multiple cards, run separate scenarios or add balances only if they have similar rates and payment assumptions." }
+    ],
+    examples: [
+      { title: "Current payment plan", description: "Estimate payoff on an $8,000 balance at 22% APR with a $250 monthly payment.", outcome: "You can see how long payoff could take and how much interest may accumulate." },
+      { title: "Aggressive payoff", description: "Add an extra $75 per month to the same balance.", outcome: "The tool shows time saved and interest saved from a more aggressive plan." }
+    ],
+    related: ["loan-calculator", "debt-to-income-calculator"]
+  },
+  {
+    slug: "debt-to-income-calculator",
+    title: "Debt-to-Income Calculator",
+    shortDescription: "Calculate front-end and back-end DTI ratios and see how current debt levels compare with common lending benchmarks.",
+    intro: "This debt-to-income calculator helps you understand how much of your gross monthly income is already committed to housing and recurring debt payments.",
+    detail: "Enter gross monthly income and your recurring debt obligations to calculate front-end and back-end DTI ratios. The calculator also shows rough housing-payment guidance based on common 28/36 rule benchmarks.",
+    category: "Finance",
+    searchTerms: ["dti calculator", "debt to income ratio", "mortgage dti calculator"],
+    features: ["Front-end and back-end DTI", "28/36 rule guidance", "Lender-style context"],
+    faqs: [
+      { question: "What is debt-to-income ratio?", answer: "Debt-to-income ratio compares recurring monthly debt payments with gross monthly income to show how leveraged your budget already is." },
+      { question: "What is the difference between front-end and back-end DTI?", answer: "Front-end DTI looks only at housing costs, while back-end DTI includes housing plus other recurring debts such as car, student, and credit card payments." },
+      { question: "What DTI is considered good?", answer: "Many lenders prefer lower ratios, and common benchmark rules often reference 28% for housing and 36% for total recurring debt, though real approvals vary." }
+    ],
+    examples: [
+      { title: "Mortgage readiness", description: "Estimate whether your current debt load leaves room for a new housing payment.", outcome: "The calculator shows both your total DTI and a rough housing-payment range." },
+      { title: "Budget pressure test", description: "Add recurring loan and card payments to see how much they squeeze your ratio.", outcome: "This helps show whether debt is still manageable or getting tight." }
+    ],
+    related: ["mortgage-calculator", "salary-to-hourly-calculator"]
+  },
+  {
+    slug: "rent-vs-buy-calculator",
+    title: "Rent vs Buy Calculator",
+    shortDescription: "Compare the estimated long-term cost of renting versus buying based on time horizon, mortgage terms, appreciation, and rent growth.",
+    intro: "This rent vs buy calculator helps you compare whether renting or buying looks cheaper over your expected time horizon under a clear set of assumptions.",
+    detail: "Enter home price, down payment, mortgage terms, rent, time horizon, appreciation, rent growth, taxes, maintenance, and transaction costs. The calculator compares rent cost against a simplified buy net cost after estimated owner equity.",
+    category: "Finance",
+    searchTerms: ["rent vs buy calculator", "buying vs renting house", "should i rent or buy"],
+    features: ["Side-by-side cost comparison", "Break-even estimate", "Rent vs buy chart"],
+    faqs: [
+      { question: "How does this rent vs buy calculator work?", answer: "It compares total rent paid against a simplified buy net cost that includes ownership cash outflows and estimated equity after sale." },
+      { question: "What assumptions matter most?", answer: "Time horizon, mortgage rate, appreciation, rent growth, and transaction costs usually have the biggest impact on the result." },
+      { question: "Is rent vs buy always a financial decision?", answer: "No. Flexibility, lifestyle, maintenance responsibility, and location preferences matter too, so the output should be treated as one planning input." }
+    ],
+    examples: [
+      { title: "Seven-year horizon", description: "Compare renting against buying if you expect to stay in one place for about seven years.", outcome: "The calculator shows whether ownership equity may offset higher upfront and transaction costs over that period." },
+      { title: "Shorter stay scenario", description: "Reduce the stay length to see what happens over three or four years.", outcome: "Shorter horizons often make renting more competitive because buying costs have less time to be absorbed." }
+    ],
+    related: ["mortgage-calculator", "debt-to-income-calculator"]
+  },
 ];
 
 export const calculatorMap = Object.fromEntries(calculators.map((calculator) => [calculator.slug, calculator])) as Record<CalculatorSlug, CalculatorDefinition>;
@@ -377,3 +587,6 @@ export function getCalculator(slug: string) {
 export function getRelatedCalculators(slugs: CalculatorSlug[]) {
   return slugs.map((slug) => calculatorMap[slug]).filter(Boolean);
 }
+
+
+

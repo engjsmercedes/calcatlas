@@ -5,21 +5,31 @@ import { useEffect } from "react";
 import type { CalculatorSlug } from "@/data/calculators";
 import { useRecentCalculators } from "@/lib/hooks/use-recent-calculators";
 
+import { AutoLoanCalculator } from "./auto-loan-calculator";
 import { BmiCalculator } from "./bmi-calculator";
 import { BodyFatCalculator } from "./body-fat-calculator";
 import { CalorieNeedsCalculator } from "./calorie-needs-calculator";
 import { CompoundInterestCalculator } from "./compound-interest-calculator";
+import { CreditCardPayoffCalculator } from "./credit-card-payoff-calculator";
+import { DebtToIncomeCalculator } from "./debt-to-income-calculator";
+import { DiscountCalculator } from "./discount-calculator";
+import { DownPaymentCalculator } from "./down-payment-calculator";
 import { IdealWeightCalculator } from "./ideal-weight-calculator";
+import { InflationCalculator } from "./inflation-calculator";
+import { LoanCalculator } from "./loan-calculator";
 import { MacroCalculator } from "./macro-calculator";
 import { MarginCalculator } from "./margin-calculator";
 import { MortgageCalculator } from "./mortgage-calculator";
 import { OneRepMaxCalculator } from "./one-rep-max-calculator";
 import { PercentageCalculator } from "./percentage-calculator";
 import { ProteinIntakeCalculator } from "./protein-intake-calculator";
+import { RentVsBuyCalculator } from "./rent-vs-buy-calculator";
 import { RoiCalculator } from "./roi-calculator";
 import { RunningPaceCalculator } from "./running-pace-calculator";
 import { SalaryToHourlyCalculator } from "./salary-to-hourly-calculator";
+import { SavingsGoalCalculator } from "./savings-goal-calculator";
 import { SleepCycleCalculator } from "./sleep-cycle-calculator";
+import { TipCalculator } from "./tip-calculator";
 import { WaterIntakeCalculator } from "./water-intake-calculator";
 
 export function CalculatorRenderer({ slug }: { slug: CalculatorSlug }) {
@@ -32,14 +42,34 @@ export function CalculatorRenderer({ slug }: { slug: CalculatorSlug }) {
   switch (slug) {
     case "percentage-calculator":
       return <PercentageCalculator />;
+    case "discount-calculator":
+      return <DiscountCalculator />;
+    case "tip-calculator":
+      return <TipCalculator />;
     case "margin-calculator":
       return <MarginCalculator />;
     case "mortgage-calculator":
       return <MortgageCalculator />;
+    case "loan-calculator":
+      return <LoanCalculator />;
+    case "auto-loan-calculator":
+      return <AutoLoanCalculator />;
+    case "credit-card-payoff-calculator":
+      return <CreditCardPayoffCalculator />;
+    case "debt-to-income-calculator":
+      return <DebtToIncomeCalculator />;
+    case "down-payment-calculator":
+      return <DownPaymentCalculator />;
+    case "rent-vs-buy-calculator":
+      return <RentVsBuyCalculator />;
     case "roi-calculator":
       return <RoiCalculator />;
     case "compound-interest-calculator":
       return <CompoundInterestCalculator />;
+    case "savings-goal-calculator":
+      return <SavingsGoalCalculator />;
+    case "inflation-calculator":
+      return <InflationCalculator />;
     case "salary-to-hourly-calculator":
       return <SalaryToHourlyCalculator />;
     case "bmi-calculator":

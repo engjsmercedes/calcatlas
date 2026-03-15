@@ -67,8 +67,18 @@ export function createCalculatorMetadata(calculator: CalculatorDefinition) {
 
 const calculatorIntroExtensions: Record<CalculatorSlug, string> = {
   "percentage-calculator": "It is built for the common percentage tasks people search for most often, from quick discounts and tips to growth rates and percent-of comparisons. Instead of forcing users to jump between tools, the page keeps the main percentage workflows in one interface with live answers and plain-language context.",
+  "discount-calculator": "The page is designed for quick shopping and retail decisions where users want the final sale price without doing multiple percent-off steps by hand. Showing effective discount makes it more useful than a one-step sale-price estimate.",
+  "tip-calculator": "It is intentionally simple and fast so users can get a usable answer in a few seconds on mobile. Adding the split-per-person result makes it more practical for real restaurant and group-bill scenarios than a basic tip-only tool.",
   "margin-calculator": "The page is designed for operators, founders, and ecommerce teams who need to move quickly between margin and markup without mixing the two up. It helps turn pricing questions into clearer decisions by showing the business meaning behind the math, not just the raw output.",
   "mortgage-calculator": "For SEO and usability, the page focuses on the numbers people actually care about when comparing homes or refinance scenarios: monthly payment, long-term interest cost, and the effect of taxes, insurance, and HOA dues. That makes it more useful than a bare principal-and-interest estimator.",
+  "loan-calculator": "The page is useful for personal loans, renovation loans, and other fixed borrowing scenarios where users want a fast monthly payment estimate plus a realistic view of total interest. The extra-payment comparison also turns it into a planning tool instead of a one-number answer.",
+  "auto-loan-calculator": "It is built around the real details that affect car financing offers, including taxes, fees, trade-in value, and down payment. Showing multiple common loan terms helps users compare dealer offers without switching between separate tools.",
+  "credit-card-payoff-calculator": "The page is designed for one of the most common debt questions online: how long will this balance take to pay off, and what happens if I pay more each month. By comparing the current payment against an accelerated plan, it makes the interest cost of revolving debt easier to see.",
+  "debt-to-income-calculator": "This page is aimed at borrowers who need quick underwriting-style context before applying for a mortgage, auto loan, or other financing. Showing both front-end and back-end ratios makes it more practical than a single DTI number alone.",
+  "rent-vs-buy-calculator": "It gives users a more decision-ready comparison by combining housing costs, time horizon, appreciation, and transaction costs into one side-by-side estimate. That makes the result more useful than relying on mortgage payment alone when evaluating whether buying is worth it.",
+  "down-payment-calculator": "The page helps homebuyers move from a percentage assumption to a real cash target and a more realistic loan size. Connecting the down payment directly to estimated monthly payment makes it more actionable than a simple percentage converter.",
+  "savings-goal-calculator": "It is built for one of the most common personal finance questions: how long will it take to reach my target if I save this much each month. Pairing the timeline with contribution and growth context makes the result easier to use for planning.",
+  "inflation-calculator": "The page is useful because it translates an abstract economic concept into a clear before-and-after dollar comparison. Showing both future cost and lost purchasing power helps users connect inflation to budgeting and long-term planning more directly.",
   "roi-calculator": "This page is meant for fast evaluation of campaigns, projects, and investments where simple return math needs extra context. By showing gain, total ROI, and annualized ROI together, it helps users compare opportunities that span different amounts and timeframes.",
   "compound-interest-calculator": "It is structured to make compounding more intuitive by separating contributions from growth and pairing the numbers with a visual chart. That makes it easier to explain long-term investing, savings habits, and future value planning without overwhelming the user.",
   "salary-to-hourly-calculator": "The page goes beyond a basic salary conversion by reflecting the questions people actually have when evaluating compensation: what the hourly equivalent is, how taxes change the picture, and how deductions affect take-home pay. That makes it useful for job offers, freelancing, and relocation planning.",
@@ -89,7 +99,79 @@ export function getCalculatorLead(calculator: CalculatorDefinition) {
 }
 
 export function getCalculatorResultExplanation(calculator: CalculatorDefinition) {
-  return `${calculator.title} updates results instantly as inputs change, then turns the output into a plain-language answer so users can understand what the number means and what to do next.`;
+  switch (calculator.slug) {
+    case "mortgage-calculator":
+      return "The output separates principal and interest from taxes, insurance, and HOA costs so users can understand what is driving the all-in housing payment. It also makes the tradeoff between monthly affordability and long-term interest cost easier to evaluate.";
+    case "loan-calculator":
+      return "The result shows how much the loan costs each month and how much total interest accumulates if the debt runs its full term. When extra payments are added, the output also makes the payoff-speed tradeoff clearer.";
+    case "credit-card-payoff-calculator":
+      return "The result highlights payoff time and total interest so users can see how expensive revolving debt becomes when balances linger. Comparing the current payment with a larger payment makes the savings from faster payoff more concrete.";
+    case "rent-vs-buy-calculator":
+      return "The result frames renting and buying as a longer-horizon comparison instead of just comparing one monthly payment with another. It helps users see how time horizon, equity, transaction costs, and ongoing ownership costs all shape the decision.";
+    case "down-payment-calculator":
+      return "The output links the upfront cash target to the remaining loan amount and a rough monthly payment, which makes the tradeoff immediately useful. Users can quickly see whether a larger down payment meaningfully improves the financing picture.";
+    case "savings-goal-calculator":
+      return "The result shows whether the current savings pace is enough for the target and how much of the ending balance comes from contributions versus growth. That gives users a clearer planning answer than a future value number alone.";
+    case "inflation-calculator":
+      return "The output translates an annual inflation assumption into a future-dollar cost and reduced purchasing power. That helps users understand how a seemingly small rate can materially change long-term budget or savings plans.";
+    case "salary-to-hourly-calculator":
+      return "The result connects pay conversion to a more realistic take-home estimate, which makes the number easier to use for job offers, budgeting, and freelance comparisons. The breakdown also clarifies how taxes and deductions change the picture.";
+    case "bmi-calculator":
+      return "The result places the BMI score inside a broader category and healthy-weight context so users are not left with a raw ratio alone. It works best as a quick screening number rather than a full health assessment.";
+    case "calorie-needs-calculator":
+      return "The output shows maintenance calories plus nearby targets for fat loss or gain, which makes the result usable for planning rather than just reference. It helps users turn a formula estimate into an actual decision about daily intake.";
+    case "body-fat-calculator":
+      return "The result turns a measurement-based estimate into a category and plain-language interpretation so users can gauge general body-composition context. It is most useful for repeat tracking and broad benchmarking, not exact laboratory-level precision.";
+    case "macro-calculator":
+      return "The output converts calorie needs into protein, carb, and fat targets that can be used in meal planning right away. The chosen macro style also helps users understand how the recommendation fits their goal and eating preference.";
+    case "running-pace-calculator":
+      return "The result converts one race or workout number into pace, speed, and finish-time context that runners can use immediately. That makes it easier to plan training and race strategy without extra conversions.";
+    default:
+      if (calculator.category === "Finance") {
+        return `${calculator.title} turns the raw output into a planning answer so users can understand what the number means before making a money decision.`;
+      }
+      if (calculator.category === "Health") {
+        return `${calculator.title} pairs the number with plain-language context so users can interpret the result more responsibly and use it as a starting point for planning.`;
+      }
+      return `${calculator.title} updates results instantly as inputs change, then explains what the number means in plain language so the output is easier to act on.`;
+  }
+}
+
+export function getCalculatorGuide(calculator: CalculatorDefinition) {
+  switch (calculator.category) {
+    case "Finance":
+      return {
+        measures: `This calculator measures the main money relationship behind ${calculator.title.toLowerCase()}, turning inputs into a planning number instead of a rough guess.`,
+        affects: "Rates, time horizon, payment size, and other scenario assumptions usually have the biggest impact on the final result.",
+        uses: "People use the output to compare options, pressure-test affordability, and decide whether the current setup still fits the goal.",
+        related: "Related finance tools below help users keep moving through the next step of the same decision instead of returning to search."
+      };
+    case "Health":
+      return {
+        measures: `This calculator measures the core health or fitness estimate behind ${calculator.title.toLowerCase()} and puts it into readable context.`,
+        affects: "Body size, activity, timing, and the chosen assumptions are usually what move the result the most.",
+        uses: "People use the output as a starting point for planning habits, nutrition, recovery, or training rather than as a perfect standalone verdict.",
+        related: "Related health tools below help users compare the result with nutrition, body-composition, recovery, and performance calculators."
+      };
+    case "Business":
+      return {
+        measures: `This calculator measures the pricing or profitability math behind ${calculator.title.toLowerCase()} so the tradeoff is easier to read.`,
+        affects: "Cost, selling price, target margins, and the direction of the calculation all change the business outcome.",
+        uses: "People use the result to set prices faster, check profitability, and avoid making decisions from partial math.",
+        related: "Related business and finance tools below help users move into adjacent pricing and return questions."
+      };
+    default:
+      return {
+        measures: `This calculator measures the main input-to-output relationship behind ${calculator.title.toLowerCase()} in a way that is fast to reuse.`,
+        affects: "The selected mode, the quality of the starting inputs, and the chosen assumptions all influence the final number.",
+        uses: "People use the result to answer a quick practical question and then move directly into the next decision.",
+        related: "Related calculators below keep users inside the same problem cluster without duplicating navigation."
+      };
+  }
+}
+
+export function getCalculatorShareNote(calculator: CalculatorDefinition) {
+  return `This ${calculator.title.toLowerCase()} supports shareable URL state, so the current inputs can be copied into a link and reopened later without re-entering the scenario.`;
 }
 
 export function createCalculatorSchemas(calculator: CalculatorDefinition) {
@@ -147,3 +229,6 @@ export function createCalculatorIndexSchemas() {
     url: absoluteUrl("/calculators")
   };
 }
+
+
+
