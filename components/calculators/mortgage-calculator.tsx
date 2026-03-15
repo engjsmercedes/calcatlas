@@ -7,16 +7,16 @@ import { LineChart } from "@/components/ui/line-chart";
 import { PillTabs } from "@/components/ui/pill-tabs";
 import { ResultCard } from "@/components/ui/result-card";
 import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculator-state";
+import { amortizedMonthlyPayment } from "@/lib/calculators/borrowing";
 import { calculateMortgage, solveMortgageAnnualRate } from "@/lib/calculators/mortgage";
 import { formatCurrency, formatNumber, parseNumberInput } from "@/lib/utils";
 
 import { CalculatorActions, EmptyCalculatorState, ExamplePresetList, InsightPanel } from "./shared";
 
 const initialState = {
-  mode: "solve-payment",
   loanAmount: "400000",
   annualRate: "6.5",
-  targetPrincipalInterest: "2528.27",
+  targetPrincipalInterest: "",
   years: "30",
   propertyTaxAnnual: "4800",
   insuranceAnnual: "1800",
@@ -25,17 +25,169 @@ const initialState = {
   extraMonthlyPayment: "0"
 };
 
+function solveMortgageAmount(monthlyPayment: number, annualRate: number, years: number) {
+  const months = Math.round(years * 12);
+  const monthlyRate = annualRate / 100 / 12;
+
+  if (monthlyPayment <= 0 || annualRate < 0 || months <= 0) {
+    return undefined;
+  }
+
+  if (monthlyRate === 0) {
+    return monthlyPayment * months;
+  }
+
+  const denominator = (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+
+  if (denominator <= 0) {
+    return undefined;
+  }
+
+  return monthlyPayment / denominator;
+}
+
+function solveMortgageYears(loanAmount: number, annualRate: number, monthlyPayment: number) {
+  const monthlyRate = annualRate / 100 / 12;
+
+  if (loanAmount <= 0 || annualRate < 0 || monthlyPayment <= 0) {
+    return undefined;
+  }
+
+  if (monthlyRate === 0) {
+    return loanAmount / monthlyPayment / 12;
+  }
+
+  if (monthlyPayment <= loanAmount * monthlyRate) {
+    return undefined;
+  }
+
+  const months = -Math.log(1 - (monthlyRate * loanAmount) / monthlyPayment) / Math.log(1 + monthlyRate);
+  return months / 12;
+}
+
+function formatLoanTerm(years: number) {
+  const totalMonths = Math.max(1, Math.round(years * 12));
+  const wholeYears = Math.floor(totalMonths / 12);
+  const remainingMonths = totalMonths % 12;
+
+  if (remainingMonths === 0) {
+    return `${wholeYears} years`;
+  }
+
+  return `${wholeYears} years ${remainingMonths} months`;
+}
+
+function resolveMortgageCore(inputs: {
+  loanAmount?: number;
+  annualRate?: number;
+  years?: number;
+  principalInterest?: number;
+}) {
+  const { loanAmount, annualRate, years, principalInterest } = inputs;
+  const providedCount = [loanAmount, annualRate, years, principalInterest].filter((value) => value !== undefined).length;
+
+  if (providedCount < 3) {
+    return undefined;
+  }
+
+  let resolvedLoanAmount = loanAmount;
+  let resolvedAnnualRate = annualRate;
+  let resolvedYears = years;
+  let resolvedPrincipalInterest = principalInterest;
+  let solvedField: "loanAmount" | "annualRate" | "years" | "principalInterest" | "none" = "none";
+  let solvedBy = "all inputs";
+
+  if (resolvedLoanAmount === undefined) {
+    if (resolvedAnnualRate === undefined || resolvedYears === undefined || resolvedPrincipalInterest === undefined) {
+      return undefined;
+    }
+
+    const solved = solveMortgageAmount(resolvedPrincipalInterest, resolvedAnnualRate, resolvedYears);
+
+    if (solved === undefined || solved <= 0) {
+      return {
+        error: "These inputs do not produce a valid loan amount."
+      };
+    }
+
+    resolvedLoanAmount = solved;
+    solvedField = "loanAmount";
+    solvedBy = "rate, term, and principal plus interest payment";
+  } else if (resolvedAnnualRate === undefined) {
+    if (resolvedYears === undefined || resolvedPrincipalInterest === undefined) {
+      return undefined;
+    }
+
+    const solved = solveMortgageAnnualRate(resolvedLoanAmount, resolvedPrincipalInterest, resolvedYears);
+
+    if (solved === undefined || solved < 0) {
+      return {
+        error: "That principal-and-interest payment is too low for this loan amount and term, so there is no valid positive rate to solve for."
+      };
+    }
+
+    resolvedAnnualRate = solved;
+    solvedField = "annualRate";
+    solvedBy = "amount, term, and principal plus interest payment";
+  } else if (resolvedYears === undefined) {
+    if (resolvedPrincipalInterest === undefined) {
+      return undefined;
+    }
+
+    const solved = solveMortgageYears(resolvedLoanAmount, resolvedAnnualRate, resolvedPrincipalInterest);
+
+    if (solved === undefined || !Number.isFinite(solved) || solved <= 0) {
+      return {
+        error: "That principal-and-interest payment is too low to fully amortize the loan at this rate."
+      };
+    }
+
+    resolvedYears = solved;
+    solvedField = "years";
+    solvedBy = "amount, rate, and principal plus interest payment";
+  } else if (resolvedPrincipalInterest === undefined) {
+    resolvedPrincipalInterest = amortizedMonthlyPayment(resolvedLoanAmount, resolvedAnnualRate, Math.round(resolvedYears * 12));
+    solvedField = "principalInterest";
+    solvedBy = "amount, rate, and term";
+  }
+
+  if (
+    resolvedLoanAmount === undefined ||
+    resolvedAnnualRate === undefined ||
+    resolvedYears === undefined ||
+    resolvedPrincipalInterest === undefined
+  ) {
+    return undefined;
+  }
+
+  const expectedPayment = amortizedMonthlyPayment(resolvedLoanAmount, resolvedAnnualRate, Math.round(resolvedYears * 12));
+
+  if (Math.abs(expectedPayment - resolvedPrincipalInterest) > 0.5) {
+    return {
+      error: "These core mortgage inputs conflict with each other. Clear one field or adjust the amount, rate, term, and principal-and-interest payment so they agree."
+    };
+  }
+
+  return {
+    loanAmount: resolvedLoanAmount,
+    annualRate: resolvedAnnualRate,
+    years: resolvedYears,
+    principalInterest: resolvedPrincipalInterest,
+    solvedField,
+    solvedBy
+  };
+}
+
 export function MortgageCalculator() {
   const [scheduleView, setScheduleView] = useState<"annual" | "monthly">("annual");
   const { state, setState, hasActiveValues, copyShareLink, reset } = useShareableCalculatorState({
     initialState,
-    keys: ["mode", "loanAmount", "annualRate", "targetPrincipalInterest", "years", "propertyTaxAnnual", "insuranceAnnual", "hoaMonthly", "pmiMonthly", "extraMonthlyPayment"]
+    keys: ["loanAmount", "annualRate", "targetPrincipalInterest", "years", "propertyTaxAnnual", "insuranceAnnual", "hoaMonthly", "pmiMonthly", "extraMonthlyPayment"]
   });
 
-  const mode = state.mode === "solve-rate" ? "solve-rate" : "solve-payment";
   const loanAmount = parseNumberInput(state.loanAmount);
   const annualRate = parseNumberInput(state.annualRate);
-  const targetPrincipalInterest = parseNumberInput(state.targetPrincipalInterest);
+  const principalInterest = parseNumberInput(state.targetPrincipalInterest);
   const years = parseNumberInput(state.years);
   const propertyTaxAnnual = parseNumberInput(state.propertyTaxAnnual) ?? 0;
   const insuranceAnnual = parseNumberInput(state.insuranceAnnual) ?? 0;
@@ -43,64 +195,50 @@ export function MortgageCalculator() {
   const pmiMonthly = parseNumberInput(state.pmiMonthly) ?? 0;
   const extraMonthlyPayment = parseNumberInput(state.extraMonthlyPayment) ?? 0;
 
-  const solvedAnnualRate = useMemo(() => {
-    if (mode !== "solve-rate" || loanAmount === undefined || years === undefined || targetPrincipalInterest === undefined) {
-      return undefined;
-    }
-
-    return solveMortgageAnnualRate(loanAmount, targetPrincipalInterest, years);
-  }, [loanAmount, mode, targetPrincipalInterest, years]);
-
-  const effectiveAnnualRate = mode === "solve-rate" ? solvedAnnualRate : annualRate;
+  const resolved = useMemo(
+    () =>
+      resolveMortgageCore({
+        loanAmount,
+        annualRate,
+        years,
+        principalInterest
+      }),
+    [annualRate, loanAmount, principalInterest, years]
+  );
 
   const result = useMemo(() => {
-    if (loanAmount === undefined || years === undefined || effectiveAnnualRate === undefined) {
+    if (!resolved || "error" in resolved) {
       return undefined;
     }
 
     return calculateMortgage({
-      loanAmount,
-      annualRate: effectiveAnnualRate,
-      years,
+      loanAmount: resolved.loanAmount,
+      annualRate: resolved.annualRate,
+      years: resolved.years,
       propertyTaxAnnual,
       insuranceAnnual,
       hoaMonthly,
       pmiMonthly,
       extraMonthlyPayment
     });
-  }, [effectiveAnnualRate, extraMonthlyPayment, hoaMonthly, insuranceAnnual, loanAmount, pmiMonthly, propertyTaxAnnual, years]);
-
-  const showImpossibleRate = mode === "solve-rate" && loanAmount !== undefined && years !== undefined && targetPrincipalInterest !== undefined && solvedAnnualRate === undefined;
+  }, [extraMonthlyPayment, hoaMonthly, insuranceAnnual, pmiMonthly, propertyTaxAnnual, resolved]);
 
   return (
     <div className="space-y-8">
       <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="space-y-4">
           <div className="surface p-6 md:p-8">
-            <div className="mb-6">
-              <PillTabs
-                options={[
-                  { label: "Solve payment", value: "solve-payment" },
-                  { label: "Solve rate", value: "solve-rate" }
-                ]}
-                value={mode}
-                onChange={(nextMode) => setState((current) => ({ ...current, mode: nextMode }))}
-              />
-            </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <InputField label="Loan amount" prefix="$" value={state.loanAmount} onChange={(event) => setState((current) => ({ ...current, loanAmount: event.target.value }))} />
-              {mode === "solve-payment" ? (
-                <InputField label="Interest rate" hint="Annual %" value={state.annualRate} onChange={(event) => setState((current) => ({ ...current, annualRate: event.target.value }))} />
-              ) : (
-                <InputField
-                  label="Target principal + interest"
-                  hint="Monthly core payment"
-                  prefix="$"
-                  value={state.targetPrincipalInterest}
-                  onChange={(event) => setState((current) => ({ ...current, targetPrincipalInterest: event.target.value }))}
-                />
-              )}
+              <InputField label="Interest rate" hint="Annual %" value={state.annualRate} onChange={(event) => setState((current) => ({ ...current, annualRate: event.target.value }))} />
               <InputField label="Loan term" hint="Years" value={state.years} onChange={(event) => setState((current) => ({ ...current, years: event.target.value }))} />
+              <InputField
+                label="Principal + interest"
+                hint="Monthly core payment"
+                prefix="$"
+                value={state.targetPrincipalInterest}
+                onChange={(event) => setState((current) => ({ ...current, targetPrincipalInterest: event.target.value }))}
+              />
               <InputField label="Property tax" hint="Annual" prefix="$" value={state.propertyTaxAnnual} onChange={(event) => setState((current) => ({ ...current, propertyTaxAnnual: event.target.value }))} />
               <InputField label="Home insurance" hint="Annual" prefix="$" value={state.insuranceAnnual} onChange={(event) => setState((current) => ({ ...current, insuranceAnnual: event.target.value }))} />
               <InputField label="HOA dues" hint="Monthly" prefix="$" value={state.hoaMonthly} onChange={(event) => setState((current) => ({ ...current, hoaMonthly: event.target.value }))} />
@@ -108,9 +246,7 @@ export function MortgageCalculator() {
               <InputField label="Extra payment" hint="Monthly" prefix="$" value={state.extraMonthlyPayment} onChange={(event) => setState((current) => ({ ...current, extraMonthlyPayment: event.target.value }))} />
             </div>
             <p className="mt-4 text-sm leading-7 text-muted">
-              {mode === "solve-rate"
-                ? "Use the principal-and-interest payment if you want the calculator to back into the implied rate. Taxes, insurance, HOA, PMI, and extra payment sit on top of that core payment."
-                : "Enter loan amount, rate, and term to estimate the mortgage payment. Leave optional housing costs at zero if they do not apply."}
+              Enter any three core fields above and leave the fourth blank. The calculator solves the missing loan amount, rate, term, or principal-and-interest payment, then layers taxes, insurance, HOA, PMI, and extra payments on top.
             </p>
             <div className="mt-6">
               <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
@@ -118,16 +254,31 @@ export function MortgageCalculator() {
           </div>
           <ExamplePresetList
             title="Try an example"
-            body="Use a preset scenario to compare a standard mortgage against an aggressive payoff plan or back into the implied rate from a target payment."
+            body="Use a preset scenario to solve for a monthly payment, implied rate, or payoff term without re-entering the full mortgage setup."
             items={[
               {
-                label: "Standard 30-year loan",
-                description: "$400,000 at 6.5% for 30 years with taxes and insurance but no extra payment.",
+                label: "Solve monthly payment",
+                description: "A standard $400,000 mortgage at 6.5% over 30 years with housing costs added separately.",
                 onApply: () =>
                   setState({
-                    mode: "solve-payment",
                     loanAmount: "400000",
                     annualRate: "6.5",
+                    targetPrincipalInterest: "",
+                    years: "30",
+                    propertyTaxAnnual: "4800",
+                    insuranceAnnual: "1800",
+                    hoaMonthly: "0",
+                    pmiMonthly: "0",
+                    extraMonthlyPayment: "0"
+                  })
+              },
+              {
+                label: "Solve rate from payment",
+                description: "Back into the implied rate from a $2,528.27 principal-and-interest payment on a $400,000, 30-year loan.",
+                onApply: () =>
+                  setState({
+                    loanAmount: "400000",
+                    annualRate: "",
                     targetPrincipalInterest: "2528.27",
                     years: "30",
                     propertyTaxAnnual: "4800",
@@ -138,32 +289,14 @@ export function MortgageCalculator() {
                   })
               },
               {
-                label: "Faster payoff scenario",
-                description: "Same mortgage with an extra $300 monthly principal payment to reduce interest over time.",
+                label: "Solve term from payment",
+                description: "Estimate how long a $2,800 principal-and-interest payment would take to amortize a $400,000 loan at 6.5%.",
                 onApply: () =>
                   setState({
-                    mode: "solve-payment",
                     loanAmount: "400000",
                     annualRate: "6.5",
-                    targetPrincipalInterest: "2528.27",
-                    years: "30",
-                    propertyTaxAnnual: "4800",
-                    insuranceAnnual: "1800",
-                    hoaMonthly: "0",
-                    pmiMonthly: "0",
-                    extraMonthlyPayment: "300"
-                  })
-              },
-              {
-                label: "Solve rate from payment",
-                description: "Back into the implied rate for a $400,000 loan over 30 years with a $2,528 principal-and-interest payment.",
-                onApply: () =>
-                  setState({
-                    mode: "solve-rate",
-                    loanAmount: "400000",
-                    annualRate: "",
-                    targetPrincipalInterest: "2528.27",
-                    years: "30",
+                    targetPrincipalInterest: "2800",
+                    years: "",
                     propertyTaxAnnual: "4800",
                     insuranceAnnual: "1800",
                     hoaMonthly: "0",
@@ -175,19 +308,17 @@ export function MortgageCalculator() {
           />
         </div>
         <div className="space-y-4">
-          {showImpossibleRate ? (
+          {!resolved ? (
             <EmptyCalculatorState
-              title="Payment is too low for this loan"
-              body="That principal-and-interest payment is below the zero-interest baseline for this loan amount and term, so there is no valid positive rate to solve for."
+              title="Enter any 3 core mortgage inputs"
+              body="Use any three of these four core fields: loan amount, interest rate, loan term, and principal-plus-interest payment. Optional housing costs are added after the core mortgage is solved."
             />
+          ) : "error" in resolved ? (
+            <EmptyCalculatorState title="Inputs conflict" body={resolved.error ?? "The entered values conflict with each other."} />
           ) : !result ? (
             <EmptyCalculatorState
-              title={mode === "solve-rate" ? "Enter loan amount, payment, and term" : "Enter your mortgage details"}
-              body={
-                mode === "solve-rate"
-                  ? "Add the loan amount, target principal-and-interest payment, and loan term to estimate the implied mortgage rate before taxes and insurance are added."
-                  : "Add the loan amount, rate, and loan term to estimate monthly payment, total interest, and the long-term cost of the loan."
-              }
+              title="Enter your mortgage details"
+              body="Add enough core mortgage information to solve the loan, then use the optional housing costs to estimate the all-in monthly payment."
             />
           ) : (
             <>
@@ -196,15 +327,15 @@ export function MortgageCalculator() {
                   <p className="section-label">Mortgage payment</p>
                   <h3 className="mt-4 text-2xl font-semibold">{formatCurrency(result.totalMonthlyPayment)} / month</h3>
                   <p className="mt-2 text-sm leading-7">
-                    {mode === "solve-rate"
-                      ? `A principal-and-interest payment of ${formatCurrency(result.monthlyPrincipalInterest)} implies about ${formatNumber(effectiveAnnualRate ?? 0, 3)}% annual interest over ${state.years} years before taxes, insurance, HOA, PMI, and extra payment are added.`
-                      : `Principal and interest come to ${formatCurrency(result.monthlyPrincipalInterest)} per month before taxes, insurance, HOA, PMI, and any extra payment are added.`}
+                    Solved from {resolved.solvedBy}, principal and interest come to {formatCurrency(result.monthlyPrincipalInterest)} per month before taxes, insurance, HOA, PMI, and any extra payment are added.
                   </p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <ResultCard label="Total monthly payment" value={formatCurrency(result.totalMonthlyPayment)} tone="success" />
-                  <ResultCard label={mode === "solve-rate" ? "Solved interest rate" : "Interest rate"} value={`${formatNumber(effectiveAnnualRate ?? 0, 3)}%`} />
-                  <ResultCard label="Principal + interest" value={formatCurrency(result.monthlyPrincipalInterest)} />
+                  <ResultCard label={resolved.solvedField === "loanAmount" ? "Solved loan amount" : "Loan amount"} value={formatCurrency(resolved.loanAmount)} />
+                  <ResultCard label={resolved.solvedField === "annualRate" ? "Solved interest rate" : "Interest rate"} value={`${formatNumber(resolved.annualRate, 3)}%`} />
+                  <ResultCard label={resolved.solvedField === "years" ? "Solved loan term" : "Loan term"} value={formatLoanTerm(resolved.years)} />
+                  <ResultCard label={resolved.solvedField === "principalInterest" ? "Solved principal + interest" : "Principal + interest"} value={formatCurrency(result.monthlyPrincipalInterest)} />
                   <ResultCard label="Total interest" value={formatCurrency(result.totalInterest)} />
                   <ResultCard label="Total paid over loan" value={formatCurrency(result.totalPaid)} />
                   <ResultCard label="Payoff time" value={`${formatNumber(result.payoffMonths / 12, 1)} years`} />
@@ -214,9 +345,13 @@ export function MortgageCalculator() {
               <InsightPanel
                 title="Payment insight"
                 body={
-                  mode === "solve-rate"
-                    ? `Given this loan amount and term, a principal-and-interest payment of ${formatCurrency(result.monthlyPrincipalInterest)} points to an implied rate of about ${formatNumber(effectiveAnnualRate ?? 0, 3)}%. That helps you reverse-engineer a quoted payment before the side housing costs are layered on top.`
-                    : `On this ${state.years}-year mortgage, the interest cost alone adds up to ${formatCurrency(result.totalInterest)}. Adding extra monthly principal can shorten payoff and save about ${formatCurrency(result.interestSavedWithExtra)} in interest.`
+                  resolved.solvedField === "annualRate"
+                    ? `Given this amount, term, and principal-and-interest payment, the implied mortgage rate is about ${formatNumber(resolved.annualRate, 3)}% before taxes and insurance are layered on top.`
+                    : resolved.solvedField === "years"
+                      ? `At ${formatNumber(resolved.annualRate, 3)}%, a principal-and-interest payment of ${formatCurrency(result.monthlyPrincipalInterest)} would pay this mortgage off in about ${formatLoanTerm(resolved.years)} before optional housing costs are added.`
+                      : resolved.solvedField === "loanAmount"
+                        ? `At ${formatNumber(resolved.annualRate, 3)}% over ${formatLoanTerm(resolved.years)}, a principal-and-interest payment of ${formatCurrency(result.monthlyPrincipalInterest)} supports a mortgage of about ${formatCurrency(resolved.loanAmount)}.`
+                        : `On this ${formatLoanTerm(resolved.years)} mortgage, the interest cost alone adds up to ${formatCurrency(result.totalInterest)}. Adding extra monthly principal can shorten payoff and save about ${formatCurrency(result.interestSavedWithExtra)} in interest.`
                 }
               />
             </>
@@ -290,3 +425,4 @@ export function MortgageCalculator() {
     </div>
   );
 }
+

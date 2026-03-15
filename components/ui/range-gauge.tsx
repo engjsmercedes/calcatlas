@@ -2,6 +2,7 @@ import { formatNumber } from "@/lib/utils";
 
 interface RangeGaugeSegment {
   label: string;
+  displayLabel?: string;
   max: number;
   color: string;
 }
@@ -51,7 +52,7 @@ export function RangeGauge({
                 return (
                   <div
                     key={segment.label}
-                    className="flex items-center justify-center px-2 text-center text-[10px] font-semibold leading-tight text-white sm:text-sm"
+                    className="flex items-center justify-center px-2 text-center text-[9px] font-semibold leading-tight text-white sm:text-xs lg:text-sm"
                     style={{
                       width: `${width}%`,
                       backgroundColor: segment.color,
@@ -59,7 +60,7 @@ export function RangeGauge({
                       paddingRight: index === segments.length - 1 ? "0.9rem" : undefined
                     }}
                   >
-                    <span className="block max-w-full whitespace-normal break-words">{segment.label}</span>
+                    <span className="block max-w-full whitespace-normal break-words">{segment.displayLabel ?? segment.label}</span>
                   </div>
                 );
               })}
@@ -74,3 +75,4 @@ export function RangeGauge({
     </div>
   );
 }
+

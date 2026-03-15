@@ -26,18 +26,24 @@ export function CalorieNeedsCalculator() {
     keys: ["age", "sex", "heightCm", "weightKg", "activityLevel", "goal"]
   });
 
-  const result = useMemo(
-    () =>
-      calculateCalorieNeeds({
-        age: parseNumberInput(state.age) || 0,
-        sex: state.sex as "male" | "female",
-        heightCm: parseNumberInput(state.heightCm) || 0,
-        weightKg: parseNumberInput(state.weightKg) || 0,
-        activityLevel: state.activityLevel as any,
-        goal: state.goal as any
-      }),
-    [state]
-  );
+  const age = parseNumberInput(state.age);
+  const heightCm = parseNumberInput(state.heightCm);
+  const weightKg = parseNumberInput(state.weightKg);
+
+  const result = useMemo(() => {
+    if (age === undefined || heightCm === undefined || weightKg === undefined) {
+      return undefined;
+    }
+
+    return calculateCalorieNeeds({
+      age,
+      sex: state.sex as "male" | "female",
+      heightCm,
+      weightKg,
+      activityLevel: state.activityLevel as any,
+      goal: state.goal as any
+    });
+  }, [age, heightCm, state.activityLevel, state.goal, state.sex, weightKg]);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
@@ -122,3 +128,4 @@ export function CalorieNeedsCalculator() {
     </div>
   );
 }
+

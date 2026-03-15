@@ -129,9 +129,9 @@ export function BmiCalculator() {
               centerLabel={formatNumber(result.bmi, 1)}
               unitLabel={result.category}
               segments={[
-                { label: "Underweight", max: 18.5, color: "#3b82f6" },
+                { label: "Underweight", displayLabel: "Under", max: 18.5, color: "#3b82f6" },
                 { label: "Healthy", max: 24.9, color: "#22c55e" },
-                { label: "Overweight", max: 29.9, color: "#f59e0b" },
+                { label: "Overweight", displayLabel: "Over", max: 29.9, color: "#f59e0b" },
                 { label: "Obese", max: 40, color: "#ef4444" }
               ]}
             />
@@ -154,3 +154,4 @@ export function BmiCalculator() {
     </div>
   );
 }
+

@@ -34,18 +34,25 @@ export function CompoundInterestCalculator() {
     ]
   });
 
-  const result = useMemo(
-    () =>
-      calculateCompoundInterest({
-        initialAmount: parseNumberInput(state.initialAmount) || 0,
-        contributionAmount: parseNumberInput(state.contributionAmount) || 0,
-        contributionFrequency: state.contributionFrequency as "monthly" | "quarterly" | "annually",
-        annualRate: parseNumberInput(state.annualRate) || 0,
-        years: parseNumberInput(state.years) || 0,
-        compoundingFrequency: state.compoundingFrequency as "annually" | "quarterly" | "monthly" | "daily"
-      }),
-    [state]
-  );
+  const initialAmount = parseNumberInput(state.initialAmount);
+  const contributionAmount = parseNumberInput(state.contributionAmount) ?? 0;
+  const annualRate = parseNumberInput(state.annualRate);
+  const years = parseNumberInput(state.years);
+
+  const result = useMemo(() => {
+    if (initialAmount === undefined || annualRate === undefined || years === undefined) {
+      return undefined;
+    }
+
+    return calculateCompoundInterest({
+      initialAmount,
+      contributionAmount,
+      contributionFrequency: state.contributionFrequency as "monthly" | "quarterly" | "annually",
+      annualRate,
+      years,
+      compoundingFrequency: state.compoundingFrequency as "annually" | "quarterly" | "monthly" | "daily"
+    });
+  }, [annualRate, contributionAmount, initialAmount, state.compoundingFrequency, state.contributionFrequency, years]);
 
   return (
     <div className="space-y-8">
@@ -163,7 +170,7 @@ export function CompoundInterestCalculator() {
               </div>
               <InsightPanel
                 title="Growth insight"
-                body={`If you invest ${formatCurrency(parseNumberInput(state.contributionAmount) || 0)} ${state.contributionFrequency} at ${state.annualRate}% annually, your balance could reach ${formatCurrency(result.finalBalance)} in ${state.years} years. The chart also compares growth against cash contributed.`}
+                body={`If you invest ${formatCurrency(contributionAmount)} ${state.contributionFrequency} at ${state.annualRate}% annually, your balance could reach ${formatCurrency(result.finalBalance)} in ${state.years} years. The chart also compares growth against cash contributed.`}
               />
             </>
           )}
@@ -189,3 +196,4 @@ export function CompoundInterestCalculator() {
     </div>
   );
 }
+
