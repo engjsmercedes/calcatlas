@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react";
 
+import { TurnstileWidget } from "@/components/turnstile-widget";
+
 const topics = [
   "Calculator suggestion",
   "Correction or bug report",
@@ -16,6 +18,8 @@ export function ContactForm() {
     type: "idle",
     message: ""
   });
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
   const [values, setValues] = useState({
     name: "",
     email: "",
@@ -23,6 +27,8 @@ export function ContactForm() {
     message: "",
     company: ""
   });
+
+  const requiresTurnstile = Boolean(process.env.NEXT_PUBLIC_TURNSTILE);
 
   function updateValue(field: keyof typeof values, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
@@ -32,6 +38,14 @@ export function ContactForm() {
     event.preventDefault();
     setStatus({ type: "idle", message: "" });
 
+    if (requiresTurnstile && !turnstileToken) {
+      setStatus({
+        type: "error",
+        message: "Please complete the spam check before sending your message."
+      });
+      return;
+    }
+
     startTransition(async () => {
       try {
         const response = await fetch("/api/contact", {
@@ -39,7 +53,10 @@ export function ContactForm() {
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify(values)
+          body: JSON.stringify({
+            ...values,
+            turnstileToken
+          })
         });
 
         const data = (await response.json()) as { message?: string };
@@ -49,6 +66,8 @@ export function ContactForm() {
             type: "error",
             message: data.message || "Something went wrong while sending your message."
           });
+          setTurnstileToken("");
+          setTurnstileReset((current) => current + 1);
           return;
         }
 
@@ -63,11 +82,15 @@ export function ContactForm() {
           message: "",
           company: ""
         });
+        setTurnstileToken("");
+        setTurnstileReset((current) => current + 1);
       } catch {
         setStatus({
           type: "error",
           message: "The message could not be sent right now. Please try again in a moment."
         });
+        setTurnstileToken("");
+        setTurnstileReset((current) => current + 1);
       }
     });
   }
@@ -139,11 +162,18 @@ export function ContactForm() {
           />
         </label>
       </div>
-      <div className="mt-6 flex flex-wrap items-center gap-4">
-        <button type="submit" disabled={isPending} className="button-base bg-accent text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-70 dark:text-slate-950">
-          {isPending ? "Sending..." : "Send message"}
-        </button>
-        <p className="text-sm text-muted">We recommend including the calculator page URL and your input values when reporting an issue.</p>
+      <div className="mt-6 space-y-4">
+        <TurnstileWidget onTokenChange={setTurnstileToken} resetSignal={turnstileReset} />
+        <div className="flex flex-wrap items-center gap-4">
+          <button
+            type="submit"
+            disabled={isPending || (requiresTurnstile && !turnstileToken)}
+            className="button-base bg-accent text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-70 dark:text-slate-950"
+          >
+            {isPending ? "Sending..." : "Send message"}
+          </button>
+          <p className="text-sm text-muted">We recommend including the calculator page URL and your input values when reporting an issue.</p>
+        </div>
       </div>
       {status.type !== "idle" ? (
         <div

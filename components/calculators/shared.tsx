@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
@@ -88,11 +88,74 @@ export function ExamplePresetList({
   );
 }
 
-export function DecisionSummaryPanel({ body }: { body: string }) {
+export function DecisionSummaryPanel({
+  body,
+  calculator,
+  aiPrompt
+}: {
+  body: string;
+  calculator?: string;
+  aiPrompt?: string;
+}) {
+  const [aiBody, setAiBody] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (!calculator || !aiPrompt) {
+      setAiBody(null);
+      return;
+    }
+
+    setIsLoading(true);
+
+    fetch("/api/decision-summary", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        calculator,
+        prompt: aiPrompt
+      })
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          return null;
+        }
+
+        const data = (await response.json()) as { summary?: string };
+        return data.summary?.trim() || null;
+      })
+      .then((summary) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setAiBody(summary);
+      })
+      .catch(() => {
+        if (isMounted) {
+          setAiBody(null);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [aiPrompt, body, calculator]);
+
   return (
     <div className="rounded-3xl border border-accent/15 bg-accent-soft/70 p-5">
-      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">Decision summary</p>
-      <p className="mt-2 text-sm leading-7 text-slate-700 dark:text-slate-200">{body}</p>
+      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">{aiBody ? "AI decision summary" : "Decision summary"}</p>
+      <p className="mt-2 text-sm leading-7 text-slate-700 dark:text-slate-200">{aiBody || body}</p>
+      {isLoading ? <p className="mt-2 text-xs leading-6 text-muted">Generating a more tailored summary...</p> : null}
     </div>
   );
 }
@@ -135,3 +198,4 @@ export function ComparisonControls({
     </div>
   );
 }
+

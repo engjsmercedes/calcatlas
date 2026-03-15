@@ -238,7 +238,7 @@ export function LoanCalculator() {
                     <ResultCard label="Scenario B accelerated payoff" value={formatMonths(comparisonResult.acceleratedPayoffMonths)} />
                     <ResultCard label="Payoff delta" value={`${formatNumber((comparisonResult.acceleratedPayoffMonths - result.acceleratedPayoffMonths) / 12, 1)} years`} tone={comparisonResult.acceleratedPayoffMonths <= result.acceleratedPayoffMonths ? "success" : "default"} />
                   </div>
-                  <DecisionSummaryPanel body={comparisonResult.monthlyPayment <= result.monthlyPayment && comparisonResult.totalInterest <= result.totalInterest ? `Scenario B is stronger on both monthly cash flow and long-term borrowing cost, making it the cleaner loan structure if the assumptions are realistic.` : comparisonResult.monthlyPayment <= result.monthlyPayment ? `Scenario B is easier on monthly cash flow, but it gives up some long-term cost efficiency. It is the better fit only if payment flexibility matters more than total interest.` : comparisonResult.totalInterest <= result.totalInterest || comparisonResult.acceleratedPayoffMonths <= result.acceleratedPayoffMonths ? `Scenario B costs less over the life of the loan and pays down faster, but it asks for more cash flow each month. It is the stronger choice when long-term cost matters more than near-term budget room.` : `The primary scenario remains the more balanced option. Scenario B asks for more cash flow without improving total borrowing cost enough to justify the tradeoff.`} />
+                  <DecisionSummaryPanel calculator="Loan calculator" body={comparisonResult.monthlyPayment <= result.monthlyPayment && comparisonResult.totalInterest <= result.totalInterest ? `Scenario B is stronger on both monthly cash flow and long-term borrowing cost, making it the cleaner loan structure if the assumptions are realistic.` : comparisonResult.monthlyPayment <= result.monthlyPayment ? `Scenario B is easier on monthly cash flow, but it gives up some long-term cost efficiency. It is the better fit only if payment flexibility matters more than total interest.` : comparisonResult.totalInterest <= result.totalInterest || comparisonResult.acceleratedPayoffMonths <= result.acceleratedPayoffMonths ? `Scenario B costs less over the life of the loan and pays down faster, but it asks for more cash flow each month. It is the stronger choice when long-term cost matters more than near-term budget room.` : `The primary scenario remains the more balanced option. Scenario B asks for more cash flow without improving total borrowing cost enough to justify the tradeoff.`} />
                 </div>
               )) : null}
             </>
@@ -251,6 +251,7 @@ export function LoanCalculator() {
     </div>
   );
 }
+
 
 
 

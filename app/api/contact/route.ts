@@ -6,11 +6,17 @@ interface ContactPayload {
   topic?: string;
   message?: string;
   company?: string;
+  turnstileToken?: string;
 }
 
 type RateLimitEntry = {
   count: number;
   resetAt: number;
+};
+
+type TurnstileVerificationResponse = {
+  success: boolean;
+  "error-codes"?: string[];
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,6 +31,7 @@ const rateLimitStore =
 
 export async function POST(request: Request) {
   const clientKey = getClientKey(request);
+  const clientIp = getClientIp(request);
   const limit = enforceRateLimit(clientKey);
 
   if (!limit.allowed) {
@@ -46,6 +53,7 @@ export async function POST(request: Request) {
   const topic = body.topic?.trim() || "General feedback";
   const message = body.message?.trim() || "";
   const company = body.company?.trim() || "";
+  const turnstileToken = body.turnstileToken?.trim() || "";
 
   if (company) {
     return NextResponse.json({ message: "Message sent." });
@@ -61,6 +69,23 @@ export async function POST(request: Request) {
 
   if (name.length > 80 || email.length > 120 || topic.length > 120 || message.length > 3000) {
     return NextResponse.json({ message: "One or more fields are too long." }, { status: 400 });
+  }
+
+  const turnstileSecret = process.env.TURNSTILE_SECRET;
+
+  if (turnstileSecret) {
+    if (!turnstileToken) {
+      return NextResponse.json({ message: "Please complete the spam check before sending your message." }, { status: 400 });
+    }
+
+    const verification = await verifyTurnstile(turnstileSecret, turnstileToken, clientIp);
+
+    if (!verification.success) {
+      return NextResponse.json(
+        { message: "The spam check could not be verified. Please refresh the page and try again." },
+        { status: 400 }
+      );
+    }
   }
 
   const apiKey = process.env.RESEND_API_KEY;
@@ -111,12 +136,37 @@ export async function POST(request: Request) {
   return NextResponse.json({ message: "Thanks. Your message has been sent." });
 }
 
-function getClientKey(request: Request) {
+async function verifyTurnstile(secret: string, token: string, remoteip: string) {
+  const body = new URLSearchParams({
+    secret,
+    response: token,
+    remoteip
+  });
+
+  const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body
+  });
+
+  if (!response.ok) {
+    return { success: false };
+  }
+
+  return (await response.json()) as TurnstileVerificationResponse;
+}
+
+function getClientIp(request: Request) {
   const forwardedFor = request.headers.get("x-forwarded-for") || "";
   const realIp = request.headers.get("x-real-ip") || "";
+  return forwardedFor.split(",")[0]?.trim() || realIp || "unknown-ip";
+}
+
+function getClientKey(request: Request) {
   const userAgent = request.headers.get("user-agent") || "unknown-agent";
-  const ip = forwardedFor.split(",")[0]?.trim() || realIp || "unknown-ip";
-  return `${ip}:${userAgent.slice(0, 120)}`;
+  return `${getClientIp(request)}:${userAgent.slice(0, 120)}`;
 }
 
 function enforceRateLimit(key: string) {
