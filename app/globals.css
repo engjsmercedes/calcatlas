@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-canvas: 246 248 252;
+  --color-panel: 255 255 255;
+  --color-text: 15 23 42;
+  --color-muted: 88 101 121;
+  --color-accent: 14 116 144;
+  --color-accent-soft: 232 247 250;
+  --color-border: 221 228 236;
+  --color-success: 22 163 74;
+  --color-warning: 217 119 6;
+}
+
+.dark {
+  --color-canvas: 12 17 29;
+  --color-panel: 18 25 41;
+  --color-text: 241 245 249;
+  --color-muted: 148 163 184;
+  --color-accent: 56 189 248;
+  --color-accent-soft: 15 23 42;
+  --color-border: 51 65 85;
+  --color-success: 74 222 128;
+  --color-warning: 251 191 36;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-canvas text-text antialiased;
+  background-image:
+    radial-gradient(circle at top, rgba(14, 165, 233, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.6), transparent 28%);
+}
+
+.dark body {
+  background-image:
+    radial-gradient(circle at top, rgba(56, 189, 248, 0.12), transparent 28%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.6), transparent 28%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  ::selection {
+    background: rgba(14, 116, 144, 0.16);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply tracking-tight text-slate-950 dark:text-slate-50;
+  }
+
+  p {
+    @apply text-muted;
+  }
+
+  input,
+  select,
+  textarea {
+    @apply text-text;
+  }
+}
+
+@layer utilities {
+  .page-shell {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .surface {
+    @apply rounded-3xl border border-border bg-panel shadow-card;
+  }
+
+  .section-label {
+    @apply inline-flex items-center rounded-full border border-accent/10 bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-accent;
+  }
+
+  .button-base {
+    @apply inline-flex items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold transition duration-150;
+  }
+
+  .input-base {
+    @apply h-12 w-full rounded-2xl border border-border bg-white/90 px-4 text-sm shadow-sm outline-none ring-0 transition placeholder:text-slate-400 focus:border-accent focus:bg-white dark:bg-slate-950/40 dark:focus:bg-slate-950/60;
+  }
+}
+
+@media print {
+  body {
+    background: white;
+  }
+
+  .print-hidden {
+    display: none !important;
+  }
+
+  .surface {
+    box-shadow: none;
+  }
+}

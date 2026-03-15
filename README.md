@@ -1,0 +1,77 @@
+# Calc Atlas
+
+Calc Atlas is a production-ready calculator website built with Next.js, TypeScript, and Tailwind CSS. It currently ships with 16 calculators across finance, business, income, health, and everyday categories, with a reusable architecture for expanding the library later.
+
+## Included calculators
+
+- Percentage Calculator
+- Margin Calculator
+- Mortgage Calculator
+- ROI Calculator
+- Compound Interest Calculator
+- Salary to Hourly Calculator
+- BMI Calculator
+- Calorie Needs Calculator
+- Body Fat Calculator
+- Water Intake Calculator
+- Ideal Weight Calculator
+- Macro Calculator
+- Protein Intake Calculator
+- Sleep Cycle Calculator
+- Running Pace Calculator
+- One Rep Max Calculator
+
+## Local development
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start the dev server:
+   ```bash
+   npm run dev
+   ```
+3. Open [http://localhost:3000](http://localhost:3000)
+
+## Production build
+
+```bash
+npm run build
+npm run start
+```
+
+## Deploy to Vercel
+
+1. Push the project to a Git provider.
+2. Import the repository into Vercel.
+3. Set `NEXT_PUBLIC_SITE_URL` to your production domain.
+4. Deploy. The app uses static-friendly routes and frontend-only calculation logic, so no database or backend setup is required.
+
+## Architecture overview
+
+- `app/`: Next.js App Router pages, layout, sitemap, robots, and the dynamic calculator route.
+- `components/`: Reusable UI, homepage sections, and calculator-specific interactive components.
+- `data/calculators.ts`: Central registry for calculator metadata, content, categories, FAQs, examples, and related links.
+- `lib/calculators/`: Pure calculation logic separated from the UI.
+- `lib/hooks/`: Client-side hooks for theme, recent calculators, and shareable URL state.
+
+## Adding more calculators
+
+1. Add the new calculator metadata, FAQ content, examples, category, and related links in `data/calculators.ts`.
+2. Add the new calculation logic in `lib/calculators/`.
+3. Create a client component in `components/calculators/`.
+4. Register the component in `components/calculators/calculator-renderer.tsx`.
+
+## Branding edits
+
+- Site name and base description: `lib/site.ts`
+- Header and footer brand treatment: `components/site-header.tsx` and `components/site-footer.tsx`
+- Homepage hero messaging: `app/page.tsx`
+- Favicon/icon: `app/icon.svg`
+- Colors and global styling: `app/globals.css`
+
+## Notes
+
+- Results update live and are stored in query params for shareable calculator URLs.
+- Recently used calculators are saved locally in the browser.
+- Dark mode is optional and handled entirely on the frontend.

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://calc-atlas.vercel.app/sitemap.xml
