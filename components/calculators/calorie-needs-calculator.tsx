@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo } from "react";
 
@@ -50,21 +50,21 @@ export function CalorieNeedsCalculator() {
       <div className="space-y-4">
         <div className="surface space-y-5 p-6 md:p-8">
           <div className="grid gap-4 sm:grid-cols-2">
-            <InputField label="Age" value={state.age} onChange={(event) => setState((current) => ({ ...current, age: event.target.value }))} />
-            <SelectField label="Gender" value={state.sex} onChange={(event) => setState((current) => ({ ...current, sex: event.target.value }))}>
+            <InputField label="Age" tooltip="Current age in years. Age affects the estimated resting calorie burn." value={state.age} onChange={(event) => setState((current) => ({ ...current, age: event.target.value }))} />
+            <SelectField label="Gender" tooltip="Used by the calorie formula to estimate resting metabolic rate." value={state.sex} onChange={(event) => setState((current) => ({ ...current, sex: event.target.value }))}>
               <option value="male">Male</option>
               <option value="female">Female</option>
             </SelectField>
-            <InputField label="Height (cm)" value={state.heightCm} onChange={(event) => setState((current) => ({ ...current, heightCm: event.target.value }))} />
-            <InputField label="Weight (kg)" value={state.weightKg} onChange={(event) => setState((current) => ({ ...current, weightKg: event.target.value }))} />
-            <SelectField label="Activity level" value={state.activityLevel} onChange={(event) => setState((current) => ({ ...current, activityLevel: event.target.value }))}>
+            <InputField label="Height (cm)" tooltip="Current height in centimeters." value={state.heightCm} onChange={(event) => setState((current) => ({ ...current, heightCm: event.target.value }))} />
+            <InputField label="Weight (kg)" tooltip="Current body weight in kilograms." value={state.weightKg} onChange={(event) => setState((current) => ({ ...current, weightKg: event.target.value }))} />
+            <SelectField label="Activity level" tooltip="How active you are across the week. This multiplier has a big effect on maintenance calories." value={state.activityLevel} onChange={(event) => setState((current) => ({ ...current, activityLevel: event.target.value }))}>
               <option value="sedentary">Sedentary</option>
               <option value="light">Lightly active</option>
               <option value="moderate">Moderately active</option>
               <option value="active">Active</option>
               <option value="very-active">Very active</option>
             </SelectField>
-            <SelectField label="Goal" value={state.goal} onChange={(event) => setState((current) => ({ ...current, goal: event.target.value }))}>
+            <SelectField label="Goal" tooltip="Choose whether you want to maintain, lose, or gain so the result can shift around the maintenance estimate." value={state.goal} onChange={(event) => setState((current) => ({ ...current, goal: event.target.value }))}>
               <option value="maintain">Maintain</option>
               <option value="lose">Lose</option>
               <option value="gain">Gain</option>
@@ -128,4 +128,5 @@ export function CalorieNeedsCalculator() {
     </div>
   );
 }
+
 

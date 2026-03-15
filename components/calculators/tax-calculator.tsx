@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 
@@ -58,19 +58,19 @@ export function TaxCalculator() {
       <div className="space-y-4">
         <div className="surface p-6 md:p-8">
           <div className="grid gap-4 sm:grid-cols-2">
-            <InputField label="Annual income" prefix="$" value={state.annualIncome} onChange={(event) => setState((current) => ({ ...current, annualIncome: event.target.value }))} />
-            <SelectField label="Filing status" value={state.filingStatus} onChange={(event) => setState((current) => ({ ...current, filingStatus: event.target.value }))}>
+            <InputField label="Annual income" prefix="$" tooltip="Estimated gross annual income before taxes and deductions." value={state.annualIncome} onChange={(event) => setState((current) => ({ ...current, annualIncome: event.target.value }))} />
+            <SelectField label="Filing status" tooltip="Tax filing assumption used for the estimate, such as single or married." value={state.filingStatus} onChange={(event) => setState((current) => ({ ...current, filingStatus: event.target.value }))}>
               {taxFilingStatusOptions.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </SelectField>
-            <SelectField label="State" hint="US estimate" value={state.state} onChange={(event) => setState((current) => ({ ...current, state: event.target.value }))}>
+            <SelectField label="State" hint="US estimate" tooltip="State-level tax assumption. This is a planning estimate, not full state return preparation." value={state.state} onChange={(event) => setState((current) => ({ ...current, state: event.target.value }))}>
               {taxStateOptions.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </SelectField>
-            <InputField label="Pre-tax deductions" prefix="$" value={state.preTaxDeductions} onChange={(event) => setState((current) => ({ ...current, preTaxDeductions: event.target.value }))} />
-            <InputField label="Post-tax deductions" prefix="$" value={state.postTaxDeductions} onChange={(event) => setState((current) => ({ ...current, postTaxDeductions: event.target.value }))} />
+            <InputField label="Pre-tax deductions" prefix="$" tooltip="Amounts removed before income tax, such as retirement contributions or certain benefits." value={state.preTaxDeductions} onChange={(event) => setState((current) => ({ ...current, preTaxDeductions: event.target.value }))} />
+            <InputField label="Post-tax deductions" prefix="$" tooltip="Amounts deducted after taxes, such as union dues or other after-tax payroll items." value={state.postTaxDeductions} onChange={(event) => setState((current) => ({ ...current, postTaxDeductions: event.target.value }))} />
           </div>
           <div className="mt-6">
             <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
@@ -158,6 +158,7 @@ export function TaxCalculator() {
     </div>
   );
 }
+
 
 
 

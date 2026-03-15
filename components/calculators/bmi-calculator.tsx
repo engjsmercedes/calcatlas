@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo } from "react";
 
@@ -57,21 +57,21 @@ export function BmiCalculator() {
           />
           {state.unitSystem === "imperial" ? (
             <div className="grid gap-4 sm:grid-cols-2">
-              <InputField label="Height (feet)" value={state.heightFeet} onChange={(event) => setState((current) => ({ ...current, heightFeet: event.target.value }))} />
-              <InputField label="Height (inches)" value={state.heightInches} onChange={(event) => setState((current) => ({ ...current, heightInches: event.target.value }))} />
-              <InputField label="Weight (lb)" value={state.weightLb} onChange={(event) => setState((current) => ({ ...current, weightLb: event.target.value }))} />
-              <InputField label="Age" hint="Optional" value={state.age} onChange={(event) => setState((current) => ({ ...current, age: event.target.value }))} />
-              <SelectField label="Gender" value={state.sex} onChange={(event) => setState((current) => ({ ...current, sex: event.target.value }))}>
+              <InputField label="Height (feet)" tooltip="Whole feet portion of height when using imperial units." value={state.heightFeet} onChange={(event) => setState((current) => ({ ...current, heightFeet: event.target.value }))} />
+              <InputField label="Height (inches)" tooltip="Remaining inches on top of the feet value." value={state.heightInches} onChange={(event) => setState((current) => ({ ...current, heightInches: event.target.value }))} />
+              <InputField label="Weight (lb)" tooltip="Current body weight in pounds." value={state.weightLb} onChange={(event) => setState((current) => ({ ...current, weightLb: event.target.value }))} />
+              <InputField label="Age" hint="Optional" tooltip="Age is shown for context and interpretation, but it does not change the BMI formula itself." value={state.age} onChange={(event) => setState((current) => ({ ...current, age: event.target.value }))} />
+              <SelectField label="Gender" tooltip="Used for context only. BMI itself still comes from height and weight." value={state.sex} onChange={(event) => setState((current) => ({ ...current, sex: event.target.value }))}>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
               </SelectField>
             </div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">
-              <InputField label="Height (cm)" value={state.heightCm} onChange={(event) => setState((current) => ({ ...current, heightCm: event.target.value }))} />
-              <InputField label="Weight (kg)" value={state.weightKg} onChange={(event) => setState((current) => ({ ...current, weightKg: event.target.value }))} />
-              <InputField label="Age" hint="Optional" value={state.age} onChange={(event) => setState((current) => ({ ...current, age: event.target.value }))} />
-              <SelectField label="Gender" value={state.sex} onChange={(event) => setState((current) => ({ ...current, sex: event.target.value }))}>
+              <InputField label="Height (cm)" tooltip="Current height in centimeters when using metric units." value={state.heightCm} onChange={(event) => setState((current) => ({ ...current, heightCm: event.target.value }))} />
+              <InputField label="Weight (kg)" tooltip="Current body weight in kilograms." value={state.weightKg} onChange={(event) => setState((current) => ({ ...current, weightKg: event.target.value }))} />
+              <InputField label="Age" hint="Optional" tooltip="Age is shown for context and interpretation, but it does not change the BMI formula itself." value={state.age} onChange={(event) => setState((current) => ({ ...current, age: event.target.value }))} />
+              <SelectField label="Gender" tooltip="Used for context only. BMI itself still comes from height and weight." value={state.sex} onChange={(event) => setState((current) => ({ ...current, sex: event.target.value }))}>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
               </SelectField>
@@ -154,4 +154,5 @@ export function BmiCalculator() {
     </div>
   );
 }
+
 

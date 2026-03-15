@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 
@@ -68,16 +68,16 @@ export function CompoundInterestCalculator() {
         <div className="space-y-4">
           <div className="surface p-6 md:p-8">
             <div className="grid gap-4 sm:grid-cols-2">
-              <InputField label="Initial amount" prefix="$" value={state.initialAmount} onChange={(event) => setState((current) => ({ ...current, initialAmount: event.target.value }))} />
-              <InputField label="Contribution amount" prefix="$" value={state.contributionAmount} onChange={(event) => setState((current) => ({ ...current, contributionAmount: event.target.value }))} />
-              <SelectField label="Contribution frequency" value={state.contributionFrequency} onChange={(event) => setState((current) => ({ ...current, contributionFrequency: event.target.value }))}>
+              <InputField label="Initial amount" prefix="$" tooltip="Starting balance before any future contributions are added." value={state.initialAmount} onChange={(event) => setState((current) => ({ ...current, initialAmount: event.target.value }))} />
+              <InputField label="Contribution amount" prefix="$" tooltip="Amount added at each contribution interval such as monthly or annually." value={state.contributionAmount} onChange={(event) => setState((current) => ({ ...current, contributionAmount: event.target.value }))} />
+              <SelectField label="Contribution frequency" tooltip="How often new money is added to the balance." value={state.contributionFrequency} onChange={(event) => setState((current) => ({ ...current, contributionFrequency: event.target.value }))}>
                 <option value="monthly">Monthly</option>
                 <option value="quarterly">Quarterly</option>
                 <option value="annually">Annually</option>
               </SelectField>
-              <InputField label="Annual rate" hint="Expected yearly return %" value={state.annualRate} onChange={(event) => setState((current) => ({ ...current, annualRate: event.target.value }))} />
-              <InputField label="Years" hint="Projection length" value={state.years} onChange={(event) => setState((current) => ({ ...current, years: event.target.value }))} />
-              <SelectField label="Compounding frequency" hint="Short timelines usually change only a little" value={state.compoundingFrequency} onChange={(event) => setState((current) => ({ ...current, compoundingFrequency: event.target.value }))}>
+              <InputField label="Annual rate" hint="Expected yearly return %" tooltip="Assumed annual return before compounding is applied." value={state.annualRate} onChange={(event) => setState((current) => ({ ...current, annualRate: event.target.value }))} />
+              <InputField label="Years" hint="Projection length" tooltip="Number of years the balance stays invested under the current plan." value={state.years} onChange={(event) => setState((current) => ({ ...current, years: event.target.value }))} />
+              <SelectField label="Compounding frequency" hint="Short timelines usually change only a little" tooltip="How often returns are added back into the balance. This usually matters more over long periods than short ones." value={state.compoundingFrequency} onChange={(event) => setState((current) => ({ ...current, compoundingFrequency: event.target.value }))}>
                 <option value="annually">Annually</option>
                 <option value="quarterly">Quarterly</option>
                 <option value="monthly">Monthly</option>
@@ -173,6 +173,7 @@ export function CompoundInterestCalculator() {
     </div>
   );
 }
+
 
 
 
