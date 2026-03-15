@@ -1,4 +1,6 @@
-﻿export interface MortgageInputs {
+import { solveAnnualRateFromPayment } from "@/lib/calculators/borrowing";
+
+export interface MortgageInputs {
   loanAmount: number;
   annualRate: number;
   years: number;
@@ -135,6 +137,10 @@ function buildSchedule(loanAmount: number, annualRate: number, years: number, ex
     monthlySchedule,
     yearlySchedule
   };
+}
+
+export function solveMortgageAnnualRate(loanAmount: number, monthlyPrincipalInterest: number, years: number) {
+  return solveAnnualRateFromPayment(loanAmount, monthlyPrincipalInterest, Math.round(years * 12));
 }
 
 export function calculateMortgage(inputs: MortgageInputs): MortgageResult | undefined {

@@ -27,19 +27,29 @@ export function AutoLoanCalculator() {
     keys: ["vehiclePrice", "downPayment", "tradeInValue", "salesTaxRate", "fees", "annualRate", "years"]
   });
 
-  const result = useMemo(
-    () =>
-      calculateAutoLoan({
-        vehiclePrice: parseNumberInput(state.vehiclePrice) || 0,
-        downPayment: parseNumberInput(state.downPayment) || 0,
-        tradeInValue: parseNumberInput(state.tradeInValue) || 0,
-        salesTaxRate: parseNumberInput(state.salesTaxRate) || 0,
-        fees: parseNumberInput(state.fees) || 0,
-        annualRate: parseNumberInput(state.annualRate) || 0,
-        years: parseNumberInput(state.years) || 0
-      }),
-    [state]
-  );
+  const vehiclePrice = parseNumberInput(state.vehiclePrice);
+  const downPayment = parseNumberInput(state.downPayment) ?? 0;
+  const tradeInValue = parseNumberInput(state.tradeInValue) ?? 0;
+  const salesTaxRate = parseNumberInput(state.salesTaxRate) ?? 0;
+  const fees = parseNumberInput(state.fees) ?? 0;
+  const annualRate = parseNumberInput(state.annualRate);
+  const years = parseNumberInput(state.years);
+
+  const result = useMemo(() => {
+    if (vehiclePrice === undefined || annualRate === undefined || years === undefined) {
+      return undefined;
+    }
+
+    return calculateAutoLoan({
+      vehiclePrice,
+      downPayment,
+      tradeInValue,
+      salesTaxRate,
+      fees,
+      annualRate,
+      years
+    });
+  }, [annualRate, downPayment, fees, salesTaxRate, state, tradeInValue, vehiclePrice, years]);
 
   return (
     <div className="space-y-8">
@@ -100,3 +110,4 @@ export function AutoLoanCalculator() {
     </div>
   );
 }
+

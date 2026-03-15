@@ -135,7 +135,7 @@ export interface RentVsBuyResult {
   points: RentVsBuyPoint[];
 }
 
-function amortizedMonthlyPayment(principal: number, annualRate: number, months: number) {
+export function amortizedMonthlyPayment(principal: number, annualRate: number, months: number) {
   const monthlyRate = annualRate / 100 / 12;
 
   if (months <= 0) {
@@ -147,6 +147,46 @@ function amortizedMonthlyPayment(principal: number, annualRate: number, months: 
   }
 
   return (principal * monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+}
+
+export function solveAnnualRateFromPayment(principal: number, monthlyPayment: number, months: number) {
+  if (principal <= 0 || monthlyPayment <= 0 || months <= 0) {
+    return undefined;
+  }
+
+  const zeroRatePayment = principal / months;
+
+  if (monthlyPayment < zeroRatePayment - 0.01) {
+    return undefined;
+  }
+
+  if (Math.abs(monthlyPayment - zeroRatePayment) <= 0.01) {
+    return 0;
+  }
+
+  let low = 0;
+  let high = 12;
+
+  while (amortizedMonthlyPayment(principal, high, months) < monthlyPayment && high < 1024) {
+    high *= 2;
+  }
+
+  if (amortizedMonthlyPayment(principal, high, months) < monthlyPayment) {
+    return undefined;
+  }
+
+  for (let iteration = 0; iteration < 80; iteration += 1) {
+    const mid = (low + high) / 2;
+    const paymentAtMid = amortizedMonthlyPayment(principal, mid, months);
+
+    if (paymentAtMid < monthlyPayment) {
+      low = mid;
+    } else {
+      high = mid;
+    }
+  }
+
+  return high;
 }
 
 function buildAnnualPoints(history: number[]) {

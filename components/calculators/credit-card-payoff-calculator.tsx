@@ -38,16 +38,23 @@ export function CreditCardPayoffCalculator() {
     keys: ["balance", "annualRate", "monthlyPayment", "extraPaymentMonthly"]
   });
 
-  const result = useMemo(
-    () =>
-      calculateCreditCardPayoff({
-        balance: parseNumberInput(state.balance) || 0,
-        annualRate: parseNumberInput(state.annualRate) || 0,
-        monthlyPayment: parseNumberInput(state.monthlyPayment) || 0,
-        extraPaymentMonthly: parseNumberInput(state.extraPaymentMonthly) || 0
-      }),
-    [state]
-  );
+  const balance = parseNumberInput(state.balance);
+  const annualRate = parseNumberInput(state.annualRate);
+  const monthlyPayment = parseNumberInput(state.monthlyPayment);
+  const extraPaymentMonthly = parseNumberInput(state.extraPaymentMonthly) ?? 0;
+
+  const result = useMemo(() => {
+    if (balance === undefined || annualRate === undefined || monthlyPayment === undefined) {
+      return undefined;
+    }
+
+    return calculateCreditCardPayoff({
+      balance,
+      annualRate,
+      monthlyPayment,
+      extraPaymentMonthly
+    });
+  }, [annualRate, balance, extraPaymentMonthly, monthlyPayment]);
 
   return (
     <div className="space-y-8">
@@ -77,7 +84,7 @@ export function CreditCardPayoffCalculator() {
                   <p className="section-label">Base payoff plan</p>
                   <h3 className="mt-4 text-3xl font-semibold">{formatMonths(result.standardMonths)}</h3>
                   <p className="mt-2 text-sm leading-7">
-                    Paying {formatCurrency(parseNumberInput(state.monthlyPayment) || 0)} per month would cost about {formatCurrency(result.standardInterest)} in interest before the balance reaches zero.
+                    Paying {formatCurrency(monthlyPayment ?? 0)} per month would cost about {formatCurrency(result.standardInterest)} in interest before the balance reaches zero.
                   </p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
@@ -92,7 +99,7 @@ export function CreditCardPayoffCalculator() {
                   <p className="section-label">With extra payment</p>
                   <h3 className="mt-4 text-2xl font-semibold">{formatMonths(result.acceleratedMonths)}</h3>
                   <p className="mt-2 text-sm leading-7">
-                    Adding {formatCurrency(parseNumberInput(state.extraPaymentMonthly) || 0)} per month could save {formatCurrency(result.interestSaved)} in interest and shorten payoff by {formatMonths(result.monthsSaved)}.
+                    Adding {formatCurrency(extraPaymentMonthly)} per month could save {formatCurrency(result.interestSaved)} in interest and shorten payoff by {formatMonths(result.monthsSaved)}.
                   </p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
@@ -110,3 +117,4 @@ export function CreditCardPayoffCalculator() {
     </div>
   );
 }
+

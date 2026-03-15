@@ -45,24 +45,52 @@ export function RentVsBuyCalculator() {
     ]
   });
 
-  const result = useMemo(
-    () =>
-      calculateRentVsBuy({
-        homePrice: parseNumberInput(state.homePrice) || 0,
-        downPayment: parseNumberInput(state.downPayment) || 0,
-        mortgageRate: parseNumberInput(state.mortgageRate) || 0,
-        loanTermYears: parseNumberInput(state.loanTermYears) || 0,
-        monthlyRent: parseNumberInput(state.monthlyRent) || 0,
-        yearsInHome: parseNumberInput(state.yearsInHome) || 0,
-        annualHomeAppreciation: parseNumberInput(state.annualHomeAppreciation) || 0,
-        annualRentIncrease: parseNumberInput(state.annualRentIncrease) || 0,
-        propertyTaxRate: parseNumberInput(state.propertyTaxRate) || 0,
-        maintenanceRate: parseNumberInput(state.maintenanceRate) || 0,
-        closingCostsRate: parseNumberInput(state.closingCostsRate) || 0,
-        sellingCostsRate: parseNumberInput(state.sellingCostsRate) || 0
-      }),
-    [state]
-  );
+  const homePrice = parseNumberInput(state.homePrice);
+  const downPayment = parseNumberInput(state.downPayment);
+  const mortgageRate = parseNumberInput(state.mortgageRate);
+  const loanTermYears = parseNumberInput(state.loanTermYears);
+  const monthlyRent = parseNumberInput(state.monthlyRent);
+  const yearsInHome = parseNumberInput(state.yearsInHome);
+  const annualHomeAppreciation = parseNumberInput(state.annualHomeAppreciation);
+  const annualRentIncrease = parseNumberInput(state.annualRentIncrease);
+  const propertyTaxRate = parseNumberInput(state.propertyTaxRate);
+  const maintenanceRate = parseNumberInput(state.maintenanceRate);
+  const closingCostsRate = parseNumberInput(state.closingCostsRate);
+  const sellingCostsRate = parseNumberInput(state.sellingCostsRate);
+
+  const result = useMemo(() => {
+    if (
+      homePrice === undefined ||
+      downPayment === undefined ||
+      mortgageRate === undefined ||
+      loanTermYears === undefined ||
+      monthlyRent === undefined ||
+      yearsInHome === undefined ||
+      annualHomeAppreciation === undefined ||
+      annualRentIncrease === undefined ||
+      propertyTaxRate === undefined ||
+      maintenanceRate === undefined ||
+      closingCostsRate === undefined ||
+      sellingCostsRate === undefined
+    ) {
+      return undefined;
+    }
+
+    return calculateRentVsBuy({
+      homePrice,
+      downPayment,
+      mortgageRate,
+      loanTermYears,
+      monthlyRent,
+      yearsInHome,
+      annualHomeAppreciation,
+      annualRentIncrease,
+      propertyTaxRate,
+      maintenanceRate,
+      closingCostsRate,
+      sellingCostsRate
+    });
+  }, [annualHomeAppreciation, annualRentIncrease, closingCostsRate, downPayment, homePrice, loanTermYears, maintenanceRate, monthlyRent, mortgageRate, propertyTaxRate, sellingCostsRate, yearsInHome]);
 
   return (
     <div className="space-y-8">
@@ -173,3 +201,4 @@ export function RentVsBuyCalculator() {
     </div>
   );
 }
+

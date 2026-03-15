@@ -25,18 +25,27 @@ export function DownPaymentCalculator() {
     keys: ["homePrice", "downPaymentPercent", "mortgageRate", "loanTermYears", "propertyTaxAnnual", "insuranceAnnual"]
   });
 
-  const result = useMemo(
-    () =>
-      calculateDownPayment({
-        homePrice: parseNumberInput(state.homePrice) || 0,
-        downPaymentPercent: parseNumberInput(state.downPaymentPercent) || 0,
-        mortgageRate: parseNumberInput(state.mortgageRate) || 0,
-        loanTermYears: parseNumberInput(state.loanTermYears) || 0,
-        propertyTaxAnnual: parseNumberInput(state.propertyTaxAnnual) || 0,
-        insuranceAnnual: parseNumberInput(state.insuranceAnnual) || 0
-      }),
-    [state]
-  );
+  const homePrice = parseNumberInput(state.homePrice);
+  const downPaymentPercent = parseNumberInput(state.downPaymentPercent);
+  const mortgageRate = parseNumberInput(state.mortgageRate);
+  const loanTermYears = parseNumberInput(state.loanTermYears);
+  const propertyTaxAnnual = parseNumberInput(state.propertyTaxAnnual) ?? 0;
+  const insuranceAnnual = parseNumberInput(state.insuranceAnnual) ?? 0;
+
+  const result = useMemo(() => {
+    if (homePrice === undefined || downPaymentPercent === undefined || mortgageRate === undefined || loanTermYears === undefined) {
+      return undefined;
+    }
+
+    return calculateDownPayment({
+      homePrice,
+      downPaymentPercent,
+      mortgageRate,
+      loanTermYears,
+      propertyTaxAnnual,
+      insuranceAnnual
+    });
+  }, [downPaymentPercent, homePrice, insuranceAnnual, loanTermYears, mortgageRate, propertyTaxAnnual]);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
@@ -63,7 +72,7 @@ export function DownPaymentCalculator() {
                 <p className="section-label">Down payment view</p>
                 <h3 className="mt-4 text-3xl font-semibold">{formatCurrency(result.downPaymentAmount)}</h3>
                 <p className="mt-2 text-sm leading-7">
-                  A {state.downPaymentPercent}% down payment on {formatCurrency(parseNumberInput(state.homePrice) || 0)} leaves a loan amount of {formatCurrency(result.loanAmount)}.
+                  A {state.downPaymentPercent}% down payment on {formatCurrency(homePrice ?? 0)} leaves a loan amount of {formatCurrency(result.loanAmount)}.
                 </p>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
@@ -81,3 +90,4 @@ export function DownPaymentCalculator() {
     </div>
   );
 }
+
