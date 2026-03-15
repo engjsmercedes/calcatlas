@@ -1,16 +1,18 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 
 import type { CalculatorSlug } from "@/data/calculators";
 import { useRecentCalculators } from "@/lib/hooks/use-recent-calculators";
 
+import { AgeCalculator } from "./age-calculator";
 import { AutoLoanCalculator } from "./auto-loan-calculator";
 import { BmiCalculator } from "./bmi-calculator";
 import { BodyFatCalculator } from "./body-fat-calculator";
 import { CalorieNeedsCalculator } from "./calorie-needs-calculator";
 import { CompoundInterestCalculator } from "./compound-interest-calculator";
 import { CreditCardPayoffCalculator } from "./credit-card-payoff-calculator";
+import { DateDifferenceCalculator } from "./date-difference-calculator";
 import { DebtToIncomeCalculator } from "./debt-to-income-calculator";
 import { DiscountCalculator } from "./discount-calculator";
 import { DownPaymentCalculator } from "./down-payment-calculator";
@@ -20,6 +22,7 @@ import { LoanCalculator } from "./loan-calculator";
 import { MacroCalculator } from "./macro-calculator";
 import { MarginCalculator } from "./margin-calculator";
 import { MortgageCalculator } from "./mortgage-calculator";
+import { NetWorthCalculator } from "./net-worth-calculator";
 import { OneRepMaxCalculator } from "./one-rep-max-calculator";
 import { PercentageCalculator } from "./percentage-calculator";
 import { ProteinIntakeCalculator } from "./protein-intake-calculator";
@@ -29,6 +32,8 @@ import { RunningPaceCalculator } from "./running-pace-calculator";
 import { SalaryToHourlyCalculator } from "./salary-to-hourly-calculator";
 import { SavingsGoalCalculator } from "./savings-goal-calculator";
 import { SleepCycleCalculator } from "./sleep-cycle-calculator";
+import { TaxCalculator } from "./tax-calculator";
+import { TimeDurationCalculator } from "./time-duration-calculator";
 import { TipCalculator } from "./tip-calculator";
 import { WaterIntakeCalculator } from "./water-intake-calculator";
 
@@ -62,14 +67,18 @@ export function CalculatorRenderer({ slug }: { slug: CalculatorSlug }) {
       return <DownPaymentCalculator />;
     case "rent-vs-buy-calculator":
       return <RentVsBuyCalculator />;
-    case "roi-calculator":
-      return <RoiCalculator />;
-    case "compound-interest-calculator":
-      return <CompoundInterestCalculator />;
     case "savings-goal-calculator":
       return <SavingsGoalCalculator />;
     case "inflation-calculator":
       return <InflationCalculator />;
+    case "tax-calculator":
+      return <TaxCalculator />;
+    case "net-worth-calculator":
+      return <NetWorthCalculator />;
+    case "roi-calculator":
+      return <RoiCalculator />;
+    case "compound-interest-calculator":
+      return <CompoundInterestCalculator />;
     case "salary-to-hourly-calculator":
       return <SalaryToHourlyCalculator />;
     case "bmi-calculator":
@@ -88,6 +97,12 @@ export function CalculatorRenderer({ slug }: { slug: CalculatorSlug }) {
       return <ProteinIntakeCalculator />;
     case "sleep-cycle-calculator":
       return <SleepCycleCalculator />;
+    case "age-calculator":
+      return <AgeCalculator />;
+    case "date-difference-calculator":
+      return <DateDifferenceCalculator />;
+    case "time-duration-calculator":
+      return <TimeDurationCalculator />;
     case "running-pace-calculator":
       return <RunningPaceCalculator />;
     case "one-rep-max-calculator":

@@ -12,6 +12,11 @@ export type CalculatorSlug =
   | "down-payment-calculator"
   | "savings-goal-calculator"
   | "inflation-calculator"
+  | "tax-calculator"
+  | "net-worth-calculator"
+  | "age-calculator"
+  | "date-difference-calculator"
+  | "time-duration-calculator"
   | "roi-calculator"
   | "compound-interest-calculator"
   | "salary-to-hourly-calculator"
@@ -574,6 +579,106 @@ export const calculators: CalculatorDefinition[] = [
     ],
     related: ["mortgage-calculator", "debt-to-income-calculator"]
   },
+  {
+    slug: "tax-calculator",
+    title: "Tax Calculator",
+    shortDescription: "Estimate federal, state, and payroll taxes to get a rough annual and monthly take-home pay picture.",
+    intro: "This tax calculator gives you a simplified take-home pay estimate using annual income, filing status, state tax assumptions, and optional deductions.",
+    detail: "Enter annual income, filing status, selected state, and pre-tax or post-tax deductions to estimate taxable income, total taxes, effective rate, and net pay. It is designed for planning rather than exact payroll withholding.",
+    category: "Finance",
+    searchTerms: ["income tax calculator", "take home pay calculator", "federal and state tax estimate"],
+    features: ["Federal and state estimate", "Net annual and monthly pay", "Effective tax rate"],
+    faqs: [
+      { question: "Is this tax calculator exact?", answer: "No. It is a planning calculator that uses simplified federal, payroll, and selected-state assumptions rather than payroll-grade withholding logic." },
+      { question: "What lowers taxable income?", answer: "Pre-tax deductions reduce the income exposed to income tax, which can lower both tax owed and the effective tax rate." },
+      { question: "Why does my take-home pay differ from my salary?", answer: "Federal tax, payroll tax, state tax, and deductions all reduce gross pay before the money reaches your bank account." }
+    ],
+    examples: [
+      { title: "Offer comparison", description: "Estimate take-home pay on a $95,000 salary with a 401(k) contribution and a selected state tax assumption.", outcome: "The calculator shows how gross pay translates into annual and monthly net income for planning." },
+      { title: "Budget planning", description: "Add pre-tax and post-tax deductions to understand how benefits and payroll costs affect take-home pay.", outcome: "The result makes it easier to budget from net income instead of relying on salary alone." }
+    ],
+    related: ["salary-to-hourly-calculator", "debt-to-income-calculator"]
+  },
+  {
+    slug: "net-worth-calculator",
+    title: "Net Worth Calculator",
+    shortDescription: "Add assets and liabilities to estimate current net worth and overall debt-to-asset position.",
+    intro: "This net worth calculator helps you total what you own and subtract what you owe so your current financial position is easier to see in one place.",
+    detail: "Enter common asset categories such as cash, investments, retirement, and property, then add liabilities like mortgages, loans, and credit cards to estimate net worth and your debt-to-asset ratio.",
+    category: "Finance",
+    searchTerms: ["net worth calculator", "assets minus liabilities", "personal balance sheet calculator"],
+    features: ["Assets vs liabilities", "Net worth estimate", "Debt-to-asset ratio"],
+    faqs: [
+      { question: "What is net worth?", answer: "Net worth is the difference between total assets and total liabilities. It is a snapshot of financial position at a given time." },
+      { question: "Should I include my home in net worth?", answer: "Many people do. If you include the property as an asset, also include the mortgage as a liability so the picture stays balanced." },
+      { question: "How often should I update net worth?", answer: "Monthly or quarterly updates are often enough. Consistency matters more than checking it every day." }
+    ],
+    examples: [
+      { title: "Personal finance snapshot", description: "Add checking, brokerage, retirement, property, and debt balances to measure a current household position.", outcome: "The calculator turns scattered account balances into one cleaner net worth number." },
+      { title: "Progress tracking", description: "Recheck the same categories every few months to see whether debt is shrinking and assets are growing.", outcome: "That makes the metric more useful as a trend instead of a one-time number." }
+    ],
+    related: ["savings-goal-calculator", "tax-calculator"]
+  },
+  {
+    slug: "age-calculator",
+    title: "Age Calculator",
+    shortDescription: "Calculate exact age in years, months, and days from a birth date to any comparison date.",
+    intro: "This age calculator gives you an exact age breakdown in years, months, and days, plus total weeks, months, and days lived.",
+    detail: "Enter a birth date and comparison date to calculate exact age, total time lived, and the number of days until the next birthday. It works well for forms, planning, and milestone checks.",
+    category: "Everyday",
+    searchTerms: ["age calculator", "how old am i calculator", "exact age in years months days"],
+    features: ["Exact age breakdown", "Total days and weeks", "Next birthday countdown"],
+    faqs: [
+      { question: "How is exact age calculated?", answer: "The calculator compares the birth date with the selected comparison date and returns the calendar difference in years, months, and days." },
+      { question: "Can I calculate age on a past or future date?", answer: "Yes. Use any comparison date to see the exact age on that day rather than only today." },
+      { question: "Why show total days and weeks too?", answer: "Those formats are useful for milestone tracking, eligibility checks, and cases where a single calendar age is not enough detail." }
+    ],
+    examples: [
+      { title: "Form and eligibility check", description: "Calculate exact age on a specific event date rather than assuming today.", outcome: "The result helps with age-based forms, planning, and milestone questions." },
+      { title: "Birthday planning", description: "Use the comparison date to see how many days remain until the next birthday.", outcome: "The calculator shows both current age and the next birthday countdown." }
+    ],
+    related: ["date-difference-calculator", "time-duration-calculator"]
+  },
+  {
+    slug: "date-difference-calculator",
+    title: "Date Difference Calculator",
+    shortDescription: "Measure the gap between two dates in days, weeks, months, and a calendar years-months-days breakdown.",
+    intro: "This date difference calculator helps you measure the time between two dates in both total days and a calendar-style breakdown.",
+    detail: "Choose a start date and end date to calculate total days, total weeks, approximate months, and a years-months-days difference. You can also choose whether to count the end date in the total.",
+    category: "Everyday",
+    searchTerms: ["date difference calculator", "days between dates", "time between dates"],
+    features: ["Total days and weeks", "Calendar breakdown", "Optional end-date count"],
+    faqs: [
+      { question: "How do you calculate the number of days between two dates?", answer: "This calculator compares the start date and end date directly and returns the gap as total days plus other useful time formats." },
+      { question: "Why are total days and calendar months different?", answer: "Months do not all have the same length, so a calendar breakdown answers a slightly different question than a pure day count." },
+      { question: "Should I include the end date?", answer: "That depends on the task. For some schedules and project counts it makes sense to include the end date, while for elapsed time it often does not." }
+    ],
+    examples: [
+      { title: "Project timeline", description: "Measure how many total days remain between kickoff and deadline.", outcome: "The total-day and week views are useful for planning work in a simple timeline." },
+      { title: "Anniversary calculation", description: "Check the calendar difference between two dates in years, months, and days.", outcome: "The calendar breakdown is more useful than total days when the date itself matters." }
+    ],
+    related: ["age-calculator", "time-duration-calculator"]
+  },
+  {
+    slug: "time-duration-calculator",
+    title: "Time Duration Calculator",
+    shortDescription: "Calculate elapsed time between two times and subtract breaks to get working or total active hours.",
+    intro: "This time duration calculator measures the gap between two times, including overnight ranges and optional break deductions.",
+    detail: "Enter a start time, end time, and break duration to calculate total elapsed hours and minutes, decimal hours, and total minutes. It is useful for work schedules, shifts, and general timing questions.",
+    category: "Everyday",
+    searchTerms: ["time duration calculator", "hours between times", "work hours calculator"],
+    features: ["Hours and minutes", "Decimal hours", "Overnight support"],
+    faqs: [
+      { question: "Can this calculator handle overnight shifts?", answer: "Yes. If the end time is earlier than the start time, the calculator treats it as a next-day or overnight range." },
+      { question: "Why show decimal hours?", answer: "Decimal hours are useful for timesheets, invoices, payroll estimates, and any situation where hours need to be entered as a number." },
+      { question: "Can I subtract a lunch or rest break?", answer: "Yes. Enter the break in minutes and it will be removed from the total duration automatically." }
+    ],
+    examples: [
+      { title: "Workday tracking", description: "Measure paid time between clock-in and clock-out after subtracting lunch.", outcome: "The result shows hours and minutes plus a decimal-hours view for timesheets." },
+      { title: "Overnight shift", description: "Calculate total active time for a schedule that crosses midnight.", outcome: "The calculator handles the overnight jump automatically without manual conversion." }
+    ],
+    related: ["date-difference-calculator", "age-calculator"]
+  }
 ];
 
 export const calculatorMap = Object.fromEntries(calculators.map((calculator) => [calculator.slug, calculator])) as Record<CalculatorSlug, CalculatorDefinition>;
