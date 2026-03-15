@@ -75,7 +75,7 @@ export function MarginCalculator() {
           />
         </div>
         <p className="mt-4 text-sm leading-7">
-          Enter any two compatible fields. The calculator solves the rest when there is enough information.
+          Enter any two compatible fields, or leave just one field blank if the others agree. The calculator will solve the missing values and flag contradictory combinations.
         </p>
         <div className="mt-6">
           <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
@@ -84,9 +84,11 @@ export function MarginCalculator() {
       <div className="space-y-4">
         {!result ? (
           <EmptyCalculatorState
-            title="Enter two compatible inputs"
-            body="For example: cost and selling price, cost and margin, or price and markup. Impossible combinations will not calculate."
+            title="Enter compatible inputs"
+            body="For example: cost and selling price, cost and margin, or selling price and markup. You can also leave one field blank if the rest agree with each other."
           />
+        ) : result.error ? (
+          <EmptyCalculatorState title="Inputs conflict" body={result.error} />
         ) : (
           <>
             <div className="surface space-y-4 p-6 md:p-8">
