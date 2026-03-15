@@ -30,22 +30,22 @@ export function HomeSearch({ calculators }: { calculators: CalculatorDefinition[
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          className="input-base h-14 rounded-full bg-white px-5 text-base shadow-card"
+          className="input-base h-14 rounded-full bg-white px-5 text-base text-slate-950 shadow-card placeholder:text-slate-500 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
           placeholder="Search by task, formula, or calculator name"
         />
       </label>
-      <div className="surface max-h-72 overflow-y-auto p-2">
+      <div className="surface max-h-72 overflow-y-auto p-2 dark:bg-slate-900">
         <div className="grid gap-2">
           {results.map((calculator) => (
             <Link
               key={calculator.slug}
               href={`/${calculator.slug}`}
-              className="rounded-2xl px-4 py-3 transition hover:bg-accent-soft"
+              className="rounded-2xl px-4 py-3 transition hover:bg-accent-soft dark:hover:bg-slate-800"
             >
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="font-semibold text-slate-950 dark:text-white">{calculator.title}</p>
-                  <p className="text-sm">{calculator.shortDescription}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">{calculator.shortDescription}</p>
                 </div>
                 <span className="text-xs font-medium uppercase tracking-[0.18em] text-accent">
                   {calculator.category}

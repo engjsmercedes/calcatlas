@@ -36,28 +36,28 @@ export default function HomePage() {
         }}
       />
       <section className="page-shell py-10 md:py-16">
-        <div className="surface overflow-hidden bg-hero-grid p-8 md:p-12">
+        <div className="surface overflow-hidden bg-hero-grid p-8 text-slate-950 dark:text-slate-950 md:p-12">
           <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div className="space-y-6">
               <span className="section-label">High-intent calculator library</span>
               <div className="space-y-4">
-                <h1 className="font-display max-w-3xl text-4xl font-semibold leading-tight md:text-6xl">
+                <h1 className="font-display max-w-3xl text-4xl font-semibold leading-tight text-slate-950 dark:text-slate-950 md:text-6xl">
                   Online calculators that feel like a product, not a spreadsheet.
                 </h1>
-                <p className="max-w-2xl text-base leading-8 md:text-lg">
+                <p className="max-w-2xl text-base leading-8 text-slate-700 dark:text-slate-700 md:text-lg">
                   Calc Atlas helps users move from search to answer quickly with clean interfaces, live updates, shareable results, and SEO-friendly pages built for scale.
                 </p>
               </div>
               <div className="flex flex-wrap gap-3 text-sm text-muted">
-                <span className="rounded-full border border-border bg-white/70 px-4 py-2">{calculators.length} calculators live</span>
-                <span className="rounded-full border border-border bg-white/70 px-4 py-2">Shareable URLs</span>
-                <span className="rounded-full border border-border bg-white/70 px-4 py-2">Fast static-friendly pages</span>
+                <span className="rounded-full border border-border bg-white/85 px-4 py-2 text-slate-700 dark:bg-slate-950/10 dark:text-slate-700">{calculators.length} calculators live</span>
+                <span className="rounded-full border border-border bg-white/85 px-4 py-2 text-slate-700 dark:bg-slate-950/10 dark:text-slate-700">Shareable URLs</span>
+                <span className="rounded-full border border-border bg-white/85 px-4 py-2 text-slate-700 dark:bg-slate-950/10 dark:text-slate-700">Fast static-friendly pages</span>
               </div>
               <div className="flex flex-wrap gap-3">
                 <Link href="/#categories" className="button-base bg-accent text-white hover:bg-cyan-700 dark:text-slate-950">
                   Start calculating
                 </Link>
-                <Link href="/calculators" className="button-base border border-border bg-panel text-text hover:border-accent hover:text-accent">
+                <Link href="/calculators" className="button-base border border-border bg-panel text-text hover:border-accent hover:text-accent dark:bg-slate-950/80 dark:text-white">
                   Browse all calculators
                 </Link>
               </div>
@@ -66,7 +66,7 @@ export default function HomePage() {
                   <Link
                     key={category}
                     href={`/${details.slug}`}
-                    className="rounded-full border border-border bg-white/70 px-4 py-2 text-muted transition hover:border-accent hover:text-accent"
+                    className="rounded-full border border-border bg-white/85 px-4 py-2 text-slate-700 transition hover:border-accent hover:text-accent dark:bg-slate-950/10 dark:text-slate-700"
                   >
                     {category} ({items.length})
                   </Link>
@@ -91,7 +91,7 @@ export default function HomePage() {
               <Link
                 key={hub.slug}
                 href={`/${hub.slug}`}
-                className="rounded-full border border-border bg-white/70 px-4 py-2 text-sm text-muted transition hover:border-accent hover:text-accent"
+                className="rounded-full border border-border bg-white/85 px-4 py-2 text-sm text-slate-700 transition hover:border-accent hover:text-accent dark:bg-slate-800 dark:text-slate-200"
               >
                 {hub.title}
               </Link>
