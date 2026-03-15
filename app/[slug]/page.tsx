@@ -70,6 +70,17 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
               </div>
             </div>
           </div>
+          <section aria-labelledby="use-calculator" className="space-y-4">
+            <div className="space-y-2">
+              <span className="section-label">Use the calculator</span>
+              <h2 id="use-calculator" className="font-display text-3xl font-semibold">
+                Enter your numbers and review the live output
+              </h2>
+            </div>
+            <Suspense fallback={<div className="surface p-6 text-sm text-muted md:p-8">Loading calculator...</div>}>
+              <CalculatorRenderer slug={calculator.slug} />
+            </Suspense>
+          </section>
           <section aria-labelledby="about-calculator" className="space-y-4">
             <div className="space-y-2">
               <span className="section-label">About the calculator</span>
@@ -95,17 +106,6 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
                 <p className="mt-3 text-sm leading-7">{shareNote}</p>
               </div>
             </div>
-          </section>
-          <section aria-labelledby="use-calculator" className="space-y-4">
-            <div className="space-y-2">
-              <span className="section-label">Use the calculator</span>
-              <h2 id="use-calculator" className="font-display text-3xl font-semibold">
-                Enter your numbers and review the live output
-              </h2>
-            </div>
-            <Suspense fallback={<div className="surface p-6 text-sm text-muted md:p-8">Loading calculator...</div>}>
-              <CalculatorRenderer slug={calculator.slug} />
-            </Suspense>
           </section>
         </div>
       </section>
