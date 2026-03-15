@@ -5,12 +5,20 @@ import { CalculatorCard } from "@/components/calculator-card";
 import { HomeSearch } from "@/components/home/home-search";
 import { RecentlyUsed } from "@/components/home/recently-used";
 import { StructuredData } from "@/components/structured-data";
-import { calculatorCategories, calculatorCategoryDetails, calculators } from "@/data/calculators";
+import { calculatorCategoryDetails, calculators } from "@/data/calculators";
 import { subtopicHubs } from "@/data/subtopic-hubs";
 import { createMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
 
-const groupedCalculators = calculatorCategories.map((category) => ({
+const primaryCategories = ["Finance", "Health", "Everyday"] as const;
+
+const groupedCalculators = primaryCategories.map((category) => ({
+  category,
+  details: calculatorCategoryDetails[category],
+  items: calculators.filter((calculator) => calculator.category === category)
+}));
+
+const specializedTracks = (["Business", "Income"] as const).map((category) => ({
   category,
   details: calculatorCategoryDetails[category],
   items: calculators.filter((calculator) => calculator.category === category)
@@ -111,9 +119,9 @@ export default function HomePage() {
       <section id="categories" className="page-shell pb-16 md:pb-24">
         <div className="mb-8 space-y-3">
           <span className="section-label">Categories</span>
-          <h2 className="font-display text-3xl font-semibold">Finance, business, income, health, and everyday math</h2>
+          <h2 className="font-display text-3xl font-semibold">Finance, health, and everyday calculators</h2>
           <p className="max-w-2xl text-sm leading-7">
-            Calc Atlas groups calculators by the major decision areas people actually search for, making it easier to jump from one answer into the next related tool without losing context.
+            Calc Atlas groups calculators by the broad decision areas people search most often, then breaks finance into more specific business, borrowing, income, and investing tracks.
           </p>
         </div>
         <div className="space-y-12">
@@ -140,6 +148,25 @@ export default function HomePage() {
               </div>
             </div>
           ))}
+        </div>
+        <div className="mt-12 space-y-5">
+          <div className="space-y-2">
+            <span className="section-label">Finance subtracks</span>
+            <h3 className="text-2xl font-semibold">Business and income paths</h3>
+            <p className="max-w-2xl text-sm leading-7 text-muted">
+              These are smaller focused tracks inside the broader finance cluster, so they stay easy to find without pretending they are full standalone libraries yet.
+            </p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            {specializedTracks.map(({ category, details, items }) => (
+              <Link key={category} href={`/${details.slug}`} className="surface p-6 transition hover:border-accent">
+                <p className="text-sm uppercase tracking-[0.2em] text-muted">{category}</p>
+                <h4 className="mt-2 text-xl font-semibold">{details.title}</h4>
+                <p className="mt-2 text-sm leading-7 text-muted">{details.shortDescription}</p>
+                <p className="mt-3 text-sm text-accent">{items.length} calculator{items.length === 1 ? "" : "s"} live</p>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
     </>

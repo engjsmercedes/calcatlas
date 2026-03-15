@@ -3,11 +3,19 @@ import Link from "next/link";
 
 import { CalculatorCard } from "@/components/calculator-card";
 import { StructuredData } from "@/components/structured-data";
-import { calculatorCategories, calculatorCategoryDetails, calculators } from "@/data/calculators";
+import { calculatorCategoryDetails, calculators } from "@/data/calculators";
 import { subtopicHubs } from "@/data/subtopic-hubs";
 import { createCalculatorIndexSchemas, createMetadata } from "@/lib/seo";
 
-const groupedCalculators = calculatorCategories.map((category) => ({
+const primaryCategories = ["Finance", "Health", "Everyday"] as const;
+
+const groupedCalculators = primaryCategories.map((category) => ({
+  category,
+  details: calculatorCategoryDetails[category],
+  items: calculators.filter((calculator) => calculator.category === category)
+}));
+
+const specializedTracks = (["Business", "Income"] as const).map((category) => ({
   category,
   details: calculatorCategoryDetails[category],
   items: calculators.filter((calculator) => calculator.category === category)
@@ -16,7 +24,7 @@ const groupedCalculators = calculatorCategories.map((category) => ({
 export const metadata: Metadata = createMetadata({
   title: "All Calculators",
   description:
-    "Browse every calculator on Calc Atlas across finance, business, income, health, and everyday categories.",
+    "Browse every calculator on Calc Atlas across finance, health, and everyday categories, plus focused business and income tracks.",
   path: "/calculators",
   keywords: ["all calculators", "calculator index", "finance calculators", "health calculators"]
 });
@@ -44,6 +52,27 @@ export default function CalculatorsPage() {
                 className="rounded-full border border-border px-4 py-2 text-sm text-muted transition hover:border-accent hover:text-accent"
               >
                 {category} ({items.length})
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section className="page-shell pb-8 md:pb-12">
+        <div className="surface p-6 md:p-8">
+          <div className="space-y-3">
+            <span className="section-label">Focused tracks</span>
+            <h2 className="text-2xl font-semibold">Specialized finance paths</h2>
+            <p className="max-w-3xl text-sm leading-7 text-muted">
+              Business pricing and income-planning tools are still available, but they currently work better as focused tracks than as standalone top-level libraries.
+            </p>
+          </div>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            {specializedTracks.map(({ category, details, items }) => (
+              <Link key={category} href={`/${details.slug}`} className="rounded-3xl border border-border p-5 transition hover:border-accent">
+                <p className="text-sm uppercase tracking-[0.2em] text-muted">{category}</p>
+                <h3 className="mt-2 text-xl font-semibold">{details.title}</h3>
+                <p className="mt-2 text-sm leading-7 text-muted">{details.shortDescription}</p>
+                <p className="mt-3 text-sm text-accent">{items.length} calculator{items.length === 1 ? "" : "s"} live</p>
               </Link>
             ))}
           </div>
