@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+﻿import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,6 +8,7 @@ import { CalculatorFeedback } from "@/components/calculator-feedback";
 import { RelatedCalculators } from "@/components/related-calculators";
 import { StructuredData } from "@/components/structured-data";
 import { FaqList } from "@/components/ui/faq-list";
+import { getCalculatorGuidance } from "@/data/calculator-guidance";
 import { calculators, getCalculator, getRelatedCalculators } from "@/data/calculators";
 import {
   createCalculatorMetadata,
@@ -39,6 +40,7 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
   const calculatorLead = getCalculatorLead(calculator);
   const guide = getCalculatorGuide(calculator);
   const shareNote = getCalculatorShareNote(calculator);
+  const guidance = getCalculatorGuidance(calculator.slug);
 
   return (
     <>
@@ -140,6 +142,47 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
           </section>
         </div>
       </section>
+      {guidance ? (
+        <section className="page-shell pb-10 md:pb-14">
+          <section aria-labelledby="decision-guidance" className="space-y-5">
+            <div className="space-y-2">
+              <span className="section-label">Decision guidance</span>
+              <h2 id="decision-guidance" className="font-display text-3xl font-semibold">
+                Tips, considerations, and assumptions
+              </h2>
+              <p className="max-w-3xl text-sm leading-7 text-muted">
+                Use these notes to pressure-test the result before acting on it. They are written for this calculator specifically, so the output is easier to use in the real decision behind the math.
+              </p>
+            </div>
+            <div className="grid gap-4 lg:grid-cols-3">
+              <div className="surface p-6">
+                <h3 className="text-lg font-semibold text-slate-950 dark:text-white">Important considerations</h3>
+                <ul className="mt-3 space-y-3 text-sm leading-7 text-muted">
+                  {guidance.considerations.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="surface p-6">
+                <h3 className="text-lg font-semibold text-slate-950 dark:text-white">Practical tips</h3>
+                <ul className="mt-3 space-y-3 text-sm leading-7 text-muted">
+                  {guidance.tips.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="surface p-6">
+                <h3 className="text-lg font-semibold text-slate-950 dark:text-white">Assumptions and limits</h3>
+                <ul className="mt-3 space-y-3 text-sm leading-7 text-muted">
+                  {guidance.assumptions.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </section>
+        </section>
+      ) : null}
       <section className="page-shell pb-10 md:pb-14">
         <CalculatorFeedback calculatorSlug={calculator.slug} calculatorTitle={calculator.title} />
       </section>
@@ -171,5 +214,4 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
     </>
   );
 }
-
 

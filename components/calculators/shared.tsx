@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 
@@ -98,6 +98,7 @@ export function DecisionSummaryPanel({
   aiPrompt?: string;
 }) {
   const [aiBody, setAiBody] = useState<string | null>(null);
+  const [aiStatus, setAiStatus] = useState<"idle" | "ready" | "unavailable" | "error">("idle");
   const [isLoading, setIsLoading] = useState(false);
   const effectivePrompt = (aiPrompt ?? body).trim();
 
@@ -106,6 +107,7 @@ export function DecisionSummaryPanel({
 
     if (!calculator || !effectivePrompt) {
       setAiBody(null);
+      setAiStatus("idle");
       return;
     }
 
@@ -126,19 +128,24 @@ export function DecisionSummaryPanel({
           return null;
         }
 
-        const data = (await response.json()) as { summary?: string };
-        return data.summary?.trim() || null;
+        const data = (await response.json()) as { summary?: string; status?: "ready" | "unavailable" | "error" };
+        return {
+          summary: data.summary?.trim() || null,
+          status: data.status ?? "ready"
+        };
       })
-      .then((summary) => {
+      .then((result) => {
         if (!isMounted) {
           return;
         }
 
-        setAiBody(summary);
+        setAiBody(result?.summary ?? null);
+        setAiStatus(result?.status ?? "unavailable");
       })
       .catch(() => {
         if (isMounted) {
           setAiBody(null);
+          setAiStatus("error");
         }
       })
       .finally(() => {
@@ -157,6 +164,13 @@ export function DecisionSummaryPanel({
       <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">{aiBody ? "AI decision summary" : "Decision summary"}</p>
       <p className="mt-2 text-sm leading-7 text-slate-700 dark:text-slate-200">{aiBody || body}</p>
       {isLoading ? <p className="mt-2 text-xs leading-6 text-muted">Generating a more tailored summary...</p> : null}
+      {!isLoading && aiStatus === "ready" && aiBody ? <p className="mt-2 text-xs leading-6 text-muted">AI is active for this comparison.</p> : null}
+      {!isLoading && aiStatus === "unavailable" ? (
+        <p className="mt-2 text-xs leading-6 text-muted">AI summary is unavailable right now, so this section is using the built-in calculator guidance instead.</p>
+      ) : null}
+      {!isLoading && aiStatus === "error" ? (
+        <p className="mt-2 text-xs leading-6 text-muted">AI summary could not be generated for this comparison, so the built-in guidance is shown instead.</p>
+      ) : null}
     </div>
   );
 }
@@ -199,3 +213,4 @@ export function ComparisonControls({
     </div>
   );
 }
+

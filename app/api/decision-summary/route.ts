@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 
 interface SummaryPayload {
   calculator?: string;
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   const model = process.env.AI_SUMMARY_MODEL || "gpt-5-mini";
 
   if (!apiKey) {
-    return NextResponse.json({ message: "AI summaries are not configured.", summary: null }, { status: 200 });
+    return NextResponse.json({ message: "AI summaries are not configured.", summary: null, status: "unavailable" }, { status: 200 });
   }
 
   const body = (await request.json()) as SummaryPayload;
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   const prompt = body.prompt?.trim() || "";
 
   if (!prompt) {
-    return NextResponse.json({ message: "Missing summary prompt.", summary: null }, { status: 400 });
+    return NextResponse.json({ message: "Missing summary prompt.", summary: null, status: "error" }, { status: 400 });
   }
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
 
   if (!response.ok) {
     const errorText = await response.text();
-    return NextResponse.json({ message: `AI provider error: ${errorText}`, summary: null }, { status: 502 });
+    return NextResponse.json({ message: `AI provider error: ${errorText}`, summary: null, status: "error" }, { status: 502 });
   }
 
   const data = (await response.json()) as {
@@ -60,5 +60,6 @@ export async function POST(request: Request) {
 
   const summary = data.choices?.[0]?.message?.content?.trim() || null;
 
-  return NextResponse.json({ summary });
+  return NextResponse.json({ summary, status: summary ? "ready" : "unavailable" });
 }
+
