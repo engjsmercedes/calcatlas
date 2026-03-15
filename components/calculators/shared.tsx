@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { useEmbedOptions } from "@/components/embed-options";
 
 export function CalculatorActions({
   onReset,
@@ -14,12 +15,17 @@ export function CalculatorActions({
   hasActiveValues: boolean;
 }) {
   const [copied, setCopied] = useState(false);
+  const { showActions } = useEmbedOptions();
 
   const handleShare = async () => {
     await onShare();
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
   };
+
+  if (!showActions) {
+    return null;
+  }
 
   return (
     <div className="print-hidden flex flex-wrap items-center gap-3">
@@ -67,6 +73,12 @@ export function ExamplePresetList({
     onApply: () => void;
   }>;
 }) {
+  const { showExamples } = useEmbedOptions();
+
+  if (!showExamples) {
+    return null;
+  }
+
   return (
     <div className="rounded-3xl border border-border bg-slate-50/80 p-5 dark:bg-slate-950/30">
       <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">{title}</p>
@@ -100,12 +112,13 @@ export function DecisionSummaryPanel({
   const [aiBody, setAiBody] = useState<string | null>(null);
   const [aiStatus, setAiStatus] = useState<"idle" | "ready" | "unavailable" | "error">("idle");
   const [isLoading, setIsLoading] = useState(false);
+  const { showComparison } = useEmbedOptions();
   const effectivePrompt = (aiPrompt ?? body).trim();
 
   useEffect(() => {
     let isMounted = true;
 
-    if (!calculator || !effectivePrompt) {
+    if (!showComparison || !calculator || !effectivePrompt) {
       setAiBody(null);
       setAiStatus("idle");
       return;
@@ -157,7 +170,11 @@ export function DecisionSummaryPanel({
     return () => {
       isMounted = false;
     };
-  }, [calculator, effectivePrompt]);
+  }, [calculator, effectivePrompt, showComparison]);
+
+  if (!showComparison) {
+    return null;
+  }
 
   return (
     <div className="rounded-3xl border border-accent/15 bg-accent-soft/70 p-5">
@@ -190,6 +207,12 @@ export function ComparisonControls({
   title: string;
   body: string;
 }) {
+  const { showComparison } = useEmbedOptions();
+
+  if (!showComparison) {
+    return null;
+  }
+
   return (
     <div className="rounded-3xl border border-border bg-slate-50/80 p-5 dark:bg-slate-950/30">
       <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">{title}</p>
@@ -213,4 +236,3 @@ export function ComparisonControls({
     </div>
   );
 }
-

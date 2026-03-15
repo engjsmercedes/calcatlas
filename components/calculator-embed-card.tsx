@@ -6,15 +6,38 @@ import { Button } from "@/components/ui/button";
 import type { CalculatorDefinition } from "@/data/calculators";
 import { siteConfig } from "@/lib/site";
 
-function buildEmbedUrl(slug: string, showTitle: boolean, compact: boolean) {
+function buildEmbedUrl(slug: string, options: {
+  showTitle: boolean;
+  compact: boolean;
+  showPoweredBy: boolean;
+  showActions: boolean;
+  showExamples: boolean;
+  showComparison: boolean;
+}) {
   const params = new URLSearchParams();
 
-  if (!showTitle) {
+  if (!options.showTitle) {
     params.set("title", "0");
   }
 
-  if (compact) {
+  if (options.compact) {
     params.set("compact", "1");
+  }
+
+  if (!options.showPoweredBy) {
+    params.set("powered", "0");
+  }
+
+  if (!options.showActions) {
+    params.set("actions", "0");
+  }
+
+  if (!options.showExamples) {
+    params.set("examples", "0");
+  }
+
+  if (!options.showComparison) {
+    params.set("compare", "0");
   }
 
   const query = params.toString();
@@ -25,8 +48,23 @@ export function CalculatorEmbedCard({ calculator }: { calculator: CalculatorDefi
   const [copied, setCopied] = useState(false);
   const [showTitle, setShowTitle] = useState(true);
   const [compact, setCompact] = useState(false);
+  const [showPoweredBy, setShowPoweredBy] = useState(true);
+  const [showActions, setShowActions] = useState(true);
+  const [showExamples, setShowExamples] = useState(true);
+  const [showComparison, setShowComparison] = useState(true);
 
-  const embedUrl = useMemo(() => buildEmbedUrl(calculator.slug, showTitle, compact), [calculator.slug, compact, showTitle]);
+  const embedUrl = useMemo(
+    () =>
+      buildEmbedUrl(calculator.slug, {
+        showTitle,
+        compact,
+        showPoweredBy,
+        showActions,
+        showExamples,
+        showComparison
+      }),
+    [calculator.slug, compact, showActions, showComparison, showExamples, showPoweredBy, showTitle]
+  );
   const embedCode = useMemo(
     () => `<iframe src="${embedUrl}" title="${calculator.title}" width="100%" height="980" style="border:0;overflow:hidden;border-radius:24px;" loading="lazy"></iframe>`,
     [calculator.title, embedUrl]
@@ -50,7 +88,7 @@ export function CalculatorEmbedCard({ calculator }: { calculator: CalculatorDefi
         </p>
       </div>
       <div className="surface space-y-5 p-6 md:p-8">
-        <div className="flex flex-wrap gap-4 text-sm text-slate-700 dark:text-slate-200">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3 text-sm text-slate-700 dark:text-slate-200">
           <label className="flex items-center gap-2">
             <input checked={showTitle} onChange={(event) => setShowTitle(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />
             Show calculator title
@@ -58,6 +96,22 @@ export function CalculatorEmbedCard({ calculator }: { calculator: CalculatorDefi
           <label className="flex items-center gap-2">
             <input checked={compact} onChange={(event) => setCompact(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />
             Compact embed mode
+          </label>
+          <label className="flex items-center gap-2">
+            <input checked={showPoweredBy} onChange={(event) => setShowPoweredBy(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />
+            Show powered by link
+          </label>
+          <label className="flex items-center gap-2">
+            <input checked={showActions} onChange={(event) => setShowActions(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />
+            Show action buttons
+          </label>
+          <label className="flex items-center gap-2">
+            <input checked={showExamples} onChange={(event) => setShowExamples(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />
+            Show examples and presets
+          </label>
+          <label className="flex items-center gap-2">
+            <input checked={showComparison} onChange={(event) => setShowComparison(event.target.checked)} type="checkbox" className="h-4 w-4 accent-cyan-600" />
+            Show comparison tools
           </label>
         </div>
         <div className="rounded-3xl border border-border bg-slate-50/80 p-4 dark:bg-slate-950/30">
