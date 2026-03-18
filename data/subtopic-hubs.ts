@@ -1,4 +1,4 @@
-import type { CalculatorDefinition, CalculatorSlug } from "@/data/calculators";
+﻿import type { CalculatorDefinition, CalculatorSlug } from "@/data/calculators";
 
 export interface SubtopicHubDefinition {
   slug: string;
@@ -74,7 +74,15 @@ export const subtopicHubs: SubtopicHubDefinition[] = [
     searchTerms: ["fitness calculators", "running calculators", "heart rate zone calculator", "training tools"],
     slugs: ["running-pace-calculator", "heart-rate-zone-calculator", "steps-to-calories-calculator", "sleep-cycle-calculator", "one-rep-max-calculator"]
   }
-];
+,  {
+    slug: "life-decision-calculators",
+    title: "Life Decision Calculators",
+    shortDescription: "Holistic calculators for job, relationship, relocation, school, business, and retirement decisions.",
+    intro: "This life decision hub groups the weighted calculators people can use when the question is not just financial or emotional, but a blend of both.",
+    guide: "These calculators work best as structured reflection tools. Each page compares two major paths across practical, emotional, and risk factors, then links into nearby money or planning calculators when the decision needs more detail.",
+    searchTerms: ["life decision calculators", "should i calculator", "major life decision tools", "holistic decision calculators"],
+    slugs: ["quit-job-calculator", "move-calculator", "get-married-calculator", "have-kids-calculator", "buy-a-house-readiness-calculator", "start-a-business-calculator", "go-back-to-school-calculator", "job-offer-calculator", "break-up-calculator", "retire-early-calculator"]
+  }];
 
 export function getSubtopicHub(slug: string) {
   return subtopicHubs.find((hub) => hub.slug === slug);
@@ -84,3 +92,5 @@ export function getSubtopicCalculators(hub: SubtopicHubDefinition, calculators: 
   const map = new Map(calculators.map((calculator) => [calculator.slug, calculator]));
   return hub.slugs.map((slug) => map.get(slug)).filter(Boolean) as CalculatorDefinition[];
 }
+
+

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo, useState } from "react";
 
@@ -160,7 +160,17 @@ export function CompoundInterestCalculator() {
                     <ResultCard label="Balance delta" value={formatCurrency(comparisonResult.finalBalance - result.finalBalance)} tone={comparisonResult.finalBalance >= result.finalBalance ? "success" : "default"} />
                     <ResultCard label="Interest delta" value={formatCurrency(comparisonResult.totalInterest - result.totalInterest)} tone={comparisonResult.totalInterest >= result.totalInterest ? "success" : "default"} />
                   </div>
-                  <DecisionSummaryPanel calculator="Compound interest calculator" body={comparisonResult.finalBalance >= result.finalBalance && comparisonResult.totalContributions <= result.totalContributions ? `Scenario B is more capital-efficient: it finishes with a larger balance while asking for no more cash along the way.` : comparisonResult.finalBalance >= result.finalBalance ? `Scenario B builds a larger ending balance, but part of that gain comes from contributing more cash. It is the better choice only if the extra saving fits your budget.` : comparisonResult.totalContributions < result.totalContributions ? `Scenario B preserves more monthly cash flow, but it gives up end-balance growth. It is the better fit when flexibility matters more than maximum long-term value.` : `The primary plan remains the stronger wealth-building option because it turns the same or less cash into a better long-term balance.`} />
+                  <DecisionSummaryPanel
+                    calculator="Compound interest calculator"
+                    exportTitle="Compound interest comparison summary"
+                    verdict={comparisonResult.finalBalance >= result.finalBalance && comparisonResult.totalContributions <= result.totalContributions ? { label: "Scenario B wins", tone: "success" } : comparisonResult.finalBalance >= result.finalBalance ? { label: "Tradeoff", tone: "caution" } : comparisonResult.totalContributions < result.totalContributions ? { label: "Scenario B preserves cash flow", tone: "neutral" } : { label: "Scenario A wins", tone: "success" }}
+                    highlights={[
+                      `Ending balance delta: ${formatCurrency(comparisonResult.finalBalance - result.finalBalance)}`,
+                      `Contribution delta: ${formatCurrency(comparisonResult.totalContributions - result.totalContributions)}`,
+                      `Interest delta: ${formatCurrency(comparisonResult.totalInterest - result.totalInterest)}`
+                    ]}
+                    body={comparisonResult.finalBalance >= result.finalBalance && comparisonResult.totalContributions <= result.totalContributions ? `Scenario B is more capital-efficient: it finishes with a larger balance while asking for no more cash along the way.` : comparisonResult.finalBalance >= result.finalBalance ? `Scenario B builds a larger ending balance, but part of that gain comes from contributing more cash. It is the better choice only if the extra saving fits your budget.` : comparisonResult.totalContributions < result.totalContributions ? `Scenario B preserves more monthly cash flow, but it gives up end-balance growth. It is the better fit when flexibility matters more than maximum long-term value.` : `The primary plan remains the stronger wealth-building option because it turns the same or less cash into a better long-term balance.`}
+                  />
                 </div>
               ) : null}
             </>
@@ -173,6 +183,7 @@ export function CompoundInterestCalculator() {
     </div>
   );
 }
+
 
 
 

@@ -329,8 +329,151 @@ const calculatorGuidance: Partial<Record<CalculatorSlug, CalculatorGuidance>> = 
       "It does not infer overtime rules, schedules, or calendar dates unless you enter those details elsewhere."
     ]
   }
+  ,
+  "quit-job-calculator": {
+    considerations: [
+      "Burnout, runway, and the real job market usually matter more than one bad week or one salary number.",
+      "If the environment is harming your health, the right question may be how to leave safely rather than whether your feelings are valid."
+    ],
+    tips: [
+      "Run one version with your current runway and one with a stronger runway target so you can see whether preparation changes the answer.",
+      "Use the job-offer and take-home-pay tools next if the best path is leaving into another role rather than quitting cold."
+    ],
+    assumptions: [
+      "Scores are subjective and reflect your current view of the tradeoff.",
+      "The calculator does not replace legal, HR, or financial advice if the exit involves a contract, harassment, or severance terms."
+    ]
+  },
+  "move-calculator": {
+    considerations: [
+      "A move can look exciting while still weakening your support system and day-to-day stability.",
+      "One or two heavily weighted factors often decide the outcome more than the total score itself."
+    ],
+    tips: [
+      "Compare one version of the move with realistic costs and one with conservative higher costs before acting.",
+      "If the move is job-related, pair this with the job-offer and budget calculators so the financial side is grounded."
+    ],
+    assumptions: [
+      "The output depends on how honestly you rate support, stress, and lifestyle fit.",
+      "It does not estimate legal moving constraints, taxes, or exact relocation budgets."
+    ]
+  },
+  "get-married-calculator": {
+    considerations: [
+      "Trust, conflict repair, and future alignment usually matter more than emotional urgency.",
+      "If major concerns only show up when hard topics come up, that is still part of the real score."
+    ],
+    tips: [
+      "Have both partners score the factors separately and compare the mismatches before making the decision.",
+      "If waiting wins, identify which one or two factors need to improve instead of treating the result as a rejection."
+    ],
+    assumptions: [
+      "The calculator is a reflection tool and not a verdict on the relationship itself.",
+      "It should never override clear safety concerns, coercion, or fear."
+    ]
+  },
+  "have-kids-calculator": {
+    considerations: [
+      "Desire matters, but support, money, and relationship stability usually determine whether timing is sustainable.",
+      "A strong wish for children can coexist with a sensible decision to wait."
+    ],
+    tips: [
+      "Run one case for now and one for a more supported future setup so you can see what preparation would change.",
+      "If health timing matters, use the result to focus the next conversation rather than to delay it indefinitely."
+    ],
+    assumptions: [
+      "This is not a fertility or medical tool.",
+      "Scores are subjective and will change if support, income, or relationship conditions change."
+    ]
+  },
+  "buy-a-house-readiness-calculator": {
+    considerations: [
+      "Approval is not the same as readiness. Cash reserves and mobility matter a lot after closing day.",
+      "A strong desire to own can still lead to a weak timing decision if the buffer is too thin."
+    ],
+    tips: [
+      "Use this with the mortgage affordability and rent-versus-buy calculators so the readiness result is grounded in real numbers.",
+      "Stress-test the answer with a lower cash reserve or shorter stay horizon before treating buying as obviously right."
+    ],
+    assumptions: [
+      "The result reflects your self-scored readiness rather than a lender or market forecast.",
+      "Maintenance, tax changes, and repair shocks need separate numeric modeling elsewhere."
+    ]
+  },
+  "start-a-business-calculator": {
+    considerations: [
+      "Passion can carry the score emotionally while runway and proof of demand still make the launch weak.",
+      "Waiting to validate more can be a strategic choice rather than fear."
+    ],
+    tips: [
+      "If the result is close, test the same idea with better proof or more runway to see what would need to change.",
+      "Use break-even and ROI tools after this if the next step is validating the business economics."
+    ],
+    assumptions: [
+      "The calculator does not estimate revenue or legal risk directly.",
+      "Scores depend on honest judgment about market proof and financial survivability."
+    ]
+  },
+  "go-back-to-school-calculator": {
+    considerations: [
+      "The best school decisions usually have both a credible payoff and enough intrinsic interest to sustain the work.",
+      "Debt and time pressure can erase a good long-term idea if the timing is poor."
+    ],
+    tips: [
+      "Compare the current scenario with one where funding, support, or timing improves before committing.",
+      "If the decision still looks good, model the income side next with salary and tax tools."
+    ],
+    assumptions: [
+      "This tool does not project exact ROI from a program.",
+      "Program quality, admissions odds, and licensing requirements still need separate research."
+    ]
+  },
+  "job-offer-calculator": {
+    considerations: [
+      "A bigger offer can still be worse if stress, manager quality, flexibility, or stability deteriorate sharply.",
+      "Take-home pay and lived quality matter more than headline compensation alone."
+    ],
+    tips: [
+      "Pair this with take-home pay estimates if the compensation difference is driving the decision.",
+      "If the result is close, compare the two or three most important factors instead of over-reading the total score."
+    ],
+    assumptions: [
+      "The scoring depends on how honestly you rate hidden costs and risk.",
+      "It does not infer taxes, equity liquidity, or future raises automatically."
+    ]
+  },
+  "break-up-calculator": {
+    considerations: [
+      "Recurring patterns in trust, safety, and repair usually matter more than one good week or one bad fight.",
+      "If you already know the answer internally, the calculator may mainly be clarifying what you are resisting."
+    ],
+    tips: [
+      "Score the pattern over the last several months instead of the last several days.",
+      "If leaving wins but support is weak, the next step may be building a safe exit plan rather than re-debating the relationship."
+    ],
+    assumptions: [
+      "This is a structured reflection tool, not a replacement for support or safety planning.",
+      "It should not be used to rationalize staying in an unsafe relationship."
+    ]
+  },
+  "retire-early-calculator": {
+    considerations: [
+      "Early retirement can fail emotionally before it fails mathematically if purpose and lifestyle design are weak.",
+      "Healthcare, spending discipline, and optional income matter more than a single retirement number."
+    ],
+    tips: [
+      "Run one scenario for retiring now and one for working longer with stronger healthcare or flexibility assumptions.",
+      "Use retirement, inflation, and net-worth calculators next if the readiness result still points toward leaving work early."
+    ],
+    assumptions: [
+      "This tool scores readiness and risk tolerance, not a withdrawal rate.",
+      "Market shocks, taxes, and healthcare changes still need separate numeric planning."
+    ]
+  }
 };
 
 export function getCalculatorGuidance(slug: CalculatorSlug): CalculatorGuidance | null {
   return calculatorGuidance[slug] ?? null;
 }
+
+

@@ -9,6 +9,7 @@ import { CalculatorRenderer } from "@/components/calculators/calculator-renderer
 import { CalculatorFeedback } from "@/components/calculator-feedback";
 import { RelatedCalculators } from "@/components/related-calculators";
 import { StructuredData } from "@/components/structured-data";
+import { WorkflowChainPanel } from "@/components/workflow-chain-panel";
 import { FaqList } from "@/components/ui/faq-list";
 import { getCalculatorGuidance } from "@/data/calculator-guidance";
 import { calculators, getCalculator, getRelatedCalculators } from "@/data/calculators";
@@ -66,6 +67,7 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
                 Enter your numbers and review the live output
               </h2>
             </div>
+            <Suspense fallback={null}><WorkflowChainPanel /></Suspense>
             <Suspense fallback={<div className="surface p-6 text-sm text-muted md:p-8">Loading calculator...</div>}>
               <CalculatorRenderer slug={calculator.slug} />
             </Suspense>
@@ -214,10 +216,11 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
           </div>
           <div className="space-y-3">
             <p className="max-w-3xl text-sm leading-7 text-muted">{guide.related}</p>
-            <RelatedCalculators calculators={related} />
+            <Suspense fallback={null}><RelatedCalculators calculators={related} currentCalculator={calculator} /></Suspense>
           </div>
         </section>
       </section>
     </>
   );
 }
+

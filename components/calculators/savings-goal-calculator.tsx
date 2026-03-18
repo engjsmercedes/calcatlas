@@ -150,7 +150,18 @@ export function SavingsGoalCalculator() {
                     <ResultCard label="Timeline delta" value={`${comparisonResult.monthsToGoal - result.monthsToGoal} months`} tone={comparisonResult.monthsToGoal <= result.monthsToGoal ? "success" : "default"} />
                     <ResultCard label="Scenario B projected interest" value={formatCurrency(comparisonResult.interestEarned)} />
                     <ResultCard label="Interest delta" value={formatCurrency(comparisonResult.interestEarned - result.interestEarned)} tone={comparisonResult.interestEarned >= result.interestEarned ? "success" : "default"} />
-                  </div>`r`n                  <DecisionSummaryPanel calculator="Savings calculator" body={comparisonResult.monthsToGoal <= result.monthsToGoal && comparisonResult.interestEarned >= result.interestEarned ? `Scenario B is the stronger savings plan because it reaches the goal sooner and still compounds more interest along the way.` : comparisonResult.monthsToGoal <= result.monthsToGoal ? `Scenario B gets to the goal faster, but part of the speed comes from contributing more cash. It is the better fit only if the higher saving rate is sustainable.` : comparisonResult.interestEarned >= result.interestEarned ? `Scenario B compounds more interest, but it takes longer to hit the target. It is better when efficiency matters more than hitting the goal on the earliest timeline.` : `The primary plan remains the more balanced route to the goal because Scenario B does not improve the timeline-versus-contribution tradeoff enough.`} />
+                  </div>
+                  <DecisionSummaryPanel
+                    calculator="Savings calculator"
+                    exportTitle="Savings goal comparison summary"
+                    verdict={comparisonResult.monthsToGoal <= result.monthsToGoal && comparisonResult.interestEarned >= result.interestEarned ? { label: "Scenario B wins", tone: "success" } : comparisonResult.monthsToGoal <= result.monthsToGoal ? { label: "Faster timeline tradeoff", tone: "caution" } : comparisonResult.interestEarned >= result.interestEarned ? { label: "Higher compounding tradeoff", tone: "neutral" } : { label: "Scenario A wins", tone: "success" }}
+                    highlights={[
+                      `Timeline delta: ${comparisonResult.monthsToGoal - result.monthsToGoal} months`,
+                      `Interest delta: ${formatCurrency(comparisonResult.interestEarned - result.interestEarned)}`,
+                      `Contribution delta: ${formatCurrency(comparisonResult.totalContributions - result.totalContributions)}`
+                    ]}
+                    body={comparisonResult.monthsToGoal <= result.monthsToGoal && comparisonResult.interestEarned >= result.interestEarned ? `Scenario B is the stronger savings plan because it reaches the goal sooner and still compounds more interest along the way.` : comparisonResult.monthsToGoal <= result.monthsToGoal ? `Scenario B gets to the goal faster, but part of the speed comes from contributing more cash. It is the better fit only if the higher saving rate is sustainable.` : comparisonResult.interestEarned >= result.interestEarned ? `Scenario B compounds more interest, but it takes longer to hit the target. It is better when efficiency matters more than hitting the goal on the earliest timeline.` : `The primary plan remains the more balanced route to the goal because Scenario B does not improve the timeline-versus-contribution tradeoff enough.`}
+                  />
                 </div>
               ) : null}
             </>
@@ -163,6 +174,8 @@ export function SavingsGoalCalculator() {
     </div>
   );
 }
+
+
 
 
 

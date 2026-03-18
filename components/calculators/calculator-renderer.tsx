@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 
@@ -58,7 +58,8 @@ import { LengthConverter } from "./length-converter";
 import { WeightConverter } from "./weight-converter";
 import { TemperatureConverter } from "./temperature-converter";
 import { TipCalculator } from "./tip-calculator";
-import { WaterIntakeCalculator } from "./water-intake-calculator";
+import { WaterIntakeCalculator } from './water-intake-calculator';
+import { LifeDecisionCalculator } from './life-decision-calculator';
 
 export function CalculatorRenderer({ slug, embedded = false }: { slug: CalculatorSlug; embedded?: boolean }) {
   useRecentCalculators(embedded ? undefined : slug);
@@ -186,9 +187,23 @@ export function CalculatorRenderer({ slug, embedded = false }: { slug: Calculato
       return <TimeZoneConverter />;
     case "running-pace-calculator":
       return <RunningPaceCalculator />;
+    case "quit-job-calculator":
+    case "move-calculator":
+    case "get-married-calculator":
+    case "have-kids-calculator":
+    case "buy-a-house-readiness-calculator":
+    case "start-a-business-calculator":
+    case "go-back-to-school-calculator":
+    case "job-offer-calculator":
+    case "break-up-calculator":
+    case "retire-early-calculator":
+      return <LifeDecisionCalculator slug={slug} />;
     case "one-rep-max-calculator":
       return <OneRepMaxCalculator />;
     default:
       return null;
   }
 }
+
+
+

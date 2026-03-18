@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AdSlotPlaceholder } from "@/components/ad-slot-placeholder";
@@ -8,26 +8,25 @@ import { calculatorCategoryDetails, calculators } from "@/data/calculators";
 import { subtopicHubs } from "@/data/subtopic-hubs";
 import { createCalculatorIndexSchemas, createMetadata } from "@/lib/seo";
 
-const primaryCategories = ["Finance", "Health", "Everyday"] as const;
+const allCategories = ["Finance", "Health", "Everyday", "Business", "Income"] as const;
 
-const groupedCalculators = primaryCategories.map((category) => ({
+const groupedCalculators = allCategories.map((category) => ({
   category,
   details: calculatorCategoryDetails[category],
   items: calculators.filter((calculator) => calculator.category === category)
 }));
 
-const specializedTracks = (["Business", "Income"] as const).map((category) => ({
-  category,
-  details: calculatorCategoryDetails[category],
-  items: calculators.filter((calculator) => calculator.category === category)
-}));
+const lifeDecisionHub = subtopicHubs.find((hub) => hub.slug === "life-decision-calculators");
+const lifeDecisionCalculators = lifeDecisionHub
+  ? calculators.filter((calculator) => lifeDecisionHub.slugs.includes(calculator.slug))
+  : [];
 
 export const metadata: Metadata = createMetadata({
   title: "All Calculators",
   description:
-    "Browse every calculator on Calc Atlas across finance, health, and everyday categories, plus focused business and income tracks.",
+    "Browse every calculator on Calc Atlas across finance, health, everyday, business, income, and major life-decision categories.",
   path: "/calculators",
-  keywords: ["all calculators", "calculator index", "finance calculators", "health calculators"]
+  keywords: ["all calculators", "calculator index", "finance calculators", "life decision calculators"]
 });
 
 export default function CalculatorsPage() {
@@ -55,39 +54,47 @@ export default function CalculatorsPage() {
                 {category} ({items.length})
               </Link>
             ))}
+            {lifeDecisionHub ? (
+              <Link
+                href={`/${lifeDecisionHub.slug}`}
+                className="rounded-full border border-accent/30 bg-accent-soft px-4 py-2 text-sm text-accent transition hover:border-accent"
+              >
+                Life decisions ({lifeDecisionHub.slugs.length})
+              </Link>
+            ) : null}
           </div>
         </div>
       </section>
       <section className="page-shell pb-8 md:pb-12">
         <AdSlotPlaceholder label="Index ad slot" format="Responsive display or leaderboard" />
       </section>
-      <section className="page-shell pb-8 md:pb-12">
-        <div className="surface p-6 md:p-8">
-          <div className="space-y-3">
-            <span className="section-label">Focused tracks</span>
-            <h2 className="text-2xl font-semibold">Specialized finance paths</h2>
-            <p className="max-w-3xl text-sm leading-7 text-muted">
-              Business pricing and income-planning tools are still available, but they currently work better as focused tracks than as standalone top-level libraries.
-            </p>
-          </div>
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
-            {specializedTracks.map(({ category, details, items }) => (
-              <Link key={category} href={`/${details.slug}`} className="rounded-3xl border border-border p-5 transition hover:border-accent">
-                <p className="text-sm uppercase tracking-[0.2em] text-muted">{category}</p>
-                <h3 className="mt-2 text-xl font-semibold">{details.title}</h3>
-                <p className="mt-2 text-sm leading-7 text-muted">{details.shortDescription}</p>
-                <p className="mt-3 text-sm text-accent">{items.length} calculator{items.length === 1 ? "" : "s"} live</p>
+      {lifeDecisionHub ? (
+        <section className="page-shell pb-8 md:pb-12">
+          <div className="surface p-6 md:p-8">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div className="space-y-3">
+                <span className="section-label">Featured cluster</span>
+                <h2 className="text-2xl font-semibold">{lifeDecisionHub.title}</h2>
+                <p className="max-w-3xl text-sm leading-7 text-muted">{lifeDecisionHub.shortDescription}</p>
+              </div>
+              <Link href={`/${lifeDecisionHub.slug}`} className="font-medium text-accent">
+                Open life decision hub
               </Link>
-            ))}
+            </div>
+            <div className="mt-5 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {lifeDecisionCalculators.map((calculator) => (
+                <CalculatorCard key={calculator.slug} calculator={calculator} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
       <section className="page-shell pb-8 md:pb-12">
         <div className="surface p-6 md:p-8">
           <div className="space-y-3">
             <span className="section-label">Popular clusters</span>
             <h2 className="text-2xl font-semibold">Browse the biggest problem-based calculator hubs</h2>
-            <p className="max-w-3xl text-sm leading-7 text-muted">These subtopic hubs group the calculators people usually need together, such as borrowing, investing, and take-home-pay planning.</p>
+            <p className="max-w-3xl text-sm leading-7 text-muted">These subtopic hubs group the calculators people usually need together, such as borrowing, investing, take-home-pay planning, and major life decisions.</p>
           </div>
           <div className="mt-5 flex flex-wrap gap-3">
             {subtopicHubs.map((hub) => (

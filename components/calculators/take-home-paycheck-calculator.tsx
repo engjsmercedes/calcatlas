@@ -197,7 +197,17 @@ export function TakeHomePaycheckCalculator() {
                   <ResultCard label="Scenario B net annual" value={formatCurrency(comparisonResult.netAnnual)} />
                   <ResultCard label="Annual delta" value={formatCurrency(comparisonResult.netAnnual - result.netAnnual)} tone={comparisonResult.netAnnual >= result.netAnnual ? "success" : "default"} />
                 </div>
-                <DecisionSummaryPanel calculator="Take-home paycheck calculator" body={comparisonResult.netPerPaycheck > result.netPerPaycheck && comparisonResult.effectiveTaxRate <= result.effectiveTaxRate ? `Scenario B gives the stronger paycheck outcome because more money reaches you each pay cycle without raising the effective tax drag.` : comparisonResult.netPerPaycheck > result.netPerPaycheck ? `Scenario B improves per-paycheck cash flow, but review whether the gain comes from lower retirement saving or lighter deductions rather than a better compensation structure.` : comparisonResult.effectiveTaxRate < result.effectiveTaxRate ? `Scenario B is slightly more tax-efficient, but it does not clearly beat the primary setup on spendable paycheck cash. Keep it only if tax efficiency is the main goal.` : `The primary paycheck setup remains the more balanced option because Scenario B does not put more usable cash in your pocket.`} />
+                <DecisionSummaryPanel
+                  calculator="Take-home paycheck calculator"
+                  exportTitle="Take-home paycheck comparison summary"
+                  verdict={comparisonResult.netPerPaycheck > result.netPerPaycheck && comparisonResult.effectiveTaxRate <= result.effectiveTaxRate ? { label: "Scenario B wins", tone: "success" } : comparisonResult.netPerPaycheck > result.netPerPaycheck ? { label: "Higher cash-flow tradeoff", tone: "caution" } : comparisonResult.effectiveTaxRate < result.effectiveTaxRate ? { label: "Lower tax tradeoff", tone: "neutral" } : { label: "Scenario A wins", tone: "success" }}
+                  highlights={[
+                    `Per-paycheck delta: ${formatCurrency(comparisonResult.netPerPaycheck - result.netPerPaycheck)}`,
+                    `Annual net delta: ${formatCurrency(comparisonResult.netAnnual - result.netAnnual)}`,
+                    `Effective tax rate delta: ${formatPercent(comparisonResult.effectiveTaxRate - result.effectiveTaxRate)}`
+                  ]}
+                  body={comparisonResult.netPerPaycheck > result.netPerPaycheck && comparisonResult.effectiveTaxRate <= result.effectiveTaxRate ? `Scenario B gives the stronger paycheck outcome because more money reaches you each pay cycle without raising the effective tax drag.` : comparisonResult.netPerPaycheck > result.netPerPaycheck ? `Scenario B improves per-paycheck cash flow, but review whether the gain comes from lower retirement saving or lighter deductions rather than a better compensation structure.` : comparisonResult.effectiveTaxRate < result.effectiveTaxRate ? `Scenario B is slightly more tax-efficient, but it does not clearly beat the primary setup on spendable paycheck cash. Keep it only if tax efficiency is the main goal.` : `The primary paycheck setup remains the more balanced option because Scenario B does not put more usable cash in your pocket.`}
+                />
               </div>
             ) : null}
           </>
@@ -206,6 +216,7 @@ export function TakeHomePaycheckCalculator() {
     </div>
   );
 }
+
 
 
 

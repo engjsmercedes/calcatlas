@@ -148,7 +148,17 @@ export function DebtPayoffCalculator() {
                   <ResultCard label="Scenario B interest" value={formatCurrency(comparisonResult.acceleratedInterest)} />
                   <ResultCard label="Interest delta" value={formatCurrency(comparisonResult.acceleratedInterest - result.acceleratedInterest)} tone={comparisonResult.acceleratedInterest <= result.acceleratedInterest ? "success" : "default"} />
                 </div>
-                <DecisionSummaryPanel calculator="Debt payoff calculator" body={comparisonResult.acceleratedMonths < result.acceleratedMonths && comparisonResult.acceleratedInterest <= result.acceleratedInterest ? `Scenario B is the stronger payoff plan because it clears the debt faster and reduces interest drag at the same time.` : comparisonResult.acceleratedMonths < result.acceleratedMonths ? `Scenario B gets you out of debt sooner, but it does so by demanding more monthly cash flow. It is worth it if payoff speed is the priority.` : comparisonResult.acceleratedInterest < result.acceleratedInterest ? `Scenario B saves interest without meaningfully improving payoff speed. It is the better fit if cost control matters more than finishing dramatically earlier.` : `The primary payoff plan remains the more balanced choice because Scenario B does not improve the interest-time tradeoff enough to justify the change.`} />
+                <DecisionSummaryPanel
+                  calculator="Debt payoff calculator"
+                  exportTitle="Debt payoff comparison summary"
+                  verdict={comparisonResult.acceleratedMonths < result.acceleratedMonths && comparisonResult.acceleratedInterest <= result.acceleratedInterest ? { label: "Scenario B wins", tone: "success" } : comparisonResult.acceleratedMonths < result.acceleratedMonths ? { label: "Faster but pricier", tone: "caution" } : comparisonResult.acceleratedInterest < result.acceleratedInterest ? { label: "Lower cost tradeoff", tone: "neutral" } : { label: "Scenario A wins", tone: "success" }}
+                  highlights={[
+                    `Payoff delta: ${formatMonths(Math.abs(comparisonResult.acceleratedMonths - result.acceleratedMonths))}`,
+                    `Interest delta: ${formatCurrency(comparisonResult.acceleratedInterest - result.acceleratedInterest)}`,
+                    `Total paid delta: ${formatCurrency(comparisonResult.acceleratedTotalPaid - result.acceleratedTotalPaid)}`
+                  ]}
+                  body={comparisonResult.acceleratedMonths < result.acceleratedMonths && comparisonResult.acceleratedInterest <= result.acceleratedInterest ? `Scenario B is the stronger payoff plan because it clears the debt faster and reduces interest drag at the same time.` : comparisonResult.acceleratedMonths < result.acceleratedMonths ? `Scenario B gets you out of debt sooner, but it does so by demanding more monthly cash flow. It is worth it if payoff speed is the priority.` : comparisonResult.acceleratedInterest < result.acceleratedInterest ? `Scenario B saves interest without meaningfully improving payoff speed. It is the better fit if cost control matters more than finishing dramatically earlier.` : `The primary payoff plan remains the more balanced choice because Scenario B does not improve the interest-time tradeoff enough to justify the change.`}
+                />
               </div>
             ) : null}
           </>
@@ -157,6 +167,7 @@ export function DebtPayoffCalculator() {
     </div>
   );
 }
+
 
 
 

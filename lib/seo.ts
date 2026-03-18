@@ -1,8 +1,11 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 
 import type { CalculatorCategoryDefinition, CalculatorDefinition, CalculatorSlug } from "@/data/calculators";
+import { lifeDecisionCalculatorSlugs } from "@/data/life-decision-config";
 
 import { siteConfig } from "./site";
+
+const lifeDecisionSlugSet = new Set<CalculatorSlug>(lifeDecisionCalculatorSlugs);
 
 function normalizePath(path: string) {
   return path.startsWith("/") ? path : `/${path}`;
@@ -65,7 +68,7 @@ export function createCalculatorMetadata(calculator: CalculatorDefinition) {
   });
 }
 
-const calculatorIntroExtensions: Record<CalculatorSlug, string> = {
+const calculatorIntroExtensions: Partial<Record<CalculatorSlug, string>> = {
   "percentage-calculator": "It is built for the common percentage tasks people search for most often, from quick discounts and tips to growth rates and percent-of comparisons. Instead of forcing users to jump between tools, the page keeps the main percentage workflows in one interface with live answers and plain-language context.",
   "discount-calculator": "The page is designed for quick shopping and retail decisions where users want the final sale price without doing multiple percent-off steps by hand. Showing effective discount makes it more useful than a one-step sale-price estimate.",
   "tip-calculator": "It is intentionally simple and fast so users can get a usable answer in a few seconds on mobile. Adding the split-per-person result makes it more practical for real restaurant and group-bill scenarios than a basic tip-only tool.",
@@ -128,10 +131,18 @@ const calculatorIntroExtensions: Record<CalculatorSlug, string> = {
 };
 
 export function getCalculatorLead(calculator: CalculatorDefinition) {
+  if (lifeDecisionSlugSet.has(calculator.slug)) {
+    return `${calculator.title} is built for decisions that do not reduce cleanly to one formula. The page lets users score two competing paths across practical, emotional, and risk factors, then compare alternate scenarios without losing the tradeoff behind the result.`;
+  }
+
   return calculatorIntroExtensions[calculator.slug];
 }
 
 export function getCalculatorResultExplanation(calculator: CalculatorDefinition) {
+  if (lifeDecisionSlugSet.has(calculator.slug)) {
+    return `${calculator.title} compares two major paths using weighted factor scores, then separates the winning direction into practical strength, emotional fit, and risk posture. That makes the result more useful than a single yes-or-no score because users can see what is actually carrying the decision.`;
+  }
+
   switch (calculator.slug) {
     case "mortgage-calculator":
       return "The output separates principal and interest from taxes, insurance, and HOA costs so users can understand what is driving the all-in housing payment. It also makes the tradeoff between monthly affordability and long-term interest cost easier to evaluate.";
@@ -174,6 +185,15 @@ export function getCalculatorResultExplanation(calculator: CalculatorDefinition)
 }
 
 export function getCalculatorGuide(calculator: CalculatorDefinition) {
+  if (lifeDecisionSlugSet.has(calculator.slug)) {
+    return {
+      measures: `This calculator measures how two major life paths compare once practical, emotional, and risk factors are weighted together instead of treated as separate gut feelings.`,
+      affects: "The factor scores you give each option matter, but the highest-impact input is usually importance weighting. One or two heavily weighted factors can drive the entire recommendation.",
+      uses: "People use the output to pressure-test a big decision, compare the current setup with a stronger future setup, and identify which exact issues need to improve before acting.",
+      related: "Related calculators below help users move from a holistic decision result into more specific money, work, housing, or planning tools without leaving the same decision path."
+    };
+  }
+
   switch (calculator.category) {
     case "Finance":
       return {
@@ -212,8 +232,9 @@ export function getCalculatorShareNote(calculator: CalculatorDefinition) {
 
 export function createCalculatorSchemas(calculator: CalculatorDefinition) {
   const url = absoluteUrl(`/${calculator.slug}`);
-  const applicationCategory =
-    calculator.category === "Health"
+  const applicationCategory = lifeDecisionSlugSet.has(calculator.slug)
+    ? "LifestyleApplication"
+    : calculator.category === "Health"
       ? "HealthApplication"
       : calculator.category === "Finance"
         ? "FinanceApplication"
@@ -287,3 +308,6 @@ export function createCategorySchema(category: CalculatorCategoryDefinition) {
     url: absoluteUrl(`/${category.slug}`)
   };
 }
+
+
+

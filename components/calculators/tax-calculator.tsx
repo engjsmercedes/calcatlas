@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo, useState } from "react";
 
@@ -149,7 +149,17 @@ export function TaxCalculator() {
                   <ResultCard label="Scenario B total tax" value={formatCurrency(comparisonResult.totalTax)} />
                   <ResultCard label="Tax delta" value={formatCurrency(comparisonResult.totalTax - result.totalTax)} tone={comparisonResult.totalTax <= result.totalTax ? "success" : "default"} />
                 </div>
-                <DecisionSummaryPanel calculator="Tax calculator" body={comparisonResult.netAnnual > result.netAnnual && comparisonResult.totalTax <= result.totalTax ? `Scenario B is cleaner financially because it leaves more take-home pay while not increasing total tax drag.` : comparisonResult.netAnnual > result.netAnnual ? `Scenario B improves take-home pay, but part of the gain may come from different deduction assumptions rather than pure tax efficiency. Check whether the inputs still match your real situation.` : comparisonResult.totalTax < result.totalTax ? `Scenario B lowers total tax burden, but the after-tax result is not clearly better once deductions are included. It is useful mainly if your goal is tax efficiency, not maximum spendable income.` : `The primary setup remains stronger because Scenario B does not improve after-tax income or tax efficiency enough to justify switching assumptions.`} />
+                <DecisionSummaryPanel
+                  calculator="Tax calculator"
+                  exportTitle="Tax comparison summary"
+                  verdict={comparisonResult.netAnnual > result.netAnnual && comparisonResult.totalTax <= result.totalTax ? { label: "Scenario B wins", tone: "success" } : comparisonResult.netAnnual > result.netAnnual ? { label: "Higher take-home tradeoff", tone: "caution" } : comparisonResult.totalTax < result.totalTax ? { label: "Lower tax tradeoff", tone: "neutral" } : { label: "Scenario A wins", tone: "success" }}
+                  highlights={[
+                    `Net annual delta: ${formatCurrency(comparisonResult.netAnnual - result.netAnnual)}`,
+                    `Tax delta: ${formatCurrency(comparisonResult.totalTax - result.totalTax)}`,
+                    `Effective rate delta: ${formatPercent((comparisonResult.effectiveTaxRate - result.effectiveTaxRate) * 100)}`
+                  ]}
+                  body={comparisonResult.netAnnual > result.netAnnual && comparisonResult.totalTax <= result.totalTax ? `Scenario B is cleaner financially because it leaves more take-home pay while not increasing total tax drag.` : comparisonResult.netAnnual > result.netAnnual ? `Scenario B improves take-home pay, but part of the gain may come from different deduction assumptions rather than pure tax efficiency. Check whether the inputs still match your real situation.` : comparisonResult.totalTax < result.totalTax ? `Scenario B lowers total tax burden, but the after-tax result is not clearly better once deductions are included. It is useful mainly if your goal is tax efficiency, not maximum spendable income.` : `The primary setup remains stronger because Scenario B does not improve after-tax income or tax efficiency enough to justify switching assumptions.`}
+                />
               </div>
             ) : null}
           </>
@@ -158,6 +168,7 @@ export function TaxCalculator() {
     </div>
   );
 }
+
 
 
 

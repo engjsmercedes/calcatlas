@@ -1,0 +1,249 @@
+﻿"use client";
+
+import { useMemo, useState } from "react";
+
+import { decisionCalculatorConfigs } from "@/data/life-decision-config";
+import type { LifeDecisionCalculatorSlug } from "@/data/life-decision-config";
+import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculator-state";
+import { calculateDecisionOutcome } from "@/lib/calculators/life-decisions";
+import { formatNumber } from "@/lib/utils";
+import { RangeGauge } from "@/components/ui/range-gauge";
+import { ResultCard } from "@/components/ui/result-card";
+import { SelectField } from "@/components/ui/select-field";
+
+import {
+  CalculatorActions,
+  ComparisonControls,
+  DecisionSummaryPanel,
+  EmptyCalculatorState,
+  ExamplePresetList,
+  InsightPanel
+} from "./shared";
+
+function buildInitialState(slug: LifeDecisionCalculatorSlug) {
+  const config = decisionCalculatorConfigs[slug];
+  return config.presets[0]?.values ?? Object.fromEntries(config.factors.flatMap((factor) => [[`${factor.id}A`, ""], [`${factor.id}B`, ""], [`${factor.id}Weight`, "3"]]));
+}
+
+function buildKeys(slug: LifeDecisionCalculatorSlug) {
+  return decisionCalculatorConfigs[slug].factors.flatMap((factor) => [`${factor.id}A`, `${factor.id}B`, `${factor.id}Weight`]) as string[];
+}
+
+const scoreOptions = Array.from({ length: 11 }, (_, index) => `${index}`);
+const weightOptions = ["1", "2", "3", "4", "5"];
+
+function parseState(slug: LifeDecisionCalculatorSlug, state: Record<string, string>) {
+  const config = decisionCalculatorConfigs[slug];
+  const inputs = Object.fromEntries(
+    config.factors.map((factor) => {
+      const optionA = Number(state[`${factor.id}A`]);
+      const optionB = Number(state[`${factor.id}B`]);
+      const weight = Number(state[`${factor.id}Weight`]);
+
+      return [factor.id, { optionA, optionB, weight }];
+    })
+  );
+
+  if (Object.values(inputs).some((value) => !Number.isFinite(value.optionA) || !Number.isFinite(value.optionB) || !Number.isFinite(value.weight))) {
+    return undefined;
+  }
+
+  return inputs;
+}
+
+function gaugeSegments() {
+  return [
+    { label: "Low", max: 4, color: "#ef4444" },
+    { label: "Mixed", max: 7, color: "#f59e0b" },
+    { label: "Strong", max: 10, color: "#10b981" }
+  ];
+}
+
+export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorSlug }) {
+  const config = decisionCalculatorConfigs[slug];
+  const initialState = useMemo(() => buildInitialState(slug), [slug]);
+  const keys = useMemo(() => buildKeys(slug), [slug]);
+  const [comparisonEnabled, setComparisonEnabled] = useState(false);
+  const [comparisonState, setComparisonState] = useState<Record<string, string>>(initialState);
+  const { state, setState, hasActiveValues, copyShareLink, reset } = useShareableCalculatorState({ initialState, keys });
+
+  const result = useMemo(() => {
+    const parsed = parseState(slug, state);
+    return parsed ? calculateDecisionOutcome(config, parsed) : undefined;
+  }, [config, slug, state]);
+
+  const comparisonResult = useMemo(() => {
+    if (!comparisonEnabled) {
+      return undefined;
+    }
+
+    const parsed = parseState(slug, comparisonState);
+    return parsed ? calculateDecisionOutcome(config, parsed) : undefined;
+  }, [comparisonEnabled, comparisonState, config, slug]);
+
+  const recommendedPractical = result?.recommendation === "A" ? result.optionAPractical : result?.recommendation === "B" ? result.optionBPractical : Math.max(result?.optionAPractical ?? 0, result?.optionBPractical ?? 0);
+  const recommendedEmotional = result?.recommendation === "A" ? result.optionAEmotional : result?.recommendation === "B" ? result.optionBEmotional : Math.max(result?.optionAEmotional ?? 0, result?.optionBEmotional ?? 0);
+  const recommendedRisk = result?.recommendation === "A" ? result.optionARisk : result?.recommendation === "B" ? result.optionBRisk : Math.max(result?.optionARisk ?? 0, result?.optionBRisk ?? 0);
+
+  return (
+    <div className="space-y-8">
+      <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr]">
+        <div className="space-y-4">
+          <div className="surface p-6 md:p-8">
+            <div className="space-y-2">
+              <p className="section-label">Decision setup</p>
+              <p className="text-sm leading-7 text-muted">{config.prompt}</p>
+            </div>
+            <div className="mt-6 space-y-4">
+              {config.factors.map((factor) => (
+                <div key={factor.id} className="rounded-3xl border border-border bg-slate-50/70 p-4 dark:bg-slate-950/30">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-950 dark:text-white">{factor.label}</p>
+                      <p className="mt-1 text-sm leading-6 text-muted">{factor.description}</p>
+                    </div>
+                    <span className="rounded-full border border-border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
+                      {factor.dimension}
+                    </span>
+                  </div>
+                  <div className="mt-4 grid gap-4 md:grid-cols-3">
+                    <SelectField label={config.optionALabel} hint="0-10" value={state[`${factor.id}A`]} onChange={(event) => setState((current) => ({ ...current, [`${factor.id}A`]: event.target.value }))}>
+                      <option value="">Score</option>
+                      {scoreOptions.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </SelectField>
+                    <SelectField label={config.optionBLabel} hint="0-10" value={state[`${factor.id}B`]} onChange={(event) => setState((current) => ({ ...current, [`${factor.id}B`]: event.target.value }))}>
+                      <option value="">Score</option>
+                      {scoreOptions.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </SelectField>
+                    <SelectField label="Importance" hint="1-5" value={state[`${factor.id}Weight`]} onChange={(event) => setState((current) => ({ ...current, [`${factor.id}Weight`]: event.target.value }))}>
+                      <option value="">Weight</option>
+                      {weightOptions.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </SelectField>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6">
+              <CalculatorActions onReset={reset} onShare={copyShareLink} hasActiveValues={hasActiveValues} />
+            </div>
+          </div>
+          <ExamplePresetList
+            title="Try an example"
+            body="Load a preset, then adjust the factor scores until the scenario matches your real decision."
+            items={config.presets.map((preset) => ({ label: preset.label, description: preset.description, onApply: () => setState(preset.values) }))}
+          />
+          <ComparisonControls
+            enabled={comparisonEnabled}
+            onEnable={() => {
+              setComparisonEnabled(true);
+              setComparisonState(state);
+            }}
+            onDisable={() => setComparisonEnabled(false)}
+            onCopyCurrent={() => setComparisonState(state)}
+            title="Compare a second scenario"
+            body="Use this to test a different timing assumption, stronger support, more runway, or any other alternate version of the same decision."
+          />
+          {comparisonEnabled ? (
+            <div className="surface p-6 md:p-8">
+              <div className="space-y-4">
+                {config.factors.map((factor) => (
+                  <div key={factor.id} className="grid gap-4 md:grid-cols-3">
+                    <SelectField label={`${config.optionALabel} (B)`} hint={factor.label} value={comparisonState[`${factor.id}A`]} onChange={(event) => setComparisonState((current) => ({ ...current, [`${factor.id}A`]: event.target.value }))}>
+                      <option value="">Score</option>
+                      {scoreOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+                    </SelectField>
+                    <SelectField label={`${config.optionBLabel} (B)`} hint={factor.label} value={comparisonState[`${factor.id}B`]} onChange={(event) => setComparisonState((current) => ({ ...current, [`${factor.id}B`]: event.target.value }))}>
+                      <option value="">Score</option>
+                      {scoreOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+                    </SelectField>
+                    <SelectField label="Importance (B)" hint={factor.label} value={comparisonState[`${factor.id}Weight`]} onChange={(event) => setComparisonState((current) => ({ ...current, [`${factor.id}Weight`]: event.target.value }))}>
+                      <option value="">Weight</option>
+                      {weightOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+                    </SelectField>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </div>
+        <div className="space-y-4">
+          {!result ? (
+            <EmptyCalculatorState title={config.emptyStateTitle} body={config.emptyStateBody} />
+          ) : (
+            <>
+              <div className="surface space-y-4 p-6 md:p-8">
+                <div>
+                  <p className="section-label">Recommendation</p>
+                  <h3 className="mt-4 text-3xl font-semibold">{result.verdictLabel}</h3>
+                  <p className="mt-2 text-sm leading-7">{result.confidenceLabel}. The weighted score gap is {formatNumber(Math.abs(result.gap), 2)} points on a 10-point scale.</p>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <ResultCard label={config.optionALabel} value={formatNumber(result.optionAScore, 2)} tone={result.recommendation === "A" ? "success" : "default"} />
+                  <ResultCard label={config.optionBLabel} value={formatNumber(result.optionBScore, 2)} tone={result.recommendation === "B" ? "success" : "default"} />
+                  <ResultCard label="Decision direction" value={result.recommendation === "tie" ? "Close call" : result.recommendedLabel} tone={result.recommendation === "tie" ? "warning" : result.verdictTone === "caution" ? "warning" : "success"} />
+                  <ResultCard label="Risk posture" value={recommendedRisk !== undefined ? formatNumber(recommendedRisk, 2) : "-"} tone={(recommendedRisk ?? 0) >= 6 ? "success" : "warning"} />
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-3">
+                <RangeGauge value={recommendedPractical ?? 0} min={0} max={10} title="Practical score" centerLabel={formatNumber(recommendedPractical ?? 0, 1)} unitLabel="0 to 10" segments={gaugeSegments()} />
+                <RangeGauge value={recommendedEmotional ?? 0} min={0} max={10} title="Emotional score" centerLabel={formatNumber(recommendedEmotional ?? 0, 1)} unitLabel="0 to 10" segments={gaugeSegments()} />
+                <RangeGauge value={recommendedRisk ?? 0} min={0} max={10} title="Risk score" centerLabel={formatNumber(recommendedRisk ?? 0, 1)} unitLabel="0 to 10" segments={gaugeSegments()} />
+              </div>
+              <InsightPanel title="Useful context" body={config.insight} />
+              <div className="surface p-6 md:p-8">
+                <p className="section-label">What is driving the result</p>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-950 dark:text-white">Strongest signals</p>
+                    <ul className="mt-3 space-y-2 text-sm leading-7 text-muted">
+                      {result.strongestFactors.length ? result.strongestFactors.map((factor) => <li key={factor}>{factor}</li>) : <li>No factor stands out yet.</li>}
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-950 dark:text-white">Caution flags</p>
+                    <ul className="mt-3 space-y-2 text-sm leading-7 text-muted">
+                      {result.cautionFactors.length ? result.cautionFactors.map((factor) => <li key={factor}>{factor}</li>) : <li>No major risk factors are scoring low in the recommended path.</li>}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div className="surface p-6 md:p-8">
+                <p className="section-label">Before you act</p>
+                <p className="mt-4 text-sm leading-7 text-muted">{config.caution}</p>
+              </div>
+              {comparisonEnabled && comparisonResult ? (
+                <div className="surface space-y-4 p-6 md:p-8">
+                  <div>
+                    <p className="section-label">Comparison summary</p>
+                    <h3 className="mt-4 text-2xl font-semibold">Scenario B versus the current setup</h3>
+                    <p className="mt-2 text-sm leading-7">Scenario B changes the weighted gap by {formatNumber(Math.abs(comparisonResult.gap) - Math.abs(result.gap), 2)} and {comparisonResult.recommendation === result.recommendation ? "keeps the recommendation pointed the same way" : "changes the recommendation itself"}.</p>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <ResultCard label="Scenario B recommendation" value={comparisonResult.recommendation === "tie" ? "Close call" : comparisonResult.recommendedLabel} tone={comparisonResult.recommendation === result.recommendation ? "default" : "success"} />
+                    <ResultCard label="Scenario B confidence" value={comparisonResult.confidenceLabel} />
+                    <ResultCard label="Scenario B option A" value={formatNumber(comparisonResult.optionAScore, 2)} />
+                    <ResultCard label="Scenario B option B" value={formatNumber(comparisonResult.optionBScore, 2)} />
+                  </div>
+                  <DecisionSummaryPanel
+                    calculator={config.title}
+                    body={comparisonResult.recommendation === result.recommendation ? `Scenario B does not overturn the direction of the decision, which suggests the same core factors are still driving the outcome. Focus on the low-scoring risk factors before acting.` : `Scenario B flips the direction of the result, which means one or two assumptions are carrying the whole decision. Revisit the most heavily weighted factors before treating either answer as final.`}
+                    verdict={{ label: comparisonResult.verdictLabel, tone: comparisonResult.verdictTone }}
+                    highlights={comparisonResult.strongestFactors}
+                    exportTitle={`${config.title} comparison`}
+                  />
+                </div>
+              ) : null}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
