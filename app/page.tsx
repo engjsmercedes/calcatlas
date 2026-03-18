@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { AdSlotPlaceholder } from "@/components/ad-slot-placeholder";
 import { CalculatorCard } from "@/components/calculator-card";
 import { HomeSearch } from "@/components/home/home-search";
 import { RecentlyUsed } from "@/components/home/recently-used";
@@ -86,6 +87,9 @@ export default function HomePage() {
         </div>
       </section>
       <section className="page-shell pb-8 md:pb-12">
+        <AdSlotPlaceholder label="Homepage ad slot" format="Leaderboard or responsive display" />
+      </section>
+      <section className="page-shell pb-8 md:pb-12">
         <div className="surface p-6 md:p-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="space-y-2">
@@ -115,6 +119,9 @@ export default function HomePage() {
           </div>
         </div>
         <RecentlyUsed />
+      </section>
+      <section className="page-shell pb-8 md:pb-12">
+        <AdSlotPlaceholder label="Mid-page ad slot" format="In-content responsive display" />
       </section>
       <section id="categories" className="page-shell pb-16 md:pb-24">
         <div className="mb-8 space-y-3">

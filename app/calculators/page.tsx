@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { AdSlotPlaceholder } from "@/components/ad-slot-placeholder";
 import { CalculatorCard } from "@/components/calculator-card";
 import { StructuredData } from "@/components/structured-data";
 import { calculatorCategoryDetails, calculators } from "@/data/calculators";
@@ -56,6 +57,9 @@ export default function CalculatorsPage() {
             ))}
           </div>
         </div>
+      </section>
+      <section className="page-shell pb-8 md:pb-12">
+        <AdSlotPlaceholder label="Index ad slot" format="Responsive display or leaderboard" />
       </section>
       <section className="page-shell pb-8 md:pb-12">
         <div className="surface p-6 md:p-8">

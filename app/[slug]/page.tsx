@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AdSlotPlaceholder } from "@/components/ad-slot-placeholder";
 import { CalculatorEmbedCard } from "@/components/calculator-embed-card";
 import { CalculatorRenderer } from "@/components/calculators/calculator-renderer";
 import { CalculatorFeedback } from "@/components/calculator-feedback";
@@ -70,6 +71,7 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
             </Suspense>
           </section>
           <CalculatorEmbedCard calculator={calculator} />
+          <AdSlotPlaceholder label="Calculator ad slot" format="Responsive in-content unit" />
           <section aria-labelledby="about-calculator" className="space-y-4">
             <div className="space-y-2">
               <span className="section-label">About the calculator</span>
@@ -143,6 +145,9 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
             </div>
           </section>
         </div>
+      </section>
+      <section className="page-shell pb-10 md:pb-14">
+        <AdSlotPlaceholder label="Calculator lower ad slot" format="Rectangle or responsive display" />
       </section>
       {guidance ? (
         <section className="page-shell pb-10 md:pb-14">
