@@ -1,4 +1,11 @@
-import { calculators, type CalculatorSlug } from "@/data/calculators";
+import {
+  calculatorCategoryDetails,
+  calculators,
+  calculatorMap,
+  getRelatedCalculators,
+  type CalculatorDefinition,
+  type CalculatorSlug
+} from "@/data/calculators";
 import { subtopicHubs } from "@/data/subtopic-hubs";
 
 export interface CalculatorGuideIntent {
@@ -95,69 +102,181 @@ export const calculatorGuideIntents: CalculatorGuideIntent[] = [
   }
 ];
 
-export function findCalculatorGuideIntent(input: string) {
-  const normalized = input.trim().toLowerCase();
-  if (!normalized) {
-    return null;
+const stopWords = new Set([
+  "a",
+  "an",
+  "and",
+  "are",
+  "at",
+  "be",
+  "by",
+  "for",
+  "from",
+  "get",
+  "help",
+  "how",
+  "i",
+  "im",
+  "i'm",
+  "in",
+  "is",
+  "it",
+  "me",
+  "my",
+  "of",
+  "on",
+  "or",
+  "the",
+  "this",
+  "to",
+  "want",
+  "with"
+]);
+
+function normalizeText(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function tokenize(value: string) {
+  return normalizeText(value)
+    .split(" ")
+    .filter((token) => token.length > 2 && !stopWords.has(token));
+}
+
+function phraseScore(query: string, text: string, weight: number) {
+  if (!query || !text) {
+    return 0;
   }
 
+  return text.includes(query) ? weight : 0;
+}
+
+function tokenScore(tokens: string[], text: string, weight: number) {
+  if (tokens.length === 0 || !text) {
+    return 0;
+  }
+
+  return tokens.reduce((sum, token) => sum + (text.includes(token) ? weight : 0), 0);
+}
+
+function scoreIntent(query: string, tokens: string[], intent: CalculatorGuideIntent) {
+  const keywordText = normalizeText(intent.keywords.join(" "));
+  return phraseScore(query, keywordText, 8) + tokenScore(tokens, keywordText, 4);
+}
+
+function scoreCalculator(query: string, tokens: string[], calculator: CalculatorDefinition) {
+  const title = normalizeText(calculator.title);
+  const shortDescription = normalizeText(calculator.shortDescription);
+  const searchTerms = normalizeText(calculator.searchTerms.join(" "));
+  const examples = normalizeText(calculator.examples.map((example) => `${example.title} ${example.description} ${example.outcome}`).join(" "));
+  const detail = normalizeText(`${calculator.intro} ${calculator.detail}`);
+  const features = normalizeText(calculator.features.join(" "));
+  const category = normalizeText(calculator.category);
+
+  return (
+    phraseScore(query, title, 14) +
+    tokenScore(tokens, title, 6) +
+    phraseScore(query, searchTerms, 12) +
+    tokenScore(tokens, searchTerms, 5) +
+    phraseScore(query, shortDescription, 8) +
+    tokenScore(tokens, shortDescription, 3) +
+    tokenScore(tokens, examples, 2) +
+    tokenScore(tokens, detail, 1) +
+    tokenScore(tokens, features, 1) +
+    tokenScore(tokens, category, 1)
+  );
+}
+
+function getIntentMatch(query: string, tokens: string[]) {
   let bestIntent: CalculatorGuideIntent | null = null;
   let bestScore = 0;
 
   for (const intent of calculatorGuideIntents) {
-    const score = intent.keywords.reduce((sum, keyword) => sum + (normalized.includes(keyword) ? 1 : 0), 0);
+    const score = scoreIntent(query, tokens, intent);
     if (score > bestScore) {
       bestIntent = intent;
       bestScore = score;
     }
   }
 
-  return bestScore > 0 ? bestIntent : null;
+  return bestScore >= 4 ? bestIntent : null;
+}
+
+function getHubScore(query: string, tokens: string[], slugSet: Set<CalculatorSlug>) {
+  return subtopicHubs
+    .map((hub) => {
+      const matchedCount = hub.slugs.filter((slug) => slugSet.has(slug)).length;
+      const hubText = normalizeText(`${hub.title} ${hub.shortDescription} ${hub.intro} ${hub.guide} ${hub.searchTerms.join(" ")}`);
+      const score = matchedCount * 5 + phraseScore(query, hubText, 5) + tokenScore(tokens, hubText, 2);
+      return { hub, score };
+    })
+    .sort((a, b) => b.score - a.score)[0];
+}
+
+function uniqueCalculators(items: CalculatorDefinition[]) {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (seen.has(item.slug)) {
+      return false;
+    }
+    seen.add(item.slug);
+    return true;
+  });
 }
 
 export function buildCalculatorGuideResult(input: string) {
-  const intent = findCalculatorGuideIntent(input);
-  const normalized = input.trim().toLowerCase();
+  const query = normalizeText(input);
+  const tokens = tokenize(input);
+  const matchedIntent = getIntentMatch(query, tokens);
 
-  if (intent) {
-    const recommendedCalculators = intent.calculatorSlugs
-      .map((slug) => calculators.find((calculator) => calculator.slug === slug))
-      .filter((calculator): calculator is typeof calculators[number] => Boolean(calculator));
-    const hub = intent.hubSlug ? subtopicHubs.find((item) => item.slug === intent.hubSlug) : null;
+  const scored = calculators
+    .map((calculator) => ({ calculator, score: scoreCalculator(query, tokens, calculator) }))
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score);
 
-    return {
-      title: intent.title,
-      summary: intent.fallbackSummary,
-      followUp: intent.followUp,
-      recommendedCalculators,
-      recommendedHub: hub ?? null,
-      promptExamples: intent.promptExamples,
-      intentId: intent.id
-    };
-  }
+  const topDirect = scored.slice(0, 4).map((item) => item.calculator);
 
-  const recommendedCalculators = calculators
-    .filter((calculator) =>
-      [calculator.title, calculator.shortDescription, calculator.category, ...calculator.searchTerms]
-        .join(" ")
-        .toLowerCase()
-        .includes(normalized)
-    )
-    .slice(0, 4);
+  const intentCalculators = matchedIntent
+    ? matchedIntent.calculatorSlugs
+        .map((slug) => calculatorMap[slug])
+        .filter((calculator): calculator is CalculatorDefinition => Boolean(calculator))
+    : [];
+
+  const relatedCalculators = uniqueCalculators(
+    [...intentCalculators, ...topDirect]
+      .slice(0, 3)
+      .flatMap((calculator) => getRelatedCalculators(calculator.related).slice(0, 2))
+  );
+
+  const recommendedCalculators = uniqueCalculators([...intentCalculators, ...topDirect, ...relatedCalculators]).slice(0, 5);
+  const slugSet = new Set(recommendedCalculators.map((calculator) => calculator.slug));
+  const bestHub = matchedIntent?.hubSlug
+    ? subtopicHubs.find((hub) => hub.slug === matchedIntent.hubSlug) ?? null
+    : getHubScore(query, tokens, slugSet)?.score ? getHubScore(query, tokens, slugSet).hub : null;
+
+  const leadCalculator = recommendedCalculators[0] ?? null;
+  const title = matchedIntent?.title || leadCalculator?.title || "Suggested calculators";
+  const summary = matchedIntent?.fallbackSummary ||
+    (leadCalculator
+      ? `${leadCalculator.title} looks like the closest match, and the related tools below cover the next decisions people usually make after that first calculation.`
+      : "Describe the real decision in plain language and Calc Atlas will route you into the right calculators and related tools.");
+
+  const followUp = matchedIntent?.followUp ||
+    (leadCalculator
+      ? `Start with ${leadCalculator.title}, then use the related calculators to pressure-test the scenario from a second angle.`
+      : "Examples: I am buying a home, I want to pay off debt, I am comparing job offers, I want to grow my savings, or I need to convert units.");
+
+  const promptExamples = matchedIntent?.promptExamples || calculatorGuideIntents.flatMap((intent) => intent.promptExamples).slice(0, 6);
+  const categoryDetail = leadCalculator ? calculatorCategoryDetails[leadCalculator.category] : null;
 
   return {
-    title: "Suggested calculators",
-    summary:
-      recommendedCalculators.length > 0
-        ? "Here are the calculators that look closest to your request. Start with the best match, then use the related tools if the decision branches into budgeting, payoff, or planning."
-        : "I could not match that cleanly to one path yet. Try describing the decision in plain language, such as buying a home, paying off debt, comparing job offers, or losing weight.",
-    followUp:
-      recommendedCalculators.length > 0
-        ? "If none of these are quite right, try being more specific about the decision instead of the formula."
-        : "Examples: I am buying a home, I want to pay off debt, I am comparing job offers, or I want to grow my savings.",
+    title,
+    summary,
+    followUp,
     recommendedCalculators,
-    recommendedHub: null,
-    promptExamples: calculatorGuideIntents.flatMap((intent) => intent.promptExamples).slice(0, 4),
-    intentId: null
+    recommendedHub: bestHub,
+    promptExamples,
+    intentId: matchedIntent?.id ?? null,
+    leadCategory: categoryDetail ?? null
   };
 }
