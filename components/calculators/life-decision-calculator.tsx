@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo, useState } from "react";
 
@@ -59,6 +59,30 @@ function gaugeSegments() {
   ];
 }
 
+function getSupportBand(score: number) {
+  if (score >= 7) {
+    return { label: "Strong support", description: "The weighted factors support this path clearly." };
+  }
+
+  if (score >= 4) {
+    return { label: "Mixed case", description: "This path has meaningful tradeoffs or unresolved pressure points." };
+  }
+
+  return { label: "Weak support", description: "The weighted factors do not support this path well right now." };
+}
+
+function getRiskBand(score: number) {
+  if (score >= 7) {
+    return { label: "Stable enough", description: "The recommended path looks resilient against the main risks you scored." };
+  }
+
+  if (score >= 4) {
+    return { label: "Some exposure", description: "The path can work, but there are still real risk flags to manage." };
+  }
+
+  return { label: "High fragility", description: "The recommended path looks exposed to downside or weak support." };
+}
+
 export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorSlug }) {
   const config = decisionCalculatorConfigs[slug];
   const initialState = useMemo(() => buildInitialState(slug), [slug]);
@@ -84,6 +108,12 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
   const recommendedPractical = result?.recommendation === "A" ? result.optionAPractical : result?.recommendation === "B" ? result.optionBPractical : Math.max(result?.optionAPractical ?? 0, result?.optionBPractical ?? 0);
   const recommendedEmotional = result?.recommendation === "A" ? result.optionAEmotional : result?.recommendation === "B" ? result.optionBEmotional : Math.max(result?.optionAEmotional ?? 0, result?.optionBEmotional ?? 0);
   const recommendedRisk = result?.recommendation === "A" ? result.optionARisk : result?.recommendation === "B" ? result.optionBRisk : Math.max(result?.optionARisk ?? 0, result?.optionBRisk ?? 0);
+
+  const optionASupport = result ? getSupportBand(result.optionAScore) : undefined;
+  const optionBSupport = result ? getSupportBand(result.optionBScore) : undefined;
+  const practicalSupport = getSupportBand(recommendedPractical ?? 0);
+  const emotionalSupport = getSupportBand(recommendedEmotional ?? 0);
+  const riskSupport = getRiskBand(recommendedRisk ?? 0);
 
   return (
     <div className="space-y-8">
@@ -182,18 +212,19 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
                   <p className="section-label">Recommendation</p>
                   <h3 className="mt-4 text-3xl font-semibold">{result.verdictLabel}</h3>
                   <p className="mt-2 text-sm leading-7">{result.confidenceLabel}. The weighted score gap is {formatNumber(Math.abs(result.gap), 2)} points on a 10-point scale.</p>
+                  <p className="mt-2 text-sm leading-7 text-muted">Scores closer to 10 mean the option is better supported by the factors you weighted most heavily. Scores near the middle mean the case is mixed, and lower scores mean the case is weak.</p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <ResultCard label={config.optionALabel} value={formatNumber(result.optionAScore, 2)} tone={result.recommendation === "A" ? "success" : "default"} />
-                  <ResultCard label={config.optionBLabel} value={formatNumber(result.optionBScore, 2)} tone={result.recommendation === "B" ? "success" : "default"} />
-                  <ResultCard label="Decision direction" value={result.recommendation === "tie" ? "Close call" : result.recommendedLabel} tone={result.recommendation === "tie" ? "warning" : result.verdictTone === "caution" ? "warning" : "success"} />
-                  <ResultCard label="Risk posture" value={recommendedRisk !== undefined ? formatNumber(recommendedRisk, 2) : "-"} tone={(recommendedRisk ?? 0) >= 6 ? "success" : "warning"} />
+                  <ResultCard label={config.optionALabel} value={formatNumber(result.optionAScore, 2)} tone={result.recommendation === "A" ? "success" : "default"} caption={`${optionASupport?.label}: ${optionASupport?.description}`} />
+                  <ResultCard label={config.optionBLabel} value={formatNumber(result.optionBScore, 2)} tone={result.recommendation === "B" ? "success" : "default"} caption={`${optionBSupport?.label}: ${optionBSupport?.description}`} />
+                  <ResultCard label="Decision direction" value={result.recommendation === "tie" ? "Close call" : result.recommendedLabel} tone={result.recommendation === "tie" ? "warning" : result.verdictTone === "caution" ? "warning" : "success"} caption={result.recommendation === "tie" ? "The weighted case is close enough that the result should be treated as unresolved." : "This is the path with the stronger weighted support overall."} />
+                  <ResultCard label="Risk resilience" value={recommendedRisk !== undefined ? formatNumber(recommendedRisk, 2) : "-"} tone={(recommendedRisk ?? 0) >= 6 ? "success" : "warning"} caption={`${riskSupport.label}: Higher scores mean the recommended path looks safer and more sustainable.`} />
                 </div>
               </div>
               <div className="grid gap-4 md:grid-cols-3">
-                <RangeGauge value={recommendedPractical ?? 0} min={0} max={10} title="Practical score" centerLabel={formatNumber(recommendedPractical ?? 0, 1)} unitLabel="0 to 10" segments={gaugeSegments()} />
-                <RangeGauge value={recommendedEmotional ?? 0} min={0} max={10} title="Emotional score" centerLabel={formatNumber(recommendedEmotional ?? 0, 1)} unitLabel="0 to 10" segments={gaugeSegments()} />
-                <RangeGauge value={recommendedRisk ?? 0} min={0} max={10} title="Risk score" centerLabel={formatNumber(recommendedRisk ?? 0, 1)} unitLabel="0 to 10" segments={gaugeSegments()} />
+                <RangeGauge value={recommendedPractical ?? 0} min={0} max={10} title="Practical support" centerLabel={formatNumber(recommendedPractical ?? 0, 1)} unitLabel={`${practicalSupport.label} on a 0 to 10 scale`} segments={gaugeSegments()} />
+                <RangeGauge value={recommendedEmotional ?? 0} min={0} max={10} title="Emotional support" centerLabel={formatNumber(recommendedEmotional ?? 0, 1)} unitLabel={`${emotionalSupport.label} on a 0 to 10 scale`} segments={gaugeSegments()} />
+                <RangeGauge value={recommendedRisk ?? 0} min={0} max={10} title="Risk resilience" centerLabel={formatNumber(recommendedRisk ?? 0, 1)} unitLabel={`${riskSupport.label} on a 0 to 10 scale`} segments={gaugeSegments()} />
               </div>
               <InsightPanel title="Useful context" body={config.insight} />
               <div className="surface p-6 md:p-8">
@@ -225,10 +256,10 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
                     <p className="mt-2 text-sm leading-7">Scenario B changes the weighted gap by {formatNumber(Math.abs(comparisonResult.gap) - Math.abs(result.gap), 2)} and {comparisonResult.recommendation === result.recommendation ? "keeps the recommendation pointed the same way" : "changes the recommendation itself"}.</p>
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
-                    <ResultCard label="Scenario B recommendation" value={comparisonResult.recommendation === "tie" ? "Close call" : comparisonResult.recommendedLabel} tone={comparisonResult.recommendation === result.recommendation ? "default" : "success"} />
-                    <ResultCard label="Scenario B confidence" value={comparisonResult.confidenceLabel} />
-                    <ResultCard label="Scenario B option A" value={formatNumber(comparisonResult.optionAScore, 2)} />
-                    <ResultCard label="Scenario B option B" value={formatNumber(comparisonResult.optionBScore, 2)} />
+                    <ResultCard label="Scenario B recommendation" value={comparisonResult.recommendation === "tie" ? "Close call" : comparisonResult.recommendedLabel} tone={comparisonResult.recommendation === result.recommendation ? "default" : "success"} caption="This is the direction the alternate scenario points once the weights are recomputed." />
+                    <ResultCard label="Scenario B confidence" value={comparisonResult.confidenceLabel} caption="Higher confidence means the gap between the two options is wider." />
+                    <ResultCard label="Scenario B option A" value={formatNumber(comparisonResult.optionAScore, 2)} caption={getSupportBand(comparisonResult.optionAScore).label} />
+                    <ResultCard label="Scenario B option B" value={formatNumber(comparisonResult.optionBScore, 2)} caption={getSupportBand(comparisonResult.optionBScore).label} />
                   </div>
                   <DecisionSummaryPanel
                     calculator={config.title}
@@ -246,4 +277,3 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
     </div>
   );
 }
-

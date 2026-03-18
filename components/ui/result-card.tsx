@@ -4,11 +4,13 @@ import { cn } from "@/lib/utils";
 export function ResultCard({
   label,
   value,
-  tone = "default"
+  tone = "default",
+  caption
 }: {
   label: string;
   value: string;
   tone?: "default" | "success" | "warning";
+  caption?: string;
 }) {
   const { showResults } = useEmbedOptions();
 
@@ -27,6 +29,7 @@ export function ResultCard({
     >
       <p className="text-xs font-semibold uppercase tracking-[0.18em]">{label}</p>
       <p className="mt-3 text-2xl font-semibold text-slate-950 dark:text-white">{value}</p>
+      {caption ? <p className="mt-2 text-sm leading-6 text-muted">{caption}</p> : null}
     </div>
   );
 }
