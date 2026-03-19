@@ -52,12 +52,16 @@ export function RangeGauge({
                 return (
                   <div
                     key={segment.label}
-                    aria-hidden="true"
+                    className="flex items-center justify-center overflow-hidden px-1 text-center"
                     style={{
                       width: `${width}%`,
                       backgroundColor: segment.color
                     }}
-                  />
+                  >
+                    <span className="truncate text-[11px] font-semibold leading-none tracking-tight text-white sm:text-xs">
+                      {segment.displayLabel ?? segment.label}
+                    </span>
+                  </div>
                 );
               })}
             </div>
