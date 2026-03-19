@@ -80,10 +80,13 @@ export function calculateDecisionOutcome(
   const optionBScore = average(overall, "optionB");
   const gap = optionAScore - optionBScore;
   const recommendation = gap > 0.2 ? "A" : gap < -0.2 ? "B" : "tie";
-  const recommendedLabel = recommendation === "A" ? config.optionALabel : recommendation === "B" ? config.optionBLabel : "Close call";
+  const shortOptionALabel = config.shortOptionALabel ?? config.optionALabel;
+  const shortOptionBLabel = config.shortOptionBLabel ?? config.optionBLabel;
+  const tieLabel = config.tieLabel ?? "Close call";
+  const recommendedLabel = recommendation === "A" ? shortOptionALabel : recommendation === "B" ? shortOptionBLabel : tieLabel;
   const absoluteGap = Math.abs(gap);
   const confidenceLabel = absoluteGap >= 1.25 ? "High confidence" : absoluteGap >= 0.6 ? "Moderate confidence" : "Low confidence";
-  const verdictLabel = recommendation === "tie" ? "Close call" : `${recommendedLabel} leads`;
+  const verdictLabel = recommendedLabel;
   const strongestFactors = config.factors
     .map((factor) => {
       const input = inputs[factor.id];
@@ -131,4 +134,5 @@ export function calculateDecisionOutcome(
     cautionFactors
   };
 }
+
 

@@ -37,6 +37,9 @@ export interface DecisionCalculatorConfig {
   optionBLabel: string;
   optionAHint: string;
   optionBHint: string;
+  shortOptionALabel?: string;
+  shortOptionBLabel?: string;
+  tieLabel?: string;
   prompt: string;
   emptyStateTitle: string;
   emptyStateBody: string;
@@ -72,6 +75,9 @@ const configs = {
     optionBLabel: "Stay for now",
     optionAHint: "Rate how well quitting serves each factor.",
     optionBHint: "Rate how well staying serves each factor.",
+    shortOptionALabel: "Quit",
+    shortOptionBLabel: "Stay",
+    tieLabel: "Not sure",
     prompt: "Score leaving versus staying across money, growth, burnout, and risk.",
     emptyStateTitle: "Build the job decision",
     emptyStateBody: "Set factor scores for quitting versus staying to see which path is stronger overall.",
@@ -404,6 +410,7 @@ export const lifeDecisionCalculators: CalculatorDefinition[] = lifeDecisionCalcu
     related: config.related
   };
 });
+
 
 
 
