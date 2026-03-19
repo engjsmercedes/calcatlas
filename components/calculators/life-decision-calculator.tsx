@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo, useState } from "react";
 
@@ -10,7 +10,7 @@ import { decisionCalculatorConfigs } from "@/data/life-decision-config";
 import type { LifeDecisionCalculatorSlug } from "@/data/life-decision-config";
 import { calculateDecisionOutcome } from "@/lib/calculators/life-decisions";
 import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculator-state";
-import { formatNumber } from "@/lib/utils";
+import { cn, formatNumber } from "@/lib/utils";
 
 import {
   CalculatorActions,
@@ -23,7 +23,7 @@ import {
 
 function buildInitialState(slug: LifeDecisionCalculatorSlug) {
   const config = decisionCalculatorConfigs[slug];
-  return config.presets[0]?.values ?? Object.fromEntries(config.factors.flatMap((factor) => [[`${factor.id}A`, ""], [`${factor.id}B`, ""], [`${factor.id}Weight`, "3"]]));
+  return config.presets[0]?.values ?? Object.fromEntries(config.factors.flatMap((factor) => [[`${factor.id}A`, ""], [`${factor.id}B`, ""], [`${factor.id}Weight`, defaultWeightForDimension(factor.dimension)]]));
 }
 
 function buildKeys(slug: LifeDecisionCalculatorSlug) {
@@ -37,6 +37,14 @@ const guidedWeightOptions = [
   { value: "4", label: "Very important" },
   { value: "5", label: "Critical" }
 ];
+
+function defaultWeightForDimension(dimension: string) {
+  if (dimension === "risk") {
+    return "5";
+  }
+
+  return "4";
+}
 
 function parseState(slug: LifeDecisionCalculatorSlug, state: Record<string, string>) {
   const config = decisionCalculatorConfigs[slug];
@@ -84,50 +92,101 @@ function getRiskBand(score: number) {
   return { label: "High fragility", description: "The recommended path looks exposed to downside or weak support." };
 }
 
-function guidedBalanceToScores(value: string) {
-  switch (value) {
-    case "strongA":
-      return { a: "9", b: "2" };
-    case "leanA":
-      return { a: "7", b: "4" };
-    case "leanB":
-      return { a: "4", b: "7" };
-    case "strongB":
-      return { a: "2", b: "9" };
-    case "even":
-      return { a: "5", b: "5" };
-    default:
-      return { a: "", b: "" };
+function answerToScores(answer: "a" | "tie" | "b") {
+  if (answer === "a") {
+    return { a: "8", b: "3" };
   }
+  if (answer === "b") {
+    return { a: "3", b: "8" };
+  }
+  return { a: "5", b: "5" };
 }
 
-function scoresToGuidedBalance(a: string, b: string) {
+function scoresToAnswer(a: string, b: string) {
   const left = Number(a);
   const right = Number(b);
   if (!Number.isFinite(left) || !Number.isFinite(right)) {
     return "";
   }
-  if (left >= 8.5 && right <= 2.5) {
-    return "strongA";
-  }
   if (left >= 6.5 && right <= 4.5) {
-    return "leanA";
-  }
-  if (right >= 8.5 && left <= 2.5) {
-    return "strongB";
+    return "a";
   }
   if (right >= 6.5 && left <= 4.5) {
-    return "leanB";
+    return "b";
   }
-  return "even";
+  return "tie";
 }
 
-function getStepQuestion(optionALabel: string, optionBLabel: string, factorLabel: string) {
-  return `For ${factorLabel.toLowerCase()}, which option feels stronger right now?`;
+function getShortLabels(slug: LifeDecisionCalculatorSlug) {
+  const config = decisionCalculatorConfigs[slug];
+  return {
+    a: config.shortOptionALabel ?? config.optionALabel,
+    b: config.shortOptionBLabel ?? config.optionBLabel,
+    tie: config.tieLabel ?? "Not sure"
+  };
 }
 
-function getStepHint(optionALabel: string, optionBLabel: string) {
-  return `${optionALabel} vs ${optionBLabel}`;
+function getQuestionText(slug: LifeDecisionCalculatorSlug, factorLabel: string) {
+  switch (slug) {
+    case "quit-job-calculator":
+      return `For ${factorLabel.toLowerCase()}, which answer is closer to your real situation right now?`;
+    case "move-calculator":
+      return `For ${factorLabel.toLowerCase()}, what does this decision point to right now?`;
+    case "get-married-calculator":
+      return `For ${factorLabel.toLowerCase()}, what does this relationship decision point to right now?`;
+    case "have-kids-calculator":
+      return `For ${factorLabel.toLowerCase()}, what does your timing decision point to right now?`;
+    case "buy-a-house-readiness-calculator":
+      return `For ${factorLabel.toLowerCase()}, what does your readiness point to right now?`;
+    case "start-a-business-calculator":
+      return `For ${factorLabel.toLowerCase()}, what does this business decision point to right now?`;
+    case "go-back-to-school-calculator":
+      return `For ${factorLabel.toLowerCase()}, what does the school decision point to right now?`;
+    case "job-offer-calculator":
+      return `For ${factorLabel.toLowerCase()}, what does this job choice point to right now?`;
+    case "break-up-calculator":
+      return `For ${factorLabel.toLowerCase()}, what does this relationship point to right now?`;
+    case "retire-early-calculator":
+      return `For ${factorLabel.toLowerCase()}, what does your retirement decision point to right now?`;
+    default:
+      return `For ${factorLabel.toLowerCase()}, which answer fits best right now?`;
+  }
+}
+
+function getGuidedChoiceCopy(slug: LifeDecisionCalculatorSlug) {
+  const config = decisionCalculatorConfigs[slug];
+  const labels = getShortLabels(slug);
+
+  const neutralDescriptions: Record<LifeDecisionCalculatorSlug, string> = {
+    "quit-job-calculator": "This factor is mixed or you need more clarity before deciding.",
+    "move-calculator": "This factor is too close to call or needs more clarity.",
+    "get-married-calculator": "This factor feels promising but not clear enough yet.",
+    "have-kids-calculator": "This factor is mixed enough that the timing still feels open.",
+    "buy-a-house-readiness-calculator": "This factor does not clearly support buying or waiting yet.",
+    "start-a-business-calculator": "This factor is mixed enough that more clarity may still be needed.",
+    "go-back-to-school-calculator": "This factor is still mixed or unresolved.",
+    "job-offer-calculator": "This factor does not clearly favor either path yet.",
+    "break-up-calculator": "This factor still feels unresolved or hard to call.",
+    "retire-early-calculator": "This factor is still mixed enough that the call is not clear yet."
+  };
+
+  return [
+    {
+      key: "a" as const,
+      label: labels.a,
+      description: config.optionALabel
+    },
+    {
+      key: "tie" as const,
+      label: labels.tie,
+      description: neutralDescriptions[slug]
+    },
+    {
+      key: "b" as const,
+      label: labels.b,
+      description: config.optionBLabel
+    }
+  ];
 }
 
 export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorSlug }) {
@@ -154,10 +213,10 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
   }, [comparisonEnabled, comparisonState, config, slug]);
 
   const currentFactor = config.factors[currentStep];
-  const answeredCount = config.factors.filter((factor) => state[`${factor.id}A`] && state[`${factor.id}B`] && state[`${factor.id}Weight`]).length;
-  const currentBalance = currentFactor ? scoresToGuidedBalance(state[`${currentFactor.id}A`], state[`${currentFactor.id}B`]) : "";
-  const currentWeight = currentFactor ? state[`${currentFactor.id}Weight`] : "";
-  const canMoveNext = Boolean(currentBalance && currentWeight);
+  const answeredCount = config.factors.filter((factor) => state[`${factor.id}A`] && state[`${factor.id}B`]).length;
+  const currentAnswer = currentFactor ? scoresToAnswer(state[`${currentFactor.id}A`], state[`${currentFactor.id}B`]) : "";
+  const labels = getShortLabels(slug);
+  const guidedChoices = getGuidedChoiceCopy(slug);
 
   const recommendedPractical = result?.recommendation === "A" ? result.optionAPractical : result?.recommendation === "B" ? result.optionBPractical : Math.max(result?.optionAPractical ?? 0, result?.optionBPractical ?? 0);
   const recommendedEmotional = result?.recommendation === "A" ? result.optionAEmotional : result?.recommendation === "B" ? result.optionBEmotional : Math.max(result?.optionAEmotional ?? 0, result?.optionBEmotional ?? 0);
@@ -177,69 +236,66 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
             <div className="space-y-3">
               <p className="section-label">Guided decision flow</p>
               <h3 className="text-2xl font-semibold">One question at a time</h3>
-              <p className="text-sm leading-7 text-muted">This is the main way to use every life-decision calculator. Answer the current question, go next, and the recommendation updates as you work through the decision.</p>
+              <p className="text-sm leading-7 text-muted">Each step gives you three specific answers for this calculator. Pick the one that fits best and the next question opens automatically.</p>
             </div>
 
             <div className="mt-6 rounded-3xl border border-border bg-slate-50/80 p-5 dark:bg-slate-950/30">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Step {currentStep + 1} of {config.factors.length}</p>
-                  <h4 className="mt-2 text-xl font-semibold text-slate-950 dark:text-white">{currentFactor.label}</h4>
-                  <p className="mt-2 text-sm leading-7 text-muted">{currentFactor.description}</p>
-                </div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Step {currentStep + 1} of {config.factors.length}</p>
                 <span className="rounded-full border border-border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
                   {currentFactor.dimension}
                 </span>
               </div>
 
-              <div className="mt-5 grid gap-4 md:grid-cols-2">
-                <SelectField
-                  label={getStepQuestion(config.optionALabel, config.optionBLabel, currentFactor.label)}
-                  hint={getStepHint(config.optionALabel, config.optionBLabel)}
-                  value={currentBalance}
-                  onChange={(event) => {
-                    const scores = guidedBalanceToScores(event.target.value);
-                    setState((current) => ({
-                      ...current,
-                      [`${currentFactor.id}A`]: scores.a,
-                      [`${currentFactor.id}B`]: scores.b
-                    }));
-                  }}
-                >
-                  <option value="">Choose one</option>
-                  <option value="strongA">{config.optionALabel} clearly wins</option>
-                  <option value="leanA">{config.optionALabel} slightly wins</option>
-                  <option value="even">Both feel similar</option>
-                  <option value="leanB">{config.optionBLabel} slightly wins</option>
-                  <option value="strongB">{config.optionBLabel} clearly wins</option>
-                </SelectField>
-
-                <SelectField
-                  label="How much should this factor count?"
-                  value={currentWeight}
-                  onChange={(event) => setState((current) => ({ ...current, [`${currentFactor.id}Weight`]: event.target.value }))}
-                >
-                  <option value="">Choose one</option>
-                  {guidedWeightOptions.map((option) => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </SelectField>
+              <div className="mt-5 space-y-3">
+                <p className="text-sm font-semibold uppercase tracking-[0.14em] text-accent">Current question</p>
+                <h4 className="text-3xl font-semibold text-slate-950 dark:text-white">{currentFactor.label}</h4>
+                <p className="text-base leading-7 text-muted">{currentFactor.description}</p>
+                <p className="max-w-3xl text-xl font-semibold leading-8 text-slate-950 dark:text-white">{getQuestionText(slug, currentFactor.label)}</p>
+                <p className="text-sm leading-7 text-muted">Choose the answer that fits best for this factor.</p>
               </div>
 
-              <div className="mt-5 flex flex-wrap gap-3">
+              <div className="mt-6 grid gap-3 md:grid-cols-3">
+                {guidedChoices.map((option) => (
+                  <button
+                    key={option.key}
+                    type="button"
+                    onClick={() => {
+                      const scores = answerToScores(option.key);
+                      setState((current) => ({
+                        ...current,
+                        [`${currentFactor.id}A`]: scores.a,
+                        [`${currentFactor.id}B`]: scores.b,
+                        [`${currentFactor.id}Weight`]: defaultWeightForDimension(currentFactor.dimension)
+                      }));
+
+                      if (currentStep < config.factors.length - 1) {
+                        setCurrentStep((step) => step + 1);
+                      }
+                    }}
+                    className={cn(
+                      "flex min-h-40 flex-col justify-between rounded-3xl border px-5 py-5 text-left transition",
+                      currentAnswer === option.key
+                        ? "border-accent bg-accent-soft text-accent shadow-sm"
+                        : "border-border bg-white hover:border-accent hover:bg-slate-50 dark:bg-slate-950/40"
+                    )}
+                  >
+                    <div className="space-y-3">
+                      <p className="text-2xl font-semibold leading-8">{option.label}</p>
+                      <p className="text-sm leading-6 text-muted">{option.description}</p>
+                    </div>
+                    <p className="pt-4 text-xs font-semibold uppercase tracking-[0.16em] text-muted">Select to continue</p>
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-3">
                 <Button type="button" variant="secondary" onClick={() => setCurrentStep((step) => Math.max(0, step - 1))} disabled={currentStep === 0}>
                   Previous
                 </Button>
-                <Button
-                  type="button"
-                  onClick={() => setCurrentStep((step) => Math.min(config.factors.length - 1, step + 1))}
-                  disabled={!canMoveNext || currentStep === config.factors.length - 1}
-                >
-                  Next question
-                </Button>
                 {currentStep === config.factors.length - 1 ? (
                   <Button type="button" variant="secondary" onClick={() => setCurrentStep(0)}>
-                    Start over at step 1
+                    Back to step 1
                   </Button>
                 ) : null}
               </div>
@@ -263,11 +319,11 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
           <div className="surface p-6 md:p-8">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="section-label">Advanced mode</p>
-                <p className="text-sm leading-7 text-muted">Open this only if you want direct control over the raw scores behind the guided questions.</p>
+                <p className="section-label">Advanced factors</p>
+                <p className="text-sm leading-7 text-muted">Closed by default. Open this only if you want direct control over raw scores and importance.</p>
               </div>
               <Button type="button" variant="secondary" onClick={() => setShowAdvanced((current) => !current)}>
-                {showAdvanced ? "Hide advanced scoring" : "Open advanced scoring"}
+                {showAdvanced ? "Hide factors" : "Show factors"}
               </Button>
             </div>
             {showAdvanced ? (
@@ -347,7 +403,7 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
                 <div className="grid gap-4 md:grid-cols-2">
                   <ResultCard label={config.optionALabel} value={formatNumber(result.optionAScore, 2)} tone={result.recommendation === "A" ? "success" : "default"} caption={`${optionASupport?.label}: ${optionASupport?.description}`} />
                   <ResultCard label={config.optionBLabel} value={formatNumber(result.optionBScore, 2)} tone={result.recommendation === "B" ? "success" : "default"} caption={`${optionBSupport?.label}: ${optionBSupport?.description}`} />
-                  <ResultCard label="Decision direction" value={result.recommendation === "tie" ? "Close call" : result.recommendedLabel} tone={result.recommendation === "tie" ? "warning" : result.verdictTone === "caution" ? "warning" : "success"} caption={result.recommendation === "tie" ? "The weighted case is close enough that the result should be treated as unresolved." : "This is the path with the stronger weighted support overall."} />
+                  <ResultCard label="Decision direction" value={result.verdictLabel} tone={result.recommendation === "tie" ? "warning" : result.verdictTone === "caution" ? "warning" : "success"} caption={result.recommendation === "tie" ? "The weighted case is close enough that the result should be treated as unresolved." : "This is the path with the stronger weighted support overall."} />
                   <ResultCard label="Risk resilience" value={recommendedRisk !== undefined ? formatNumber(recommendedRisk, 2) : "-"} tone={(recommendedRisk ?? 0) >= 6 ? "success" : "warning"} caption={`${riskSupport.label}: Higher scores mean the recommended path looks safer and more sustainable.`} />
                 </div>
               </div>
@@ -386,7 +442,7 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
                     <p className="mt-2 text-sm leading-7">Scenario B changes the weighted gap by {formatNumber(Math.abs(comparisonResult.gap) - Math.abs(result.gap), 2)} and {comparisonResult.recommendation === result.recommendation ? "keeps the recommendation pointed the same way" : "changes the recommendation itself"}.</p>
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
-                    <ResultCard label="Scenario B recommendation" value={comparisonResult.recommendation === "tie" ? "Close call" : comparisonResult.recommendedLabel} tone={comparisonResult.recommendation === result.recommendation ? "default" : "success"} caption="This is the direction the alternate scenario points once the weights are recomputed." />
+                    <ResultCard label="Scenario B recommendation" value={comparisonResult.verdictLabel} tone={comparisonResult.recommendation === result.recommendation ? "default" : "success"} caption="This is the direction the alternate scenario points once the weights are recomputed." />
                     <ResultCard label="Scenario B confidence" value={comparisonResult.confidenceLabel} caption="Higher confidence means the gap between the two options is wider." />
                     <ResultCard label="Scenario B option A" value={formatNumber(comparisonResult.optionAScore, 2)} caption={getSupportBand(comparisonResult.optionAScore).label} />
                     <ResultCard label="Scenario B option B" value={formatNumber(comparisonResult.optionBScore, 2)} caption={getSupportBand(comparisonResult.optionBScore).label} />

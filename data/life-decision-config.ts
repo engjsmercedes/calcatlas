@@ -1,4 +1,4 @@
-﻿import type { CalculatorCategory, CalculatorDefinition, CalculatorSlug } from "@/data/calculators";
+import type { CalculatorCategory, CalculatorDefinition, CalculatorSlug } from "@/data/calculators";
 
 export const lifeDecisionCalculatorSlugs = [
   "quit-job-calculator",
@@ -105,6 +105,9 @@ const configs = {
     category: "Everyday",
     optionALabel: "Make the move",
     optionBLabel: "Stay put",
+    shortOptionALabel: "Move",
+    shortOptionBLabel: "Stay",
+    tieLabel: "Not sure",
     optionAHint: "Rate how well moving serves each factor.",
     optionBHint: "Rate how well staying serves each factor.",
     prompt: "Compare relocation upside against disruption, support loss, and practical risk.",
@@ -134,6 +137,9 @@ const configs = {
     category: "Everyday",
     optionALabel: "Get married soon",
     optionBLabel: "Wait longer",
+    shortOptionALabel: "Marry now",
+    shortOptionBLabel: "Wait",
+    tieLabel: "Not sure",
     optionAHint: "Rate how well marrying now fits each factor.",
     optionBHint: "Rate how well waiting fits each factor.",
     prompt: "Turn relationship readiness into a clearer conversation about alignment, trust, and timing.",
@@ -163,6 +169,9 @@ const configs = {
     category: "Everyday",
     optionALabel: "Have kids soon",
     optionBLabel: "Wait longer",
+    shortOptionALabel: "Have kids soon",
+    shortOptionBLabel: "Wait",
+    tieLabel: "Not sure",
     optionAHint: "Rate how well having kids soon fits each factor.",
     optionBHint: "Rate how well waiting fits each factor.",
     prompt: "Score readiness across desire, support, money, and relationship stability.",
@@ -192,6 +201,9 @@ const configs = {
     category: "Finance",
     optionALabel: "Buy a house",
     optionBLabel: "Keep waiting",
+    shortOptionALabel: "Buy now",
+    shortOptionBLabel: "Wait",
+    tieLabel: "Not sure",
     optionAHint: "Rate how well buying now fits each factor.",
     optionBHint: "Rate how well waiting fits each factor.",
     prompt: "Go beyond mortgage math and score whether ownership actually fits your life.",
@@ -221,6 +233,9 @@ const configs = {
     category: "Business",
     optionALabel: "Start the business",
     optionBLabel: "Validate more first",
+    shortOptionALabel: "Start now",
+    shortOptionBLabel: "Validate first",
+    tieLabel: "Not sure",
     optionAHint: "Rate how well launching now fits each factor.",
     optionBHint: "Rate how well validating more fits each factor.",
     prompt: "Compare entrepreneurial upside against runway, proof of demand, and execution risk.",
@@ -250,6 +265,9 @@ const configs = {
     category: "Income",
     optionALabel: "Go back to school",
     optionBLabel: "Hold off for now",
+    shortOptionALabel: "Go now",
+    shortOptionBLabel: "Wait",
+    tieLabel: "Not sure",
     optionAHint: "Rate how well school now fits each factor.",
     optionBHint: "Rate how well waiting fits each factor.",
     prompt: "Compare the career return, debt load, and life disruption behind another credential.",
@@ -279,6 +297,9 @@ const configs = {
     category: "Income",
     optionALabel: "Take the offer",
     optionBLabel: "Stay in current role",
+    shortOptionALabel: "Take it",
+    shortOptionBLabel: "Stay",
+    tieLabel: "Not sure",
     optionAHint: "Rate how well taking the offer fits each factor.",
     optionBHint: "Rate how well staying fits each factor.",
     prompt: "Compare compensation, growth, stress, and hidden tradeoffs so an offer is judged on the whole package.",
@@ -308,6 +329,9 @@ const configs = {
     category: "Everyday",
     optionALabel: "End the relationship",
     optionBLabel: "Keep working on it",
+    shortOptionALabel: "Break up",
+    shortOptionBLabel: "Work on it",
+    tieLabel: "Not sure",
     optionAHint: "Rate how well ending the relationship fits each factor.",
     optionBHint: "Rate how well staying and working fits each factor.",
     prompt: "Turn a messy relationship question into a clearer review of trust, safety, future fit, and repair effort.",
@@ -337,6 +361,9 @@ const configs = {
     category: "Finance",
     optionALabel: "Retire early",
     optionBLabel: "Keep working longer",
+    shortOptionALabel: "Retire now",
+    shortOptionBLabel: "Keep working",
+    tieLabel: "Not sure",
     optionAHint: "Rate how well retiring early fits each factor.",
     optionBHint: "Rate how well working longer fits each factor.",
     prompt: "Score the financial and identity tradeoffs behind early retirement instead of focusing on one savings number.",
@@ -410,6 +437,8 @@ export const lifeDecisionCalculators: CalculatorDefinition[] = lifeDecisionCalcu
     related: config.related
   };
 });
+
+
 
 
 
