@@ -126,31 +126,8 @@ function getShortLabels(slug: LifeDecisionCalculatorSlug) {
   };
 }
 
-function getQuestionText(slug: LifeDecisionCalculatorSlug, factorLabel: string) {
-  switch (slug) {
-    case "quit-job-calculator":
-      return `For ${factorLabel.toLowerCase()}, which answer is closer to your real situation right now?`;
-    case "move-calculator":
-      return `For ${factorLabel.toLowerCase()}, what does this decision point to right now?`;
-    case "get-married-calculator":
-      return `For ${factorLabel.toLowerCase()}, what does this relationship decision point to right now?`;
-    case "have-kids-calculator":
-      return `For ${factorLabel.toLowerCase()}, what does your timing decision point to right now?`;
-    case "buy-a-house-readiness-calculator":
-      return `For ${factorLabel.toLowerCase()}, what does your readiness point to right now?`;
-    case "start-a-business-calculator":
-      return `For ${factorLabel.toLowerCase()}, what does this business decision point to right now?`;
-    case "go-back-to-school-calculator":
-      return `For ${factorLabel.toLowerCase()}, what does the school decision point to right now?`;
-    case "job-offer-calculator":
-      return `For ${factorLabel.toLowerCase()}, what does this job choice point to right now?`;
-    case "break-up-calculator":
-      return `For ${factorLabel.toLowerCase()}, what does this relationship point to right now?`;
-    case "retire-early-calculator":
-      return `For ${factorLabel.toLowerCase()}, what does your retirement decision point to right now?`;
-    default:
-      return `For ${factorLabel.toLowerCase()}, which answer fits best right now?`;
-  }
+function getQuestionText(factorLabel: string) {
+  return `Based on ${factorLabel.toLowerCase()}, which answer fits best right now?`;
 }
 
 function getGuidedChoiceCopy(slug: LifeDecisionCalculatorSlug) {
@@ -251,8 +228,8 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
                 <p className="text-sm font-semibold uppercase tracking-[0.14em] text-accent">Current question</p>
                 <h4 className="text-3xl font-semibold text-slate-950 dark:text-white">{currentFactor.label}</h4>
                 <p className="text-base leading-7 text-muted">{currentFactor.description}</p>
-                <p className="max-w-3xl text-xl font-semibold leading-8 text-slate-950 dark:text-white">{getQuestionText(slug, currentFactor.label)}</p>
-                <p className="text-sm leading-7 text-muted">Choose the answer that fits best for this factor.</p>
+                <p className="max-w-3xl text-xl font-semibold leading-8 text-slate-950 dark:text-white">{getQuestionText(currentFactor.label)}</p>
+                <p className="text-sm leading-7 text-muted">Pick the answer that fits this factor best.</p>
               </div>
 
               <div className="mt-6 grid gap-3 md:grid-cols-3">
@@ -463,3 +440,4 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
     </div>
   );
 }
+
