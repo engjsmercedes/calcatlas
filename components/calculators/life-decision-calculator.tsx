@@ -126,8 +126,8 @@ function getShortLabels(slug: LifeDecisionCalculatorSlug) {
   };
 }
 
-function getQuestionText(factorLabel: string) {
-  return `Based on ${factorLabel.toLowerCase()}, which answer fits best right now?`;
+function getQuestionText() {
+  return "Which answer fits best right now?";
 }
 
 function getGuidedChoiceCopy(slug: LifeDecisionCalculatorSlug) {
@@ -228,7 +228,7 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
                 <p className="text-sm font-semibold uppercase tracking-[0.14em] text-accent">Current question</p>
                 <h4 className="text-3xl font-semibold text-slate-950 dark:text-white">{currentFactor.label}</h4>
                 <p className="text-base leading-7 text-muted">{currentFactor.description}</p>
-                <p className="max-w-3xl text-xl font-semibold leading-8 text-slate-950 dark:text-white">{getQuestionText(currentFactor.label)}</p>
+                <p className="max-w-3xl text-xl font-semibold leading-8 text-slate-950 dark:text-white">{getQuestionText()}</p>
                 <p className="text-sm leading-7 text-muted">Pick the answer that fits this factor best.</p>
               </div>
 
@@ -440,4 +440,8 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
     </div>
   );
 }
+
+
+
+
 
