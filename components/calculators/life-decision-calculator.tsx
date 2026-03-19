@@ -8,6 +8,7 @@ import { ResultCard } from "@/components/ui/result-card";
 import { SelectField } from "@/components/ui/select-field";
 import { decisionCalculatorConfigs } from "@/data/life-decision-config";
 import type { LifeDecisionCalculatorSlug } from "@/data/life-decision-config";
+import { decisionGuidedChoices } from "@/data/life-decision-guided-choices";
 import { calculateDecisionOutcome } from "@/lib/calculators/life-decisions";
 import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculator-state";
 import { cn, formatNumber } from "@/lib/utils";
@@ -117,51 +118,32 @@ function scoresToAnswer(a: string, b: string) {
   return "tie";
 }
 
-function getShortLabels(slug: LifeDecisionCalculatorSlug) {
-  const config = decisionCalculatorConfigs[slug];
-  return {
-    a: config.shortOptionALabel ?? config.optionALabel,
-    b: config.shortOptionBLabel ?? config.optionBLabel,
-    tie: config.tieLabel ?? "Not sure"
-  };
-}
-
 function getQuestionText() {
-  return "Which answer fits best right now?";
+  return "Which statement fits best right now?";
 }
 
-function getGuidedChoiceCopy(slug: LifeDecisionCalculatorSlug) {
+function getGuidedChoiceCopy(slug: LifeDecisionCalculatorSlug, factorId: string) {
+  const factorChoices = decisionGuidedChoices[slug]?.[factorId];
+  if (factorChoices?.length) {
+    return factorChoices;
+  }
+
   const config = decisionCalculatorConfigs[slug];
-  const labels = getShortLabels(slug);
-
-  const neutralDescriptions: Record<LifeDecisionCalculatorSlug, string> = {
-    "quit-job-calculator": "This factor is mixed or you need more clarity before deciding.",
-    "move-calculator": "This factor is too close to call or needs more clarity.",
-    "get-married-calculator": "This factor feels promising but not clear enough yet.",
-    "have-kids-calculator": "This factor is mixed enough that the timing still feels open.",
-    "buy-a-house-readiness-calculator": "This factor does not clearly support buying or waiting yet.",
-    "start-a-business-calculator": "This factor is mixed enough that more clarity may still be needed.",
-    "go-back-to-school-calculator": "This factor is still mixed or unresolved.",
-    "job-offer-calculator": "This factor does not clearly favor either path yet.",
-    "break-up-calculator": "This factor still feels unresolved or hard to call.",
-    "retire-early-calculator": "This factor is still mixed enough that the call is not clear yet."
-  };
-
   return [
     {
-      key: "a" as const,
-      label: labels.a,
-      description: config.optionALabel
-    },
-    {
-      key: "tie" as const,
-      label: labels.tie,
-      description: neutralDescriptions[slug]
-    },
-    {
-      key: "b" as const,
-      label: labels.b,
+      answer: "b" as const,
+      label: config.shortOptionBLabel ?? config.optionBLabel,
       description: config.optionBLabel
+    },
+    {
+      answer: "tie" as const,
+      label: config.tieLabel ?? "Not sure",
+      description: "This factor is mixed or still unclear."
+    },
+    {
+      answer: "a" as const,
+      label: config.shortOptionALabel ?? config.optionALabel,
+      description: config.optionALabel
     }
   ];
 }
@@ -192,8 +174,7 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
   const currentFactor = config.factors[currentStep];
   const answeredCount = config.factors.filter((factor) => state[`${factor.id}A`] && state[`${factor.id}B`]).length;
   const currentAnswer = currentFactor ? scoresToAnswer(state[`${currentFactor.id}A`], state[`${currentFactor.id}B`]) : "";
-  const labels = getShortLabels(slug);
-  const guidedChoices = getGuidedChoiceCopy(slug);
+  const guidedChoices = getGuidedChoiceCopy(slug, currentFactor.id);
 
   const recommendedPractical = result?.recommendation === "A" ? result.optionAPractical : result?.recommendation === "B" ? result.optionBPractical : Math.max(result?.optionAPractical ?? 0, result?.optionBPractical ?? 0);
   const recommendedEmotional = result?.recommendation === "A" ? result.optionAEmotional : result?.recommendation === "B" ? result.optionBEmotional : Math.max(result?.optionAEmotional ?? 0, result?.optionBEmotional ?? 0);
@@ -213,7 +194,7 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
             <div className="space-y-3">
               <p className="section-label">Guided decision flow</p>
               <h3 className="text-2xl font-semibold">One question at a time</h3>
-              <p className="text-sm leading-7 text-muted">Each step gives you three specific answers for this calculator. Pick the one that fits best and the next question opens automatically.</p>
+              <p className="text-sm leading-7 text-muted">Each step gives you three factor-specific statements. Pick the one that fits best and the next question opens automatically.</p>
             </div>
 
             <div className="mt-6 rounded-3xl border border-border bg-slate-50/80 p-5 dark:bg-slate-950/30">
@@ -229,16 +210,16 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
                 <h4 className="text-3xl font-semibold text-slate-950 dark:text-white">{currentFactor.label}</h4>
                 <p className="text-base leading-7 text-muted">{currentFactor.description}</p>
                 <p className="max-w-3xl text-xl font-semibold leading-8 text-slate-950 dark:text-white">{getQuestionText()}</p>
-                <p className="text-sm leading-7 text-muted">Pick the answer that fits this factor best.</p>
+                <p className="text-sm leading-7 text-muted">Choose the statement that matches this factor best.</p>
               </div>
 
               <div className="mt-6 grid gap-3 md:grid-cols-3">
                 {guidedChoices.map((option) => (
                   <button
-                    key={option.key}
+                    key={`${currentFactor.id}-${option.answer}-${option.label}`}
                     type="button"
                     onClick={() => {
-                      const scores = answerToScores(option.key);
+                      const scores = answerToScores(option.answer);
                       setState((current) => ({
                         ...current,
                         [`${currentFactor.id}A`]: scores.a,
@@ -252,14 +233,14 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
                     }}
                     className={cn(
                       "flex min-h-40 flex-col justify-between rounded-3xl border px-5 py-5 text-left transition",
-                      currentAnswer === option.key
+                      currentAnswer === option.answer
                         ? "border-accent bg-accent-soft text-accent shadow-sm"
                         : "border-border bg-white hover:border-accent hover:bg-slate-50 dark:bg-slate-950/40"
                     )}
                   >
                     <div className="space-y-3">
                       <p className="text-2xl font-semibold leading-8">{option.label}</p>
-                      <p className="text-sm leading-6 text-muted">{option.description}</p>
+                      {option.description ? <p className="text-sm leading-6 text-muted">{option.description}</p> : null}
                     </div>
                     <p className="pt-4 text-xs font-semibold uppercase tracking-[0.16em] text-muted">Select to continue</p>
                   </button>
@@ -440,8 +421,3 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
     </div>
   );
 }
-
-
-
-
-
