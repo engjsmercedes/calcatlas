@@ -31,6 +31,17 @@ export const metadata: Metadata = {
   title: {
     default: `${siteConfig.name} | Fast, Modern Online Calculators`,
     template: `%s | ${siteConfig.name}`
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1
+    }
   }
 };
 
