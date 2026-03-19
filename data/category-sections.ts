@@ -76,6 +76,18 @@ export const categorySections: Record<CalculatorCategory, CategorySectionDefinit
       description: "Fast everyday converters for length, weight, speed, temperature, and mixed unit checks.",
       slugs: ["unit-converter", "length-converter", "weight-converter", "speed-converter", "temperature-converter"]
     }
+  ],
+  Chance: [
+    {
+      title: "Quick randomizers",
+      description: "Fast animated tools for binary calls, list picks, dice, and number draws.",
+      slugs: ["flip-a-coin", "yes-no-picker", "random-number-generator"]
+    },
+    {
+      title: "Games and group picks",
+      description: "Chance tools for tabletop sessions, turn order, party decisions, and low-stakes tie-breakers.",
+      slugs: ["dice-roller", "random-choice-picker"]
+    }
   ]
 };
 

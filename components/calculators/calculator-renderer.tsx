@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect } from "react";
 
@@ -60,6 +60,7 @@ import { TemperatureConverter } from "./temperature-converter";
 import { TipCalculator } from "./tip-calculator";
 import { WaterIntakeCalculator } from './water-intake-calculator';
 import { LifeDecisionCalculator } from './life-decision-calculator';
+import { ChanceCalculator } from './chance-calculator';
 
 export function CalculatorRenderer({ slug, embedded = false }: { slug: CalculatorSlug; embedded?: boolean }) {
   useRecentCalculators(embedded ? undefined : slug);
@@ -204,6 +205,7 @@ export function CalculatorRenderer({ slug, embedded = false }: { slug: Calculato
       return null;
   }
 }
+
 
 
 

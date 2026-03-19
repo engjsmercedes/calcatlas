@@ -10,6 +10,7 @@ import { decisionCalculatorConfigs } from "@/data/life-decision-config";
 import type { LifeDecisionCalculatorSlug } from "@/data/life-decision-config";
 import { decisionGuidedChoices } from "@/data/life-decision-guided-choices";
 import { calculateDecisionOutcome } from "@/lib/calculators/life-decisions";
+import type { DecisionOutcome } from "@/lib/calculators/life-decisions";
 import { useShareableCalculatorState } from "@/lib/hooks/use-shareable-calculator-state";
 import { cn, formatNumber } from "@/lib/utils";
 
@@ -148,6 +149,30 @@ function getGuidedChoiceCopy(slug: LifeDecisionCalculatorSlug, factorId: string)
   ];
 }
 
+function getDecisionSurvivalSteps(config: (typeof decisionCalculatorConfigs)[LifeDecisionCalculatorSlug], result?: DecisionOutcome) {
+  if (!result) {
+    return [];
+  }
+
+  if (result.recommendation === "tie") {
+    return [
+      "Treat this as unresolved for now. If you can, buy time instead of forcing a decision from a mixed result.",
+      `Pressure-test the uncertainty around ${result.strongestFactors[0]?.toLowerCase() ?? "the biggest factor"} before you commit.`,
+      "Set a review date and decide what new evidence would be enough to move you clearly in one direction."
+    ];
+  }
+
+  const recommendedPath = result.recommendation === "A" ? config.optionALabel : config.optionBLabel;
+  const fallbackPath = result.recommendation === "A" ? config.optionBLabel : config.optionALabel;
+  const mainRisk = result.cautionFactors[0]?.toLowerCase() ?? "the main downside";
+
+  return [
+    `Protect the downside of ${recommendedPath.toLowerCase()} first, especially around ${mainRisk}.`,
+    `Keep a fallback plan for ${fallbackPath.toLowerCase()} until ${recommendedPath.toLowerCase()} feels stable in real life, not just on paper.`,
+    "Set a check-in date so you can revisit the decision early if the weak spots get worse instead of waiting too long."
+  ];
+}
+
 export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorSlug }) {
   const config = decisionCalculatorConfigs[slug];
   const initialState = useMemo(() => buildInitialState(slug), [slug]);
@@ -185,6 +210,7 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
   const practicalSupport = getSupportBand(recommendedPractical ?? 0);
   const emotionalSupport = getSupportBand(recommendedEmotional ?? 0);
   const riskSupport = getRiskBand(recommendedRisk ?? 0);
+  const decisionSurvivalSteps = getDecisionSurvivalSteps(config, result);
 
   return (
     <div className="space-y-8">
@@ -391,6 +417,14 @@ export function LifeDecisionCalculator({ slug }: { slug: LifeDecisionCalculatorS
               <div className="surface p-6 md:p-8">
                 <p className="section-label">Before you act</p>
                 <p className="mt-4 text-sm leading-7 text-muted">{config.caution}</p>
+              </div>
+              <div className="surface p-6 md:p-8">
+                <p className="section-label">How to survive the decision</p>
+                <div className="mt-4 space-y-3 text-sm leading-7 text-muted">
+                  {decisionSurvivalSteps.map((step) => (
+                    <p key={step}>{step}</p>
+                  ))}
+                </div>
               </div>
               {comparisonEnabled && comparisonResult ? (
                 <div className="surface space-y-4 p-6 md:p-8">

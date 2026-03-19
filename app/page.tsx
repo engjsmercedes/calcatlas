@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AdSlotPlaceholder } from "@/components/ad-slot-placeholder";
@@ -11,7 +11,7 @@ import { subtopicHubs } from "@/data/subtopic-hubs";
 import { createMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
 
-const allCategories = ["Finance", "Health", "Everyday", "Business", "Income"] as const;
+const allCategories = ["Finance", "Health", "Everyday", "Business", "Income", "Chance"] as const;
 
 const groupedCalculators = allCategories.map((category) => ({
   category,
@@ -28,7 +28,7 @@ export const metadata: Metadata = createMetadata({
   title: `${siteConfig.name} | Online Calculator Library`,
   description: siteConfig.description,
   path: "/",
-  keywords: ["calculator website", "online calculators", "finance calculators", "life decision calculators"]
+  keywords: ["calculator website", "online calculators", "finance calculators", "life decision calculators", "chance calculators"]
 });
 
 export default function HomePage() {
@@ -188,3 +188,4 @@ export default function HomePage() {
     </>
   );
 }
+

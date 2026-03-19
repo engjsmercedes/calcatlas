@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AdSlotPlaceholder } from "@/components/ad-slot-placeholder";
@@ -8,7 +8,7 @@ import { calculatorCategoryDetails, calculators } from "@/data/calculators";
 import { subtopicHubs } from "@/data/subtopic-hubs";
 import { createCalculatorIndexSchemas, createMetadata } from "@/lib/seo";
 
-const allCategories = ["Finance", "Health", "Everyday", "Business", "Income"] as const;
+const allCategories = ["Finance", "Health", "Everyday", "Business", "Income", "Chance"] as const;
 
 const groupedCalculators = allCategories.map((category) => ({
   category,
@@ -24,9 +24,9 @@ const lifeDecisionCalculators = lifeDecisionHub
 export const metadata: Metadata = createMetadata({
   title: "All Calculators",
   description:
-    "Browse every calculator on Calc Atlas across finance, health, everyday, business, income, and major life-decision categories.",
+    "Browse every calculator on Calc Atlas across finance, health, everyday, business, income, chance, and major life-decision categories.",
   path: "/calculators",
-  keywords: ["all calculators", "calculator index", "finance calculators", "life decision calculators"]
+  keywords: ["all calculators", "calculator index", "finance calculators", "life decision calculators", "chance calculators"]
 });
 
 export default function CalculatorsPage() {
@@ -140,3 +140,4 @@ export default function CalculatorsPage() {
     </>
   );
 }
+
