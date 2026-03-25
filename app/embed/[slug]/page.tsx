@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { CalculatorErrorBoundary } from "@/components/calculator-error-boundary";
 import { CalculatorRenderer } from "@/components/calculators/calculator-renderer";
 import { EmbedOptionsProvider } from "@/components/embed-options";
 import { calculators, getCalculator } from "@/data/calculators";
@@ -47,7 +48,7 @@ export default function EmbedCalculatorPage({
     results?: string;
     insights?: string;
     charts?: string;
-    tables?: string;
+    tables?; string;
   };
 }) {
   const calculator = getCalculator(params.slug);
@@ -95,7 +96,9 @@ export default function EmbedCalculatorPage({
             </div>
           ) : null}
           <Suspense fallback={<div className="surface p-6 text-sm text-muted md:p-8">Loading calculator...</div>}>
-            <CalculatorRenderer slug={calculator.slug} embedded />
+            <CalculatorErrorBoundary calculatorTitle={calculator.title}>
+              <CalculatorRenderer slug={calculator.slug} embedded />
+            </CalculatorErrorBoundary>
           </Suspense>
           {showPoweredBy ? (
             <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-border pt-4 text-xs leading-6 text-muted">
