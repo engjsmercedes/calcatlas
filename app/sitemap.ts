@@ -5,8 +5,13 @@ import { subtopicHubs } from "@/data/subtopic-hubs";
 import { trustPageLinks } from "@/data/static-pages";
 import { siteConfig } from "@/lib/site";
 
+// Update this date when you make meaningful content changes.
+// Using a static date prevents every page from appearing modified on every build,
+// which avoids unnecessary re-crawling by search engines.
+const LAST_MODIFIED = new Date("2025-03-24");
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date();
+  const lastModified = LAST_MODIFIED;
 
   return [
     {
