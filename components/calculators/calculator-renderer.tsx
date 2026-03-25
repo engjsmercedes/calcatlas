@@ -61,6 +61,7 @@ import { TipCalculator } from "./tip-calculator";
 import { WaterIntakeCalculator } from './water-intake-calculator';
 import { LifeDecisionCalculator } from './life-decision-calculator';
 import { ChanceCalculator } from './chance-calculator';
+import { FourOhOneKCalculator } from "./four-oh-one-k-calculator";
 
 export function CalculatorRenderer({ slug, embedded = false }: { slug: CalculatorSlug; embedded?: boolean }) {
   useRecentCalculators(embedded ? undefined : slug);
@@ -118,6 +119,8 @@ export function CalculatorRenderer({ slug, embedded = false }: { slug: Calculato
       return <CompoundInterestCalculator />;
     case "retirement-calculator":
       return <RetirementCalculator />;
+    case "four-oh-one-k-calculator":
+      return <FourOhOneKCalculator />;
     case "inflation-calculator":
       return <InflationCalculator />;
     case "tax-calculator":
