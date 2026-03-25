@@ -71,6 +71,7 @@ export type CalculatorSlug =
   | "job-offer-calculator"
   | "break-up-calculator"
   | "retire-early-calculator"
+  | "four-oh-one-k-calculator"
   | "flip-a-coin"
   | "dice-roller"
   | "random-number-generator"
