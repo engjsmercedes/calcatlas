@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import { AdSlotPlaceholder } from "@/components/ad-slot-placeholder";
 import { CalculatorEmbedCard } from "@/components/calculator-embed-card";
+import { CalculatorErrorBoundary } from "@/components/calculator-error-boundary";
 import { CalculatorRenderer } from "@/components/calculators/calculator-renderer";
 import { CalculatorFeedback } from "@/components/calculator-feedback";
 import { RelatedCalculators } from "@/components/related-calculators";
@@ -69,7 +70,9 @@ export default function CalculatorPage({ params }: { params: { slug: string } })
             </div>
             <Suspense fallback={null}><WorkflowChainPanel /></Suspense>
             <Suspense fallback={<div className="surface p-6 text-sm text-muted md:p-8">Loading calculator...</div>}>
-              <CalculatorRenderer slug={calculator.slug} />
+              <CalculatorErrorBoundary calculatorTitle={calculator.title}>
+                <CalculatorRenderer slug={calculator.slug} />
+              </CalculatorErrorBoundary>
             </Suspense>
           </section>
           <CalculatorEmbedCard calculator={calculator} />
