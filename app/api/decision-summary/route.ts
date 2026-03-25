@@ -6,8 +6,8 @@ interface SummaryPayload {
 }
 
 export async function POST(request: Request) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.AI_SUMMARY_MODEL || "gpt-4o-mini";
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const model = process.env.AI_SUMMARY_MODEL || "claude-haiku-4-5";
 
   if (!apiKey) {
     return NextResponse.json({ message: "AI summaries are not configured.", summary: null, status: "unavailable" }, { status: 200 });
@@ -28,22 +28,18 @@ export async function POST(request: Request) {
   }
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
         model,
-        temperature: 0.2,
         max_tokens: 120,
+        system: "You write concise, practical calculator decision summaries. Keep the answer to 2 sentences max. Be specific about tradeoffs. Do not mention being an AI.",
         messages: [
-          {
-            role: "system",
-            content:
-              "You write concise, practical calculator decision summaries. Keep the answer to 2 sentences max. Be specific about tradeoffs. Do not mention being an AI."
-          },
           {
             role: "user",
             content: `Calculator: ${calculator}\n\nExisting comparison details:\n${prompt}\n\nRewrite this into a sharper recommendation for a non-expert making a decision.`
@@ -58,17 +54,14 @@ export async function POST(request: Request) {
     }
 
     const data = (await response.json()) as {
-      choices?: Array<{
-        message?: {
-          content?: string;
-        };
-      }>;
+      content?: Array<{ type: string; text?: string }>;
     };
 
-    const summary = data.choices?.[0]?.message?.content?.trim() || null;
+    const summary = data.content?.find((b) => b.type === "text")?.text?.trim() || null;
 
     return NextResponse.json({ summary, status: summary ? "ready" : "unavailable" });
   } catch {
     return NextResponse.json({ message: "Unexpected error contacting AI provider.", summary: null, status: "error" }, { status: 500 });
   }
 }
+
