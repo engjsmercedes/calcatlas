@@ -48,7 +48,7 @@ export default function EmbedCalculatorPage({
     results?: string;
     insights?: string;
     charts?: string;
-    tables?; string;
+    tables?: string;
   };
 }) {
   const calculator = getCalculator(params.slug);
