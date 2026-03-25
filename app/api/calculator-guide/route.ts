@@ -8,7 +8,7 @@ interface GuidePayload {
 
 export async function POST(request: Request) {
   const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.AI_SUMMARY_MODEL || "gpt-5-mini";
+  const model = process.env.AI_SUMMARY_MODEL || "gpt-4o-mini";
   const body = (await request.json()) as GuidePayload;
   const message = body.message?.trim() || "";
 
